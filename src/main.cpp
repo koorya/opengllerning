@@ -105,12 +105,19 @@ int main(){
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	ourShader.use();
+
+	GLuint aspect = glGetUniformLocation(ourShader.Program, "ourAspect");
+	glUniform1f(aspect, 600.0/800.0);
+
+	GLuint additional_pos = glGetUniformLocation(ourShader.Program, "addPos");
+	glUniform3f(additional_pos, 0.2f, 0.0f, 0.0f);
+
 	GLuint color_uniform = glGetUniformLocation(ourShader.Program, "ourColor");
 	GLfloat red_color = 0.0f;
 
 	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
 
-	ourShader.use();
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -119,6 +126,9 @@ int main(){
 		
 		red_color = sin(glfwGetTime()) / 2 + 0.5f;
 		glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
+
+		
+		glUniform3f(additional_pos, red_color, 0.0f, 0.0f);
 
 		glBindVertexArray(VAO[1]);
 
@@ -129,6 +139,7 @@ int main(){
 //		glDrawArrays(GL_TRIANGLES, 0, points_count/2);
 
 		glBindVertexArray(0);
+
 
 		glfwSwapBuffers(window);
 	}
