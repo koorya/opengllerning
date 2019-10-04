@@ -1,6 +1,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <SOIL/SOIL.h>
 
 #include <iostream>
 #include <math.h>
@@ -35,32 +36,30 @@ int main(){
 
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
 
+	int twidth, theight;
+	unsigned char * image = SOIL_load_image("./textures/container.jpg", &twidth, &theight, 0, SOIL_LOAD_RGB);
+	if (!image)
+		std::cout<<"LOAD IMAGE FAILED"<<std::endl;
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, twidth, theight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 
 	GLfloat vertices[] = {
-		0.6f, 0.4f, 0.0f,  
-		-0.1f, -0.7f, 0.0f,  
-		-0.6f, 0.1f, 0.0f,  
-		-0.3f, 0.5f, 0.0f,  
-		0.4f, 0.8f, 0.0f,  
-		0.4f, -0.4f, 0.0f
+		//position         		//colors          	//texture coord
+		-0.5f, -0.5f, 0.0f,  		0.6f, 0.4f, 0.5f, 	0.0f, 0.0f,  		//left bot
+		-0.5f,  0.5f, 0.0f,			0.1f, 0.7f, 0.0f, 	0.0f, 1.0f,  		//left top
+		 0.5f,  0.5f, 0.0f,  		0.4f, 0.8f, 0.0f, 	1.0f, 1.0f,  		//right top
+		 0.5f, -0.5f, 0.0f, 		0.4f, 0.4f, 0.0f, 	1.0f, 0.0f			//right bot
 	};
-	int points_count = sizeof(vertices)/sizeof(GLfloat)/3;
-
-	GLfloat colored_vertices[] = {
-		//position         		//colors          
-		0.6f, 0.4f, 0.0f,  		0.6f, 0.4f, 0.5f,  
-		-0.1f, -0.7f, 0.0f,		0.1f, 0.7f, 0.0f,  
-		-0.6f, 0.1f, 0.0f, 		0.6f, 0.1f, 0.0f,  
-		-0.3f, 0.5f, 0.0f, 		0.3f, 0.5f, 0.0f,  
-		0.4f, 0.8f, 0.0f,  		0.4f, 0.8f, 0.0f,  
-		0.4f, -0.4f, 0.0f, 		0.4f, 0.4f, 0.0f
-	};
-	int colored_points_count = sizeof(vertices)/sizeof(GLfloat)/6;
-
 
 	GLuint indices[] = {
 		0, 1, 2,
-		3, 4, 5
+		2, 3, 0
 	};
 
 	GLuint VBO[2], EBO[2], VAO[2];
@@ -70,9 +69,14 @@ int main(){
 	glBindVertexArray(VAO[0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)/2, vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid*)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)0);//pos
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat))); //colors
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(6*sizeof(GLfloat))); //texture coodr
+	glEnableVertexAttribArray(2);
+
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
@@ -80,35 +84,14 @@ int main(){
 
 	glBindVertexArray(0);
 
-	glBindVertexArray(VAO[1]);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colored_vertices), colored_vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid*)0);//position
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid*)( 3*sizeof(GLfloat) ) );//color
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER,0);
-
-
-
-	glBindVertexArray(0);
 	
-	GLfloat vertices_post[] = {
-		-0.1f, -0.7f, 0.0f,  //1
-		0.4f, -0.4f, 0.0f,//5
-		0.1f, -0.9f, 0.0f
-	};
-
-//	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_post), vertices_post, GL_STATIC_DRAW);
-
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	ourShader.use();
 
 	GLuint aspect = glGetUniformLocation(ourShader.Program, "ourAspect");
-	glUniform1f(aspect, 600.0/800.0);
+	glUniform1f(aspect, (float)height/(float)width);
 
 	GLuint additional_pos = glGetUniformLocation(ourShader.Program, "addPos");
 	glUniform3f(additional_pos, 0.2f, 0.0f, 0.0f);
@@ -118,6 +101,7 @@ int main(){
 
 	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
 
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -130,13 +114,10 @@ int main(){
 		
 		glUniform3f(additional_pos, red_color, 0.0f, 0.0f);
 
-		glBindVertexArray(VAO[1]);
+		glBindVertexArray(VAO[0]);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-//		glBindVertexArray(VAO[0]);
-//		glDrawArrays(GL_TRIANGLES, 0, points_count/2);
 
 		glBindVertexArray(0);
 
