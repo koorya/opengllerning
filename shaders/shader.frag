@@ -6,6 +6,7 @@ in vec2 texPos;
 uniform vec4 ourColor;
 uniform sampler2D ourTexture1;
 uniform sampler2D ourTexture2;
+uniform float mixParam;
 
 void main(){
 //   color = vec4(vertexColor.rgb + ourColor.rgb, 1.0f);
@@ -13,5 +14,5 @@ void main(){
 	float gamma = 2.2f;
 	
 
-	color = mix(texture(ourTexture1, texPos), texture(ourTexture2, vec2( texPos.x, 1.0f - texPos.y)), 0.2f);
+	color = mix(texture(ourTexture1, texPos), texture(ourTexture2, vec2( texPos.x, 1.0f - texPos.y)), mixParam);
 }

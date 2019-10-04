@@ -9,6 +9,8 @@
 #include "shader.h"
 
 void key_callback (GLFWwindow*,int,int,int,int);
+GLfloat mix_param = 0.5f;
+GLuint mix_param_uniform;
 
 int main(){
 	glfwInit();
@@ -35,6 +37,8 @@ int main(){
 	glfwSetKeyCallback(window, key_callback);
 
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
+	 
+	mix_param_uniform = glGetUniformLocation(ourShader.Program, "mixParam");
 
 	int twidth, theight;
 	unsigned char * image = SOIL_load_image("./textures/container.jpg", &twidth, &theight, 0, SOIL_LOAD_RGB);
@@ -109,6 +113,7 @@ int main(){
 	GLfloat red_color = 0.0f;
 
 	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
+	glUniform1f(mix_param_uniform, mix_param);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -119,7 +124,6 @@ int main(){
 
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
-
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -152,8 +156,15 @@ int main(){
 
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
 	if(action == GLFW_PRESS)
-		if(key == GLFW_KEY_ESCAPE)
+		if(key == GLFW_KEY_ESCAPE){
 			glfwSetWindowShouldClose(window, GL_TRUE);
+		}else if(key == GLFW_KEY_UP){
+			mix_param += 0.1;
+			glUniform1f(mix_param_uniform, mix_param);
+		}else if(key == GLFW_KEY_DOWN){
+			mix_param -= 0.1;
+			glUniform1f(mix_param_uniform, mix_param);
+		}
 }
 
 
