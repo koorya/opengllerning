@@ -6,20 +6,26 @@
 void key_callback (GLFWwindow*,int,int,int,int);
 
 const GLchar * vertex_shader_source =   "#version 330 core\n"
-                                        "layout (location = 0) in vec3 position;\n" //layout (location = 0) не понятно
+                                        "layout (location = 0) in vec3 position;\n" //layout (location = n) означает, что буфер, который 
+                                                                                    //обределялся до следующего вызова glEnableVertexAttribArray(n) будет попадать в эту переменную.
+                                                                                    //так можно передавать цвет и прочие параметры вершины.
+                                        "out vec4 vertexColor;\n"
                                         "void main(){\n"
                                         "   gl_Position = vec4(position, 1.0);\n"
+                                        "   vertexColor = vec4(0.7f, 0.1f, 0.9f, 1.0f);\n"
                                         "}\n\0";
 const GLchar * fragment_sharer_source = "#version 330 core\n"
                                         "out vec4 color;\n"
+                                        "in vec4 vertexColor;\n"
                                         "void main(){\n"
-                                        "   color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                        "   color = vertexColor + vec4(0.0f, 0.2f, 0.2f, 0.0f);\n"
                                         "}\n\0";
 
 const GLchar * fragment_blue_shader_source = "#version 330 core\n"
                                         "out vec4 color;\n"
+                                        "in vec4 vertexColor;\n"
                                         "void main(){\n"
-                                        "   color = vec4(0.2f, 0.5f, 1.0f, 1.0f);\n"
+                                        "   color = vertexColor + vec4(0.2f, 0.5f, 1.0f, 0.0f);\n"
                                         "}\n\0";
 
 int main(){
