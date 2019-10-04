@@ -1,35 +1,13 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <math.h>
 
+#include "shader.h"
+
 void key_callback (GLFWwindow*,int,int,int,int);
-
-const GLchar * vertex_shader_source =   "#version 330 core\n"
-										"layout (location = 0) in vec3 position;\n" //layout (location = n) означает, что буфер, который 
-																					//обределялся до следующего вызова glEnableVertexAttribArray(n) будет попадать в эту переменную.
-																					//так можно передавать цвет и прочие параметры вершины.
-										"layout (location = 1) in vec3 color;\n"
-										"out vec4 vertexColor;\n"
-										"void main(){\n"
-										"   gl_Position = vec4(position, 1.0);\n"
-										"   vertexColor = vec4(color, 1.0f);\n"
-										"}\n\0";
-const GLchar * fragment_sharer_source = "#version 330 core\n"
-										"out vec4 color;\n"
-										"in vec4 vertexColor;\n"
-										"uniform vec4 ourColor;\n"
-										"void main(){\n"
-										"   color = vec4(vertexColor.rgb + ourColor.rgb, 1.0f);\n"
-										"}\n\0";
-
-const GLchar * fragment_blue_shader_source = "#version 330 core\n"
-										"out vec4 color;\n"
-										"in vec4 vertexColor;\n"
-										"void main(){\n"
-										"   color = vertexColor + vec4(0.2f, 0.5f, 1.0f, 0.0f);\n"
-										"}\n\0";
 
 int main(){
 	glfwInit();
@@ -55,45 +33,7 @@ int main(){
 	glViewport(0, 0, width, height);
 	glfwSetKeyCallback(window, key_callback);
 
-	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-	glCompileShader(vertex_shader);
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-	if(!success){
-		glGetShaderInfoLog(vertex_shader, sizeof(infoLog), NULL, infoLog);
-		std::cout << "VERTEX SHADER COMPILE FAILED\n" << infoLog << std::endl;
-	}
-	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment_shader, 1, &fragment_sharer_source, NULL);
-	glCompileShader(fragment_shader);
-	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-	if(!success){
-		glGetShaderInfoLog(fragment_shader, sizeof(infoLog), NULL, infoLog);
-		std::cout << "FRAGMENT SHADER COMPILE FAILED\n" << infoLog << std::endl;
-	}
-	GLuint fragment_blue_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment_blue_shader, 1, &fragment_blue_shader_source, NULL);
-	glCompileShader(fragment_blue_shader);
-	glGetShaderiv(fragment_blue_shader, GL_COMPILE_STATUS, &success);
-	if(!success){
-		glGetShaderInfoLog(fragment_blue_shader, sizeof(infoLog), NULL, infoLog);
-		std::cout << "FRAGMENT BLUE SHADER COMPILE FAILED\n" << infoLog << std::endl;
-	}
-	GLuint shader_program = glCreateProgram();
-	glAttachShader(shader_program, vertex_shader);
-	glAttachShader(shader_program, fragment_shader);
-	glLinkProgram(shader_program);
-	
-	GLuint shader_program1 = glCreateProgram();
-	glAttachShader(shader_program1, vertex_shader);
-	glAttachShader(shader_program1, fragment_blue_shader);
-	glLinkProgram(shader_program1);
-
-	glDeleteShader(vertex_shader);
-	glDeleteShader(fragment_shader);
-	glDeleteShader(fragment_blue_shader);
+	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
 
 
 	GLfloat vertices[] = {
@@ -160,18 +100,17 @@ int main(){
 		0.1f, -0.9f, 0.0f
 	};
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_post), vertices_post, GL_STATIC_DRAW);
+//	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_post), vertices_post, GL_STATIC_DRAW);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	GLuint color_uniform = glGetUniformLocation(shader_program, "ourColor");
+	GLuint color_uniform = glGetUniformLocation(ourShader.Program, "ourColor");
 	GLfloat red_color = 0.0f;
 
 	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
 
-	glUseProgram(shader_program);
-
+	ourShader.use();
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -180,15 +119,14 @@ int main(){
 		
 		red_color = sin(glfwGetTime()) / 2 + 0.5f;
 		glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
-//        glUseProgram(shader_program);
+
 		glBindVertexArray(VAO[1]);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-	  //  glUseProgram(shader_program1);
-		glBindVertexArray(VAO[0]);
-		glDrawArrays(GL_TRIANGLES, 0, points_count/2);
+//		glBindVertexArray(VAO[0]);
+//		glDrawArrays(GL_TRIANGLES, 0, points_count/2);
 
 		glBindVertexArray(0);
 
