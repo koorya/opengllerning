@@ -57,13 +57,13 @@ int main(){
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-
+	GLfloat x = 0.5f, y = 0.5f, size = 0.5f; 
 	GLfloat vertices[] = {
 		//position         		//colors          	//texture coord
-		-0.5f, -0.5f, 0.0f,  		0.6f, 0.4f, 0.5f, 	0.0f, 0.0f,  		//left bot
-		-0.5f,  0.5f, 0.0f,			0.1f, 0.7f, 0.0f, 	0.0f, 1.0f,  		//left top
-		 0.5f,  0.5f, 0.0f,  		0.4f, 0.8f, 0.0f, 	1.0f, 1.0f,  		//right top
-		 0.5f, -0.5f, 0.0f, 		0.4f, 0.4f, 0.0f, 	1.0f, 0.0f			//right bot
+		-0.5f, -0.5f, 0.0f,  		0.6f, 0.4f, 0.5f, 	x - size, y - size,  		//left bot
+		-0.5f,  0.5f, 0.0f,			0.1f, 0.7f, 0.0f, 	x - size, y + size,  		//left top
+		 0.5f,  0.5f, 0.0f,  		0.4f, 0.8f, 0.0f, 	x + size, y + size,  		//right top
+		 0.5f, -0.5f, 0.0f, 		0.4f, 0.4f, 0.0f, 	x + size, y - size			//right bot
 	};
 
 	GLuint indices[] = {
@@ -114,6 +114,7 @@ int main(){
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glActiveTexture(GL_TEXTURE1);	
 	glBindTexture(GL_TEXTURE_2D, texture[1]);
+
 
 
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);

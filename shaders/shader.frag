@@ -13,5 +13,5 @@ void main(){
 	float gamma = 2.2f;
 	
 
-	color = mix(texture(ourTexture1, texPos), texture(ourTexture2, vec2(texPos.x, 1.0f - texPos.y)), 0.2f);
+	color = mix(texture(ourTexture1, texPos), texture(ourTexture2, vec2( texPos.x, 1.0f - texPos.y)), 0.2f);
 }
