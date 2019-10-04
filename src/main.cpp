@@ -40,9 +40,18 @@ int main(){
 	unsigned char * image = SOIL_load_image("./textures/container.jpg", &twidth, &theight, 0, SOIL_LOAD_RGB);
 	if (!image)
 		std::cout<<"LOAD IMAGE FAILED"<<std::endl;
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	GLuint texture[2];
+	glGenTextures(1, texture);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, twidth, theight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	image = SOIL_load_image("./textures/awesomeface.png", &twidth, &theight, 0, SOIL_LOAD_RGB);
+	if (!image)
+		std::cout<<"LOAD IMAGE FAILED"<<std::endl;
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, twidth, theight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image);
@@ -101,7 +110,15 @@ int main(){
 
 	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
 
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glActiveTexture(GL_TEXTURE1);	
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
+
+
+	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
+	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
+
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
