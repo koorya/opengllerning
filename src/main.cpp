@@ -10,17 +10,18 @@ const GLchar * vertex_shader_source =   "#version 330 core\n"
 										"layout (location = 0) in vec3 position;\n" //layout (location = n) означает, что буфер, который 
 																					//обределялся до следующего вызова glEnableVertexAttribArray(n) будет попадать в эту переменную.
 																					//так можно передавать цвет и прочие параметры вершины.
+										"layout (location = 1) in vec3 color;\n"
 										"out vec4 vertexColor;\n"
-										"uniform vec4 ourColor;\n"
 										"void main(){\n"
 										"   gl_Position = vec4(position, 1.0);\n"
-										"   vertexColor = ourColor;\n"
+										"   vertexColor = vec4(color, 1.0f);\n"
 										"}\n\0";
 const GLchar * fragment_sharer_source = "#version 330 core\n"
 										"out vec4 color;\n"
 										"in vec4 vertexColor;\n"
+										"uniform vec4 ourColor;\n"
 										"void main(){\n"
-										"   color = vertexColor + vec4(0.0f, 0.2f, 0.2f, 0.0f);\n"
+										"   color = vec4(vertexColor.rgb + ourColor.rgb, 1.0f);\n"
 										"}\n\0";
 
 const GLchar * fragment_blue_shader_source = "#version 330 core\n"
@@ -105,6 +106,18 @@ int main(){
 	};
 	int points_count = sizeof(vertices)/sizeof(GLfloat)/3;
 
+	GLfloat colored_vertices[] = {
+		//position         		//colors          
+		0.6f, 0.4f, 0.0f,  		0.6f, 0.4f, 0.5f,  
+		-0.1f, -0.7f, 0.0f,		0.1f, 0.7f, 0.0f,  
+		-0.6f, 0.1f, 0.0f, 		0.6f, 0.1f, 0.0f,  
+		-0.3f, 0.5f, 0.0f, 		0.3f, 0.5f, 0.0f,  
+		0.4f, 0.8f, 0.0f,  		0.4f, 0.8f, 0.0f,  
+		0.4f, -0.4f, 0.0f, 		0.4f, 0.4f, 0.0f
+	};
+	int colored_points_count = sizeof(vertices)/sizeof(GLfloat)/6;
+
+
 	GLuint indices[] = {
 		0, 1, 2,
 		3, 4, 5
@@ -130,9 +143,11 @@ int main(){
 	glBindVertexArray(VAO[1]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)/2, &(vertices[(points_count/2)*3]), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid*)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colored_vertices), colored_vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid*)0);//position
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid*)( 3*sizeof(GLfloat) ) );//color
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 
@@ -152,7 +167,9 @@ int main(){
 
 	GLuint color_uniform = glGetUniformLocation(shader_program, "ourColor");
 	GLfloat red_color = 0.0f;
-	
+
+	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
+
 	glUseProgram(shader_program);
 
 
@@ -166,7 +183,7 @@ int main(){
 //        glUseProgram(shader_program);
 		glBindVertexArray(VAO[1]);
 
-		glDrawArrays(GL_TRIANGLES, 0, points_count/2);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	  //  glUseProgram(shader_program1);
