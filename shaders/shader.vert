@@ -6,9 +6,10 @@ layout (location = 2) in vec2 tex_pos;
 out vec4 vertexColor;
 out vec2 texPos;
 uniform float ourAspect;// y/x
-uniform vec3 addPos;
+uniform mat4 transform;
+
 void main(){
-   vec3 pos = position + addPos;
+   vec4 pos =  transform * vec4(position, 1.0f) ;
    //pos = vec3(pos.y, -pos.x, pos.z);
    gl_Position = vec4(pos.x*ourAspect, pos.yz, 1.0);
    vertexColor = vec4(color, 1.0f);

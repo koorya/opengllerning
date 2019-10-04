@@ -3,6 +3,12 @@
 #include <GLFW/glfw3.h>
 #include <SOIL/SOIL.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <glm/gtx/string_cast.hpp>
+
 #include <iostream>
 #include <math.h>
 
@@ -106,8 +112,11 @@ int main(){
 	GLuint aspect = glGetUniformLocation(ourShader.Program, "ourAspect");
 	glUniform1f(aspect, (float)height/(float)width);
 
-	GLuint additional_pos = glGetUniformLocation(ourShader.Program, "addPos");
-	glUniform3f(additional_pos, 0.2f, 0.0f, 0.0f);
+	GLuint trans_loc = glGetUniformLocation(ourShader.Program, "transform");
+
+
+
+
 
 	GLuint color_uniform = glGetUniformLocation(ourShader.Program, "ourColor");
 	GLfloat red_color = 0.0f;
@@ -134,12 +143,21 @@ int main(){
 		glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
 
 		
-		glUniform3f(additional_pos, red_color, 0.0f, 0.0f);
+		//glUniform3f(additional_pos, red_color, 0.0f, 0.0f);
 
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glm::mat4 trans1 = glm::mat4(1.0f);
+		trans1 = glm::scale(trans1,  glm::vec3(red_color, red_color, 1.0f));
+		glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans1) );
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+		glm::mat4 trans2 = glm::mat4(1.0f);
+		trans2 = glm::translate(trans2, glm::vec3((float)glm::sin(glm::radians(glfwGetTime()*100)), (float)glm::cos(glm::radians(glfwGetTime()*120)), 0.0f));	
+		trans2 = glm::rotate(trans2, (float)glm::radians(glfwGetTime()*360), glm::vec3(0.0f, 0.0f, 1.0f));	
+		glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans2) );
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
 
