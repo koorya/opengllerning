@@ -15,7 +15,7 @@ void main(){
 	
 	color = ourColor;
 	color.a = 0.5f;
-	if((color.r + color.b + color.b)< 0.01){
+	if((color.r + color.g + color.b)< 0.01){
 		color.rgb = vec3(0.8f);
 		color.a = 0.05f;
 	}

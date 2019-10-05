@@ -237,7 +237,6 @@ int main(){
 					uint32_t blue = color & 0xff;
 					uint32_t green = (color>>8) & 0xff;
 					uint32_t red = (color>>16) & 0xff;
-					
 					glUniform4f(color_uniform, (float)red/0xff, (float)green/0xff, (float)blue/0xff, 0.3f);
 					glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 				}

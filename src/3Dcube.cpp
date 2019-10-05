@@ -89,7 +89,7 @@ uint8_t keyConvert(int key){
     }
     return key;
 }
-
+#include <iostream>
 #endif
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -491,11 +491,12 @@ void idle_state() {
         for (int k = 0; k < 5; k++) {
             uint32_t color = strip_0.Color(255,0,0);
            set3dpix(k,0,0 , color);
-           scene[0][0][k] = color;
+           scene[k][0][0] = color;
            delay(100);     
         }
       //}
     //} 
+    fill_screen(0);
 }
 
 void init_game() {
