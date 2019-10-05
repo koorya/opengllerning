@@ -463,7 +463,9 @@ void idle_state() {
     //for (int i = 0; i < 5; i++) {
     //  for (int j = 0; j < 5; j ++) {
         for (int k = 0; k < 5; k++) {
-           set3dpix(k,0,0 , strip_0.Color(255,0,0));
+            uint32_t color = strip_0.Color(255,0,0);
+           set3dpix(k,0,0 , color);
+           scene[0][0][k] = color;
            delay(100);     
         }
       //}
