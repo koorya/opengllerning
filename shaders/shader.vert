@@ -6,12 +6,16 @@ layout (location = 2) in vec2 tex_pos;
 out vec4 vertexColor;
 out vec2 texPos;
 uniform float ourAspect;// y/x
-uniform mat4 transform;
+
+uniform mat4 model;//помещает обект на сцену
+uniform mat4 view; //ориентирует всю сцену для наблюдателя
+uniform mat4 proj; // переводит сцену в 2D
 
 void main(){
-   vec4 pos =  transform * vec4(position, 1.0f) ;
+
+   vec4 pos =  proj * view * model * vec4(position, 1.0f) ;
    //pos = vec3(pos.y, -pos.x, pos.z);
-   gl_Position = vec4(pos.x*ourAspect, pos.yz, 1.0);
+   gl_Position = pos;
    vertexColor = vec4(color, 1.0f);
    texPos = tex_pos;
 }

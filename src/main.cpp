@@ -112,8 +112,13 @@ int main(){
 	GLuint aspect = glGetUniformLocation(ourShader.Program, "ourAspect");
 	glUniform1f(aspect, (float)height/(float)width);
 
-	GLuint trans_loc = glGetUniformLocation(ourShader.Program, "transform");
+	GLuint model_loc = glGetUniformLocation(ourShader.Program, "model");
+	GLuint view_loc = glGetUniformLocation(ourShader.Program, "view");
+	GLuint proj_loc = glGetUniformLocation(ourShader.Program, "proj");
 
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 proj = glm::mat4(1.0f);
 
 
 
@@ -147,17 +152,16 @@ int main(){
 
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		glm::mat4 trans1 = glm::mat4(1.0f);
-		trans1 = glm::scale(trans1,  glm::vec3(red_color, red_color, 1.0f));
-		glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans1) );
+		model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
+		view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
+
+		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
+		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glm::mat4 trans2 = glm::mat4(1.0f);
-		trans2 = glm::translate(trans2, glm::vec3((float)glm::sin(glm::radians(glfwGetTime()*100)), (float)glm::cos(glm::radians(glfwGetTime()*120)), 0.0f));	
-		trans2 = glm::rotate(trans2, (float)glm::radians(glfwGetTime()*360), glm::vec3(0.0f, 0.0f, 1.0f));	
-		glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans2) );
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glBindVertexArray(0);
 
