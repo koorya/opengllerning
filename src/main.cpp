@@ -70,15 +70,35 @@ int main(){
 	GLfloat x = 0.5f, y = 0.5f, size = 0.5f; 
 	GLfloat vertices[] = {
 		//position         		//colors          	//texture coord
-		-0.5f, -0.5f, 0.0f,  		0.6f, 0.4f, 0.5f, 	x - size, y - size,  		//left bot
-		-0.5f,  0.5f, 0.0f,			0.1f, 0.7f, 0.0f, 	x - size, y + size,  		//left top
-		 0.5f,  0.5f, 0.0f,  		0.4f, 0.8f, 0.0f, 	x + size, y + size,  		//right top
-		 0.5f, -0.5f, 0.0f, 		0.4f, 0.4f, 0.0f, 	x + size, y - size			//right bot
+		-0.5f, -0.5f,  0.5f,  		0.6f, 0.4f, 0.5f, 	x - size, y - size,  		//left bot
+		-0.5f,  0.5f,  0.5f,		0.1f, 0.7f, 0.0f, 	x - size, y + size,  		//left top
+		 0.5f,  0.5f,  0.5f,  		0.4f, 0.8f, 0.0f, 	x + size, y + size,  		//right top
+		 0.5f, -0.5f,  0.5f, 		0.4f, 0.4f, 0.0f, 	x + size, y - size,			//right bot
+
+		-0.5f, -0.5f, -0.5f,  		0.6f, 0.4f, 0.5f, 	x + size, y + size,  		//left bot
+		-0.5f,  0.5f, -0.5f,		0.1f, 0.7f, 0.0f, 	x + size, y - size,  		//left top
+		 0.5f,  0.5f, -0.5f,  		0.4f, 0.8f, 0.0f, 	x - size, y - size,  		//right top
+		 0.5f, -0.5f, -0.5f, 		0.4f, 0.4f, 0.0f, 	x - size, y + size			//right bot
 	};
 
 	GLuint indices[] = {
 		0, 1, 2,
-		2, 3, 0
+		2, 3, 0,
+
+		1, 5, 2,
+		5, 2, 6,
+
+		5, 6, 4,
+		6, 4, 7,
+
+		7, 0, 4,
+		7, 0, 3,
+
+		3, 2, 6,
+		3, 6, 7,
+
+		0, 1, 5,
+		0, 4, 5
 	};
 
 	GLuint VBO[2], EBO[2], VAO[2];
@@ -99,7 +119,7 @@ int main(){
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices)-0*sizeof(GLuint), indices+0, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 
@@ -139,10 +159,11 @@ int main(){
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
+	glEnable(GL_DEPTH_TEST);
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		glClearColor(0.1f, 0.4f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		red_color = sin(glfwGetTime()) / 2 + 0.5f;
 		glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
@@ -153,6 +174,7 @@ int main(){
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, (float)glm::radians(20.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
 		view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
 
@@ -160,7 +182,7 @@ int main(){
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
 		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 
 
 		glBindVertexArray(0);
