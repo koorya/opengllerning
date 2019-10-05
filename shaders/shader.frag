@@ -13,6 +13,10 @@ void main(){
 
 	float gamma = 2.2f;
 	
+	color = ourColor;
+	if((color.r + color.b + color.b)< 0.01)
+		discard;
 
-	color = mix(texture(ourTexture1, texPos), texture(ourTexture2, vec2( texPos.x, 1.0f - texPos.y)), mixParam);
+	if (color.a < 0.2f)
+		discard;
 }

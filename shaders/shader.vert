@@ -7,6 +7,7 @@ out vec4 vertexColor;
 out vec2 texPos;
 uniform float ourAspect;// y/x
 
+
 uniform mat4 model;//помещает обект на сцену
 uniform mat4 view; //ориентирует всю сцену для наблюдателя
 uniform mat4 proj; // переводит сцену в 2D
@@ -17,5 +18,6 @@ void main(){
    //pos = vec3(pos.y, -pos.x, pos.z);
    gl_Position = pos;
    vertexColor = vec4(color, 1.0f);
+
    texPos = tex_pos;
 }

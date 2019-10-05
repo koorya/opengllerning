@@ -3,7 +3,7 @@ all: run
 run: aplication.exe
 	aplication.exe
 
-aplication.exe: obj/main.o obj/shader.o
+aplication.exe: obj/main.o obj/shader.o obj/3Dcube.o
 	g++ -o aplication.exe -Lc:/opengl/lib obj/*.o -lSOIL -lglew32s -llibglfw3 -lopengl32 -lgdi32 
 
 obj/main.o: src/main.cpp
@@ -11,6 +11,9 @@ obj/main.o: src/main.cpp
 
 obj/shader.o: src/shader.cpp src/shader.h
 	g++ -c -Ic:/opengl/include src/shader.cpp -o obj/shader.o
+
+obj/3Dcube.o: src/3Dcube.cpp
+	g++ -c src/3Dcube.cpp -o obj/3Dcube.o
 
 clear:
 	del obj\*.o

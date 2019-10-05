@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <math.h>
+#include <thread>
+
 
 #include "shader.h"
 
@@ -18,7 +20,25 @@ void key_callback (GLFWwindow*,int,int,int,int);
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
 
+extern uint32_t scene[5][5][5] ;
+void loop();
+void setup();
+bool exit_flag = false;
+
+void _loop(){
+	uint32_t cnt = 0;
+	setup();
+	while(!exit_flag){
+		loop();
+		std::cout<<"loop "<<cnt++<<std::endl;
+	}
+}
+
 int main(){
+
+	std::thread thr(_loop);
+	thr.detach();
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -178,8 +198,7 @@ int main(){
 		glClearColor(0.1f, 0.4f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		red_color = sin(glfwGetTime()) / 2 + 0.5f;
-		glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
+
 
 		
 		glBindVertexArray(VAO[0]);
@@ -193,16 +212,33 @@ int main(){
 		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
 		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
 
-		for(int i = 10; i--;){
-			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-			if(i % 3 == 0)
-				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
-			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
-			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+		for(int x = 0; x < 5; x++){
+			for(int y = 0; y < 5; y++){
+				for(int z = 0; z < 5; z++){
+					glm::vec3 cubePosition(0.0f, 0.0f, 0.0f);
+					glm::vec3 cubeSize(1.0f, 1.0f, 1.0f);
+					glm::vec3 cellSize(0.5f, 0.5f, 0.5f);
 
-			glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+					glm::vec3 cellPosition = glm::vec3((float)( 2 - x ), (float)( 2 - y ), (float)( 2 - z ))*cubeSize + cubePosition;
+					model = glm::translate(glm::mat4(1.0f), cellPosition);
+					model = glm::scale(model, cellSize);
+					//model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
+					glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+
+					red_color = sin(glfwGetTime()) / 2 + 0.5f;
+					uint32_t color = scene[x][y][z];
+					uint32_t blue = color & 0xff;
+					uint32_t green = (color>>8) & 0xff;
+					uint32_t red = (color>>16) & 0xff;
+					
+					glUniform4f(color_uniform, (float)red/0xff, (float)green/0xff, (float)blue/0xff, 0.3f);
+					glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+				}
+			}
 		}
-
+		glUniform4f(color_uniform, 1.0f, 1.0f, 1.0f, 0.3f);
+		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+		
 		glBindVertexArray(0);
 
 
@@ -213,6 +249,7 @@ int main(){
 	glDeleteBuffers(2, EBO);
 
 	glfwTerminate();
+	exit_flag = true;
 	return 0;
 }
 
@@ -220,6 +257,7 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 	if(action == GLFW_PRESS)
 		if(key == GLFW_KEY_ESCAPE){
 			glfwSetWindowShouldClose(window, GL_TRUE);
+			exit_flag = true;
 		}else if(key == GLFW_KEY_UP){
 			mix_param += 0.1;
 			glUniform1f(mix_param_uniform, mix_param);
