@@ -64,6 +64,32 @@ void splash();
 void fill_screen(uint32_t color);
 void set3dpix(uint16_t x, uint16_t y, uint16_t z, uint32_t color);
 void theaterChase(uint32_t c, uint8_t wait);
+
+uint8_t keyConvert(int key){
+    if(key == 0x52){
+        return 0x70;
+    }else if(key == 0x4f){
+        return 0x69;
+    }else if(key == 0x50){
+        return 0x72;
+    }else if(key == 0x51){
+        return 0x7A;
+    }else if(key == 0x4b){
+        return 0x6B;
+    }else if(key == 0x4c){
+        return 0x73;
+    }else if(key == 0x4d){
+        return 0x74;
+    }else if(key == 0x47){
+        return 0x6C;
+    }else if(key == 0x48){
+        return 0x75;
+    }else if(key == 0x49){
+        return 0x7D;
+    }
+    return key;
+}
+
 #endif
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)

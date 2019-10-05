@@ -14,9 +14,12 @@ void main(){
 	float gamma = 2.2f;
 	
 	color = ourColor;
-	if((color.r + color.b + color.b)< 0.01)
-		discard;
+	color.a = 0.5f;
+	if((color.r + color.b + color.b)< 0.01){
+		color.rgb = vec3(0.8f);
+		color.a = 0.05f;
+	}
 
-	if (color.a < 0.2f)
-		discard;
+		//discard;
+
 }

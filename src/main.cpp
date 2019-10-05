@@ -16,13 +16,16 @@
 
 #include "shader.h"
 
+
 void key_callback (GLFWwindow*,int,int,int,int);
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
 
 extern uint32_t scene[5][5][5] ;
+extern  uint8_t signalKey;
 void loop();
 void setup();
+uint8_t keyConvert(int key);
 bool exit_flag = false;
 
 void _loop(){
@@ -30,7 +33,7 @@ void _loop(){
 	setup();
 	while(!exit_flag){
 		loop();
-		std::cout<<"loop "<<cnt++<<std::endl;
+	//	std::cout<<"loop "<<cnt++<<std::endl;
 	}
 }
 
@@ -192,7 +195,9 @@ int main(){
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
 	glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
 
-	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND); 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		glClearColor(0.1f, 0.4f, 0.2f, 1.0f);
@@ -206,7 +211,9 @@ int main(){
 		view = glm::mat4(1.0f);
 //		view = glm::rotate(view, (float)glfwGetTime()/1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
-		view = glm::rotate(view, -(float)glfwGetTime()/1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+//		view = glm::rotate(view, -(float)glfwGetTime()/1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::rotate(view, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		view = glm::rotate(view, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
 
 		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
@@ -236,8 +243,6 @@ int main(){
 				}
 			}
 		}
-		glUniform4f(color_uniform, 1.0f, 1.0f, 1.0f, 0.3f);
-		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 		
 		glBindVertexArray(0);
 
@@ -254,7 +259,9 @@ int main(){
 }
 
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
-	if(action == GLFW_PRESS)
+	if(action == GLFW_PRESS){
+		signalKey = keyConvert(scancode);
+		std::cout<<"scan code "<< std::hex << scancode << std::endl;
 		if(key == GLFW_KEY_ESCAPE){
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			exit_flag = true;
@@ -265,6 +272,7 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 			mix_param -= 0.1;
 			glUniform1f(mix_param_uniform, mix_param);
 		}
+	}
 }
 
 
