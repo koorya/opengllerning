@@ -223,7 +223,12 @@ int main(){
 bool keys[1024] = {false};
 
 void do_movement(){
-	GLfloat camSpeed = 0.05f;
+	GLfloat currentFrame = glfwGetTime();
+	static GLfloat lastFrame = 0.0f;
+	GLfloat deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+
+	GLfloat camSpeed = deltaTime * 5.0f;
 	if(keys[GLFW_KEY_W])
 		camPos += camSpeed * camDir;
 	if(keys[GLFW_KEY_S])
