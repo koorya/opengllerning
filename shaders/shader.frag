@@ -7,14 +7,21 @@ in vec2 texPos;
 
 uniform vec3 objColor;
 uniform vec3 lightColor;
+uniform vec3 lightPos;
 
 uniform int isLight;
 
 void main(){
-//   color = vec4(vertexColor.rgb + ourColor.rgb, 1.0f);
 
 	color = vec4(lightColor, 1.0f);
-	if(isLight == 0)
-		color = vec4(objColor * lightColor, 1.0f);
+
+	if(isLight == 0){
+		float ambientStrenght = 0.1f;
+		vec3 ambient = ambientStrenght * lightColor;
+		vec3 result = ambient * objColor;
+
+
+		color = vec4(result, 1.0f);
+	}
 
 }

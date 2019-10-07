@@ -54,21 +54,7 @@ int main(){
 
 
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
-	 
 
-	GLfloat x = 0.5f, y = 0.5f, size = 0.5f; 
-	GLfloat vertices_[] = {
-		//position         		//colors          	//texture coord
-		-0.5f, -0.5f,  0.5f,  		0.6f, 0.4f, 0.5f, 	x - size, y - size,  		//left bot
-		-0.5f,  0.5f,  0.5f,		0.1f, 0.7f, 0.0f, 	x - size, y + size,  		//left top
-		 0.5f,  0.5f,  0.5f,  		0.4f, 0.8f, 0.0f, 	x + size, y + size,  		//right top
-		 0.5f, -0.5f,  0.5f, 		0.4f, 0.4f, 0.0f, 	x + size, y - size,			//right bot
-
-		-0.5f, -0.5f, -0.5f,  		0.6f, 0.4f, 0.5f, 	x + size, y + size,  		//left bot
-		-0.5f,  0.5f, -0.5f,		0.1f, 0.7f, 0.0f, 	x + size, y - size,  		//left top
-		 0.5f,  0.5f, -0.5f,  		0.4f, 0.8f, 0.0f, 	x - size, y - size,  		//right top
-		 0.5f, -0.5f, -0.5f, 		0.4f, 0.4f, 0.0f, 	x - size, y + size			//right bot
-	};
 	GLfloat vertices[] = {
         -0.5, -0.5, 0.5, 0, 0, 1,
         -0.5, 0.5, 0.5, 0, 0, 1,
@@ -118,46 +104,7 @@ int main(){
         -0.5, -0.5, -0.5, -1, 0, 0,
         -0.5, 0.5, -0.5, -1, 0, 0
 	};
-	GLuint indices[] = {
-		0, 1, 2,//front
-		2, 3, 0,
 
-		5, 6, 4,//back
-		6, 4, 7,
-
-		1, 5, 2,//top
-		5, 2, 6,
-
-		7, 0, 4,//bottom
-		7, 0, 3,
-
-		3, 2, 6,//right
-		3, 6, 7,
-
-		0, 1, 5,//left
-		0, 4, 5
-	};
-/*	glm::vec3 normals[] = {
-		glm::vec3(0.0f, 0.0f, 1.0f),
-		glm::vec3(0.0f, 0.0f, -1.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(0.0f, -1.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(-1.0f, 0.0f, 0.0f)
-	};
-
-	for (int i = 0; i< sizeof(indices)/sizeof(GLuint); i+=3){
-		glm::vec3 p1 = glm::vec3(vertices[indices[i]*8], vertices[indices[i]*8+1], vertices[indices[i]*8+2]);
-		glm::vec3 p2 = glm::vec3(vertices[indices[i+1]*8], vertices[indices[i+1]*8+1], vertices[indices[i+1]*8+2]);
-		glm::vec3 p3 = glm::vec3(vertices[indices[i+2]*8], vertices[indices[i+2]*8+1], vertices[indices[i+2]*8+2]);
-		glm::vec3 n = normals[i/6];
-		std::cout<<p1.x <<", " << p1.y <<", " << p1.z <<", " << n.x <<", " << n.y <<", " << n.z << "," <<std::endl;
-		std::cout<<p2.x <<", " << p2.y <<", " << p2.z <<", " << n.x <<", " << n.y <<", " << n.z << "," <<std::endl;
-		std::cout<<p3.x <<", " << p3.y <<", " << p3.z <<", " << n.x <<", " << n.y <<", " << n.z << "," <<std::endl<<std::endl;
-
-	}
-    exit(0);
-    */
 	glm::vec3 cubePositions[] = {
 		glm::vec3(  0.0f,  0.0f,  0.0f),
 		glm::vec3(  2.0f,  5.0f, -15.0f),
@@ -210,11 +157,16 @@ int main(){
 	GLuint lightLoc = glGetUniformLocation(ourShader.Program, "lightColor");
 	glm::vec3  light_color= glm::vec3(1.0f, 1.0f, 1.0f);
 
+	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "lightPos");
+
+
 	glUniform3fv(colorLoc, 1, glm::value_ptr(obj_color));
 	glUniform3fv(lightLoc, 1, glm::value_ptr(light_color));
+	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
+    
 
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
-
+ 
 
 	glEnable(GL_DEPTH_TEST);
 	while(!glfwWindowShouldClose(window)){
