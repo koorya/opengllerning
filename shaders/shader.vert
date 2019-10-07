@@ -3,7 +3,8 @@
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 
-out vec4 vertexNormal;
+out vec3 vertexNormal;
+out vec3 fragPos;
 
 
 uniform mat4 model;//помещает обект на сцену
@@ -13,6 +14,7 @@ uniform mat4 proj; // переводит сцену в 2D
 void main(){
 
 	vec4 pos =  proj * view * model * vec4(position, 1.0f) ;
+	fragPos = vec3(model * vec4(position, 1.0f));
 	gl_Position = pos;
-	vertexNormal = vec4(normal, 0.0f);
+	vertexNormal = vec3(model * vec4(normal, 0.0f));
 }
