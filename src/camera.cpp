@@ -1,11 +1,12 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch) : Direction(glm::vec3(0.0f, 0.0f, 1.0f)), MovementSpeed(3.0f), MouseSensitivity(0.1f), Zoom(45.0f) 
+Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, bool pm) : Direction(glm::vec3(0.0f, 0.0f, 1.0f)), MovementSpeed(3.0f), MouseSensitivity(0.1f), Zoom(45.0f) 
 {
 	this->WorldUp = up;
 	this->Position = position;
 	this->Pitch = pitch;
 	this->Yaw = yaw;
+	this->plane_moveing = pm;
 	this->updateCameraVectors();
 }
 
@@ -24,14 +25,19 @@ void Camera::updateCameraVectors(){
 void Camera::processKeyboard(Camera_movement direction, GLfloat delta_time){
 	GLfloat velosity = this->MovementSpeed * delta_time;
 
+	glm::vec3 shift = this->Direction;
+
+	if(this->plane_moveing)
+		shift = glm::normalize(shift - this->WorldUp*glm::dot(shift, this->WorldUp));
+
 	if(direction == Camera_movement::FORWARD)
-		this->Position += velosity * this->Direction;
+		this->Position += velosity * shift;
 	if(direction == Camera_movement::BACKWARD)
-		this->Position -= velosity * this->Direction;
+		this->Position -= velosity * shift;
 	if(direction == Camera_movement::RIGHT)
-		this->Position += velosity * glm::normalize(glm::cross(this->Direction, this->Up));
+		this->Position += velosity * glm::normalize(glm::cross(shift, this->Up));
 	if(direction == Camera_movement::LEFT)
-		this->Position -= velosity * glm::normalize(glm::cross(this->Direction, this->Up));
+		this->Position -= velosity * glm::normalize(glm::cross(shift, this->Up));
 	this->updateCameraVectors();
 }
 
