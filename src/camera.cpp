@@ -71,3 +71,6 @@ GLfloat Camera::getZoom(){
 	return this->Zoom;
 }
 
+glm::vec3 Camera::getCamPos(){
+	return this->Position;
+}

@@ -35,6 +35,7 @@ public:
 	void processMouseMovement(GLfloat xoffset, GLfloat yoffset);
 	void processMouseScroll(GLfloat yoffset);
 	GLfloat getZoom();
+	glm::vec3 getCamPos();
 private:
 	void updateCameraVectors();
 };
