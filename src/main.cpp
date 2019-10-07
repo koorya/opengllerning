@@ -18,6 +18,10 @@ void key_callback (GLFWwindow*,int,int,int,int);
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
 
+glm::vec3 camPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 camDir = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 camUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 int main(){
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -184,11 +188,8 @@ int main(){
 		
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		GLfloat radius = 15.0f;
-		GLfloat camX = sin(glfwGetTime()) * radius;
-		GLfloat camZ = cos(glfwGetTime()) * radius;
 
-		view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(camPos, camPos + camDir, camUp);
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
 
 		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
