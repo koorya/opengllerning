@@ -14,7 +14,9 @@
 
 #include "shader.h"
 
+void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
+
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
 
@@ -179,6 +181,7 @@ int main(){
 	glEnable(GL_DEPTH_TEST);
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
+		do_movement();
 		glClearColor(0.1f, 0.4f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -217,10 +220,22 @@ int main(){
 	glfwTerminate();
 	return 0;
 }
+bool keys[1024] = {false};
 
+void do_movement(){
+	GLfloat camSpeed = 0.05f;
+	if(keys[GLFW_KEY_W])
+		camPos += camSpeed * camDir;
+	if(keys[GLFW_KEY_S])
+		camPos -= camSpeed * camDir;
+	if(keys[GLFW_KEY_D])
+		camPos += camSpeed * glm::normalize(glm::cross(camDir, camUp));
+	if(keys[GLFW_KEY_A])
+		camPos -= camSpeed * glm::normalize(glm::cross(camDir, camUp));
+
+}
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
 
-	GLfloat camSpeed = 0.05f;
 	if(action == GLFW_PRESS)
 		if(key == GLFW_KEY_ESCAPE){
 			glfwSetWindowShouldClose(window, GL_TRUE);
@@ -230,16 +245,11 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 		}else if(key == GLFW_KEY_DOWN){
 			mix_param -= 0.1;
 			glUniform1f(mix_param_uniform, mix_param);
-		}else if(key == GLFW_KEY_W){
-			camPos += camSpeed * camDir;
-		}else if(key == GLFW_KEY_S){
-			camPos -= camSpeed * camDir;
-		}else if(key == GLFW_KEY_D){
-			camPos += camSpeed * glm::normalize(glm::cross(camDir, camUp));
-		}else if(key == GLFW_KEY_A){
-			camPos -= camSpeed * glm::normalize(glm::cross(camDir, camUp));
 		}
-
+	if(action == GLFW_PRESS)
+		keys[key] = true;
+	if(action == GLFW_RELEASE)
+		keys[key] = false;
 }
 
 
