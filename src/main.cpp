@@ -184,10 +184,11 @@ int main(){
 		
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		view = glm::mat4(1.0f);
-//		view = glm::rotate(view, (float)glfwGetTime()/1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
-		view = glm::rotate(view, -(float)glfwGetTime()/1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		GLfloat radius = 15.0f;
+		GLfloat camX = sin(glfwGetTime()) * radius;
+		GLfloat camZ = cos(glfwGetTime()) * radius;
+
+		view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
 
 		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
