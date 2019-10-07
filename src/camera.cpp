@@ -49,9 +49,19 @@ void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset){
 
 	this->updateCameraVectors();
 }
-
+void Camera::processMouseScroll(GLfloat yoffset){
+	if(this->Zoom >= 1.0f && this->Zoom <= 45.0f)
+		this->Zoom += yoffset;
+	if(this->Zoom < 1.0f)
+		this->Zoom = 1.0f;
+	if(this->Zoom > 45.0f)
+		this->Zoom = 45.0f;
+	
+}
 glm::mat4 Camera::getMatrix(){
 	return glm::lookAt(this->Position, this->Position + this->Direction, this->Up);
 }
-
+GLfloat Camera::getZoom(){
+	return this->Zoom;
+}
 

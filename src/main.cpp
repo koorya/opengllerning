@@ -18,6 +18,7 @@
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
 void mouse_callback(GLFWwindow * window, double xpos, double ypos);
+void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
 
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
@@ -50,6 +51,7 @@ int main(){
 
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -200,7 +202,7 @@ int main(){
 		view = my_cam.getMatrix();
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
 
-		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
+		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
 		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
 
 		for(int i = 10; i--;){
@@ -254,6 +256,10 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos){
 	lastY = ypos;
 
 	my_cam.processMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow * window, double xoffset, double yoffset){
+	my_cam.processMouseScroll(yoffset);
 }
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
 
