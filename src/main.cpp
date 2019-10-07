@@ -17,6 +17,7 @@
 
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
+void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
@@ -46,7 +47,11 @@ int main(){
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
+
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
 	 
@@ -237,6 +242,18 @@ void do_movement(){
 	if(keys[GLFW_KEY_A])
 		my_cam.processKeyboard(Camera_movement::LEFT, deltaTime);
 
+}
+
+void mouse_callback(GLFWwindow * window, double xpos, double ypos){
+	static GLfloat lastX = xpos;
+	static GLfloat lastY = ypos;
+
+	GLfloat xoffset = lastX - xpos;
+	GLfloat yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+
+	my_cam.processMouseMovement(xoffset, yoffset);
 }
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
 

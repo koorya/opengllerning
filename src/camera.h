@@ -31,7 +31,8 @@ public:
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = -90.0f, GLfloat pitch = 0.0f);
 	glm::mat4 getMatrix();
 	void processKeyboard(Camera_movement direction, GLfloat delta_time);
-
+	void processMouseMovement(GLfloat xoffset, GLfloat yoffset);
+	
 private:
 	void updateCameraVectors();
 };
