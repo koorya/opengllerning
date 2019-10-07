@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include "shader.h"
+#include "camera.h"
 
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
@@ -20,9 +21,8 @@ void key_callback (GLFWwindow*,int,int,int,int);
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
 
-glm::vec3 camPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 camDir = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 camUp = glm::vec3(0.0f, 1.0f, 0.0f);
+Camera my_cam;
+
 
 int main(){
 	glfwInit();
@@ -192,7 +192,7 @@ int main(){
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		view = glm::lookAt(camPos, camPos + camDir, camUp);
+		view = my_cam.getMatrix();
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
 
 		proj = glm::perspective(glm::radians(45.0f), (float)width/(float)height, 0.01f, 100.0f);
@@ -228,20 +228,19 @@ void do_movement(){
 	GLfloat deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 
-	GLfloat camSpeed = deltaTime * 5.0f;
 	if(keys[GLFW_KEY_W])
-		camPos += camSpeed * camDir;
+		my_cam.processKeyboard(Camera_movement::FORWARD, deltaTime);
 	if(keys[GLFW_KEY_S])
-		camPos -= camSpeed * camDir;
+		my_cam.processKeyboard(Camera_movement::BACKWARD, deltaTime);
 	if(keys[GLFW_KEY_D])
-		camPos += camSpeed * glm::normalize(glm::cross(camDir, camUp));
+		my_cam.processKeyboard(Camera_movement::RIGHT, deltaTime);
 	if(keys[GLFW_KEY_A])
-		camPos -= camSpeed * glm::normalize(glm::cross(camDir, camUp));
+		my_cam.processKeyboard(Camera_movement::LEFT, deltaTime);
 
 }
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
 
-	if(action == GLFW_PRESS)
+	if(action == GLFW_PRESS){
 		if(key == GLFW_KEY_ESCAPE){
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}else if(key == GLFW_KEY_UP){
@@ -251,6 +250,7 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 			mix_param -= 0.1;
 			glUniform1f(mix_param_uniform, mix_param);
 		}
+	}
 	if(action == GLFW_PRESS)
 		keys[key] = true;
 	if(action == GLFW_RELEASE)
