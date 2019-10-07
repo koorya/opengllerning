@@ -219,6 +219,8 @@ int main(){
 }
 
 void key_callback (GLFWwindow* window, int key, int scancode, int action, int mode){
+
+	GLfloat camSpeed = 0.05f;
 	if(action == GLFW_PRESS)
 		if(key == GLFW_KEY_ESCAPE){
 			glfwSetWindowShouldClose(window, GL_TRUE);
@@ -228,7 +230,16 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 		}else if(key == GLFW_KEY_DOWN){
 			mix_param -= 0.1;
 			glUniform1f(mix_param_uniform, mix_param);
+		}else if(key == GLFW_KEY_W){
+			camPos += camSpeed * camDir;
+		}else if(key == GLFW_KEY_S){
+			camPos -= camSpeed * camDir;
+		}else if(key == GLFW_KEY_D){
+			camPos += camSpeed * glm::normalize(glm::cross(camDir, camUp));
+		}else if(key == GLFW_KEY_A){
+			camPos -= camSpeed * glm::normalize(glm::cross(camDir, camUp));
 		}
+
 }
 
 
