@@ -23,7 +23,7 @@ void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
 GLfloat mix_param = 0.5f;
 GLuint mix_param_uniform;
 
-Camera my_cam;
+Camera my_cam(glm::vec3(1.0f, 1.0f, 3.0f));
 
 
 int main(){
@@ -54,6 +54,7 @@ int main(){
 	glfwSetScrollCallback(window, scroll_callback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
 	 
@@ -126,6 +127,7 @@ int main(){
 		glm::vec3(  1.5f,  0.2f, -1.5f),
 		glm::vec3( -1.3f,  1.0f, -1.5f)
 	};
+	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
 	GLuint VBO[2], EBO[2], VAO[2];
 	glGenVertexArrays(2, VAO);
@@ -169,10 +171,17 @@ int main(){
 
 
 
-	GLuint color_uniform = glGetUniformLocation(ourShader.Program, "ourColor");
-	GLfloat red_color = 0.0f;
+	GLuint colorLoc = glGetUniformLocation(ourShader.Program, "objColor");
+	glm::vec3  obj_color= glm::vec3(1.0f, 0.5f, 0.31f);
 
-	glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
+	GLuint lightLoc = glGetUniformLocation(ourShader.Program, "lightColor");
+	glm::vec3  light_color= glm::vec3(1.0f, 1.0f, 1.0f);
+
+	glUniform3fv(colorLoc, 1, glm::value_ptr(obj_color));
+	glUniform3fv(lightLoc, 1, glm::value_ptr(light_color));
+
+	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
+
 	glUniform1f(mix_param_uniform, mix_param);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -189,13 +198,10 @@ int main(){
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		do_movement();
-		glClearColor(0.1f, 0.4f, 0.2f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		red_color = sin(glfwGetTime()) / 2 + 0.5f;
-		glUniform4f(color_uniform, red_color, 0.0f, 0.0f, 1.0f);
-
-		
+	
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -204,6 +210,15 @@ int main(){
 
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
 		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
+
+
+		model = glm::translate(glm::mat4(1.0f), lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+		glUniform1i(obj_type_mode, 1);
+		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+
+		glUniform1i(obj_type_mode, 0);
 
 		for(int i = 10; i--;){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
