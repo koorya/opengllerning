@@ -169,6 +169,7 @@ int main(){
 
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
  
+	float lightrad = glm::length(lightPos);
 
 	glEnable(GL_DEPTH_TEST);
 	while(!glfwWindowShouldClose(window)){
@@ -178,7 +179,9 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
-
+		
+		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.z, cos(glfwGetTime())*lightrad);
+		glUniform3fv(lightPosLoc,1, glm::value_ptr(lightPos));
 	
 		glBindVertexArray(VAO[0]);
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
