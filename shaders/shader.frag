@@ -19,6 +19,7 @@ struct Material{
 	float shininess;
 	sampler2D diffuseTex;
 	sampler2D specularTex;
+	sampler2D emissionTex;
 
 };
 
@@ -49,7 +50,7 @@ void main(){
 		float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32);
 		vec3 specular = length(texture(material.specularTex, texPos).rgb) * light.specular * spec;
 
-		vec3 result = ambient + diffuse + specular;	
+		vec3 result = ambient + diffuse + specular + texture(material.emissionTex, texPos).rgb;	
 		
 		color = vec4(result, 1.0f);
 

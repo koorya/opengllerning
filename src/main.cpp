@@ -168,17 +168,23 @@ int main(){
 	GLuint texture[] = {
 		loadTexture("./textures/container2.png"),
 		loadTexture("./textures/container2_specular.png"),
+		loadTexture("./textures/matrix.jpg"),
+		loadTexture("./textures/lighting_maps_specular_color.png"),
 		loadTexture("./textures/awesomeface.png"),
 		loadTexture("./textures/container.jpg"),
 	};
 
 	glUniform1i(glGetUniformLocation(ourShader.Program, "material.diffuseTex"), 0);
 	glUniform1i(glGetUniformLocation(ourShader.Program, "material.specularTex"), 1);
+	glUniform1i(glGetUniformLocation(ourShader.Program, "material.emissionTex"), 2);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture[0]);	
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture[1]);	
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texture[2]);	
+
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
