@@ -151,9 +151,9 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-	ourShader.setVec3(glm::vec3(0.2f, 0.2f, 0.2f), "light.ambient");
-	ourShader.setVec3(glm::vec3(0.5f, 0.5f, 0.5f), "light.diffuse");
-	ourShader.setVec3(glm::vec3(1.0f, 1.0f, 1.0f), "light.specular");
+	ourShader.setVec3(glm::vec3(1.0f), "light.ambient");
+	ourShader.setVec3(glm::vec3(1.0f), "light.diffuse");
+	ourShader.setVec3(glm::vec3(1.0f), "light.specular");
 
 	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.position");
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
@@ -196,13 +196,14 @@ int main(){
 		
 		glUniform1i(obj_type_mode, 0);
 
+		ourShader.setMaterial(Material::green_plastic);
+
 		for(int i = 10; i--;){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
 			if(i % 3 == 0)
 				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-			ourShader.setMaterial(static_cast<Material>(i));
 
 			//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);

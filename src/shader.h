@@ -11,7 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 enum Material{
-	jade = 0,
+	emerald = 0,
+	jade,
 	obsidian,
 	pearl,
 	ruby,
