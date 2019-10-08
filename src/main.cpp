@@ -21,7 +21,7 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
 GLuint loadTexture(const char * file_path);
 
-Camera my_cam(glm::vec3(1.0f, 1.0f, 3.0f));
+Camera my_cam(glm::vec3(0.942951f, -2.274822f, -0.723970f));
 bool keys[1024] = {false};
 
 int main(){
@@ -113,6 +113,15 @@ int main(){
 		glm::vec3(  1.5f,  0.2f, -1.5f),
 		glm::vec3( -1.3f,  1.0f, -1.5f)
 	};
+
+	glm::vec3 lightPositions[] = {
+		glm::vec3(1.003572f, 1.105885f, -2.825360f),
+		glm::vec3(-2.258501f, -0.766950f, -2.328455f),
+		glm::vec3(0.698238f, -0.064507f, -4.464025f),
+		glm::vec3(-0.820750f, 1.761344f, -3.465433f),
+		glm::vec3(-1.309989f, 0.969520f, -7.091900f)
+	};
+
 	glm::vec3 lightPos = glm::vec3(-0.5f, 0.0f, -4.0f);
 
 	GLuint VBO[2], VAO[2];
@@ -149,26 +158,58 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f)/50.0f, "spotLight.ambient");
-	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.diffuse");
-	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.specular");
+//	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f)/50.0f, "spotLight.ambient");
+//	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.diffuse");
+//	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.specular");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "spotLight.ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "spotLight.diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "spotLight.specular");
 	ourShader.setFloat(1.0f, "spotLight.constatnt");
 	ourShader.setFloat(0.22f, "spotLight.linear");
 	ourShader.setFloat(0.2f, "spotLight.quadratic");
 
-	ourShader.setVec4(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), "spotLight.direction");
+	ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
+	ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "spotLight.cutOff");
 	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "spotLight.outerCutOff");
 
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "dirLight.ambient");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.diffuse");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.specular");
-	ourShader.setFloat(1.0f, "dirLight.constatnt");
-	ourShader.setFloat(0.22f, "dirLight.linear");
-	ourShader.setFloat(0.2f, "dirLight.quadratic");
 	ourShader.setVec4(glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
 
 
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0x0F/255.0f)/10.0f, "pointLights[0].ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0x0F/255.0f), "pointLights[0].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0x0F/255.0f), "pointLights[0].specular");
+	ourShader.setFloat(1.0f, "pointLights[0].constatnt");
+	ourShader.setFloat(0.22f, "pointLights[0].linear");
+	ourShader.setFloat(0.2f, "pointLights[0].quadratic");
+	ourShader.setVec4(glm::vec4(lightPositions[0], 1.0f), "pointLights[0].position");
+
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "pointLights[1].ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "pointLights[1].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "pointLights[1].specular");
+	ourShader.setFloat(1.0f, "pointLights[1].constatnt");
+	ourShader.setFloat(0.22f, "pointLights[1].linear");
+	ourShader.setFloat(0.2f, "pointLights[1].quadratic");
+	ourShader.setVec4(glm::vec4(lightPositions[1], 1.0f), "pointLights[1].position");
+
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "pointLights[2].ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "pointLights[2].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "pointLights[2].specular");
+	ourShader.setFloat(1.0f, "pointLights[2].constatnt");
+	ourShader.setFloat(0.22f, "pointLights[2].linear");
+	ourShader.setFloat(0.2f, "pointLights[2].quadratic");
+	ourShader.setVec4(glm::vec4(lightPositions[2], 1.0f), "pointLights[2].position");
+
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0x0F/255.0f, 0xFF/255.0f)/10.0f, "pointLights[3].ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0x0F/255.0f, 0xFF/255.0f), "pointLights[3].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0x0F/255.0f, 0xFF/255.0f), "pointLights[3].specular");
+	ourShader.setFloat(1.0f, "pointLights[3].constatnt");
+	ourShader.setFloat(0.22f, "pointLights[3].linear");
+	ourShader.setFloat(0.2f, "pointLights[3].quadratic");
+	ourShader.setVec4(glm::vec4(lightPositions[3], 1.0f), "pointLights[3].position");
 
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 
@@ -207,13 +248,14 @@ int main(){
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
-		//	std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
+//			std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
 		glfwPollEvents();
 		do_movement();
-		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
+//		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
@@ -234,18 +276,16 @@ int main(){
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
 		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
 
+		for(int i = 0; i < 4; i++){
+			model = glm::translate(glm::mat4(1.0f), lightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+			glUniform1i(obj_type_mode, i);
 
-		model = glm::translate(glm::mat4(1.0f), lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-		glUniform1i(obj_type_mode, 1);
-		//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
-
-
-		glBindVertexArray(VAO[0]);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		glUniform1i(obj_type_mode, 0);
+			glBindVertexArray(VAO[0]);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		glUniform1i(obj_type_mode, -1);
 
 		ourShader.setMaterial(Material::green_plastic);
 
@@ -317,8 +357,12 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 	}
 	if(action == GLFW_PRESS)
 		keys[key] = true;
-	if(action == GLFW_RELEASE)
+	if(action == GLFW_RELEASE){
 		keys[key] = false;
+		if(key == GLFW_KEY_B){
+			std::cout<<glm::to_string(my_cam.Position)<<std::endl;
+		}
+	}
 }
 
 GLuint loadTexture(const char * file_path){
