@@ -149,16 +149,24 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f)/5.0f, "light.ambient");
-	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "light.diffuse");
-	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "light.specular");
-	ourShader.setFloat(1.0f, "light.constatnt");
-	ourShader.setFloat(0.22f, "light.linear");
-	ourShader.setFloat(0.2f, "light.quadratic");
+	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f)/50.0f, "spotLight.ambient");
+	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.diffuse");
+	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.specular");
+	ourShader.setFloat(1.0f, "spotLight.constatnt");
+	ourShader.setFloat(0.22f, "spotLight.linear");
+	ourShader.setFloat(0.2f, "spotLight.quadratic");
 
-	ourShader.setVec4(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), "light.direction");
-	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "light.cutOff");
-	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "light.outerCutOff");
+	ourShader.setVec4(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), "spotLight.direction");
+	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "spotLight.cutOff");
+	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "spotLight.outerCutOff");
+
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "dirLight.ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.specular");
+	ourShader.setFloat(1.0f, "dirLight.constatnt");
+	ourShader.setFloat(0.22f, "dirLight.linear");
+	ourShader.setFloat(0.2f, "dirLight.quadratic");
+	ourShader.setVec4(glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
 
 
 
@@ -214,8 +222,8 @@ int main(){
 //		ourShader.setVec4(glm::vec4(lightPos, 1.0f), "light.position");
 
 		if(keys[GLFW_KEY_B]){
-			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "light.position");
-			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "light.direction");
+			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
+			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 		}
 
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
