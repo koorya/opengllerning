@@ -7,6 +7,8 @@
 
 #define GLEW_STATIC
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Shader{
 public:
@@ -15,6 +17,7 @@ public:
     Shader(const GLchar * vertexPath, const GLchar * fragmentPath);
 
     void use();
+    void setVec3(glm::vec3 value, const GLchar * name);
 };
 
 

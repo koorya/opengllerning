@@ -151,19 +151,18 @@ int main(){
 
 
 
-	GLuint colorLoc = glGetUniformLocation(ourShader.Program, "objColor");
-	glm::vec3  obj_color= glm::vec3(1.0f, 0.5f, 0.31f);
 
-	GLuint lightLoc = glGetUniformLocation(ourShader.Program, "lightColor");
-	glm::vec3  light_color= glm::vec3(1.0f, 1.0f, 1.0f);
+	ourShader.setVec3(glm::vec3(1.0f, 0.5f, 0.31f), "material.ambient");
+	ourShader.setVec3(glm::vec3(1.0f, 0.5f, 0.31f), "material.diffuse");
+	ourShader.setVec3(glm::vec3(1.0f, 0.5f, 0.31f), "material.specular");
 
-	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "lightPos");
+	ourShader.setVec3(glm::vec3(0.2f, 0.2f, 0.2f), "light.ambient");
+	ourShader.setVec3(glm::vec3(0.5f, 0.5f, 0.5f), "light.diffuse");
+	ourShader.setVec3(glm::vec3(1.0f, 1.0f, 1.0f), "light.specular");
 
+	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.position");
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 
-
- 	glUniform3fv(colorLoc, 1, glm::value_ptr(obj_color));
-	glUniform3fv(lightLoc, 1, glm::value_ptr(light_color));
 	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
 	
 
@@ -180,7 +179,7 @@ int main(){
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
-		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.z, cos(glfwGetTime())*lightrad);
+		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
 		glUniform3fv(lightPosLoc,1, glm::value_ptr(lightPos));
 	
 		glBindVertexArray(VAO[0]);

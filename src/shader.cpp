@@ -63,3 +63,9 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath){
 void Shader::use(){
 	glUseProgram(this->Program);
 }
+
+void Shader::setVec3(glm::vec3 value, const GLchar * name){
+	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
+	glUniform3fv(uniformLoc, 1, glm::value_ptr(value));
+}
+
