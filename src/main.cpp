@@ -158,6 +158,7 @@ int main(){
 
 	ourShader.setVec4(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), "light.direction");
 	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "light.cutOff");
+	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "light.outerCutOff");
 
 
 
