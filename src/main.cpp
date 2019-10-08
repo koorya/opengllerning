@@ -186,7 +186,15 @@ int main(){
 	glBindTexture(GL_TEXTURE_2D, texture[2]);	
 
 
+	GLfloat timestamp = glfwGetTime();
+	int time_cnt = 0;
 	while(!glfwWindowShouldClose(window)){
+		time_cnt ++;
+		if(time_cnt % 1000 == 0){
+			std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
+			timestamp = glfwGetTime();
+			time_cnt = 0;
+		}
 		glfwPollEvents();
 		do_movement();
 		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
