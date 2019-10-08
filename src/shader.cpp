@@ -98,7 +98,7 @@ void Shader::setVec3(glm::vec3 value, const GLchar * name){
 
 void Shader::setFloat(GLfloat value, const GLchar * name){
 	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
-	glUniform1f(uniformLoc, uniformLoc);
+	glUniform1f(uniformLoc, value);
 }
 
 

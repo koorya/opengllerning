@@ -7,11 +7,15 @@ in vec2 texPos;
 
 struct Light{
 	vec4 lightVect;
-	vec3 position;
 
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+
+	float constatnt;
+	float linear;
+	float quadratic;
+
 };
 struct Material{
 	vec3 ambient;
@@ -40,10 +44,13 @@ void main(){
 
 		vec3 norm = normalize(vertexNormal);
 		vec3 lightDir;
+		float attenuation = 1.0f;
 		if(light.lightVect.w == 0.0f){
 			lightDir = normalize(-light.lightVect.xyz);
 		}else{
 			lightDir = normalize(light.lightVect.xyz - fragPos);
+			float distance = length(light.lightVect.xyz - fragPos);
+			attenuation = 1.0f/(light.constatnt + (light.linear * distance)+ light.quadratic * distance * distance );
 		}
 		
 		float diff = max(0.0f, dot(norm, lightDir));
@@ -54,7 +61,8 @@ void main(){
 		float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32);
 		vec3 specular = length(texture(material.specularTex, texPos).rgb) * light.specular * spec;
 
-		vec3 result = ambient + diffuse + specular + texture(material.emissionTex, texPos).rgb;	
+		vec3 result = (ambient + diffuse + specular)*attenuation;
+		//result += texture(material.emissionTex, texPos).rgb;	
 		
 		color = vec4(result, 1.0f);
 

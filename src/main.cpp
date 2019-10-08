@@ -113,7 +113,7 @@ int main(){
 		glm::vec3(  1.5f,  0.2f, -1.5f),
 		glm::vec3( -1.3f,  1.0f, -1.5f)
 	};
-	glm::vec3 lightPos = glm::vec3(-0.5f, -1.0f, 0.0f);
+	glm::vec3 lightPos = glm::vec3(-0.5f, 0.0f, -4.0f);
 
 	GLuint VBO[2], VAO[2];
 	glGenVertexArrays(2, VAO);
@@ -149,14 +149,18 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-	ourShader.setVec3(glm::vec3(0.5f), "light.ambient");
-	ourShader.setVec3(glm::vec3(0.5f), "light.diffuse");
+	ourShader.setVec3(glm::vec3(1.0f), "light.ambient");
+	ourShader.setVec3(glm::vec3(1.0f), "light.diffuse");
 	ourShader.setVec3(glm::vec3(1.0f), "light.specular");
+	ourShader.setFloat(1.0f, "light.constatnt");
+	ourShader.setFloat(0.22f, "light.linear");
+	ourShader.setFloat(0.2f, "light.quadratic");
+
 
 	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.lightVect");
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 
-	glUniform4fv(lightPosLoc, 1, glm::value_ptr(glm::vec4(lightPos, 0.0f)));
+	glUniform4fv(lightPosLoc, 1, glm::value_ptr(glm::vec4(lightPos, 1.0f)));
 	
 
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
@@ -202,8 +206,8 @@ int main(){
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
-//		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
-//		glUniform4fv(lightPosLoc,1, glm::value_ptr(glm::vec4(lightPos, 0.0f)));
+		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
+		glUniform4fv(lightPosLoc,1, glm::value_ptr(glm::vec4(lightPos, 1.0f)));
 
 
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
