@@ -6,6 +6,7 @@ in vec3 fragPos;
 in vec2 texPos;
 
 struct Light{
+	vec4 lightVect;
 	vec3 position;
 
 	vec3 ambient;
@@ -37,13 +38,16 @@ void main(){
 	if(isLight == 0){
 		vec3 ambient = texture(material.diffuseTex, texPos).rgb * light.ambient;
 
-
 		vec3 norm = normalize(vertexNormal);
-		vec3 lightDir = normalize(light.position - fragPos);
+		vec3 lightDir;
+		if(light.lightVect.w == 0.0f){
+			lightDir = normalize(-light.lightVect.xyz);
+		}else{
+			lightDir = normalize(light.lightVect.xyz - fragPos);
+		}
+		
 		float diff = max(0.0f, dot(norm, lightDir));
 		vec3 diffuse = diff * texture(material.diffuseTex, texPos).rgb * light.diffuse;
-		
-	
 
 		vec3 viewDir = normalize(viewPos - fragPos);
 		vec3 reflectDir = reflect(-lightDir, norm);

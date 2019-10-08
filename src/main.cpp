@@ -113,7 +113,7 @@ int main(){
 		glm::vec3(  1.5f,  0.2f, -1.5f),
 		glm::vec3( -1.3f,  1.0f, -1.5f)
 	};
-	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+	glm::vec3 lightPos = glm::vec3(-0.5f, -1.0f, 0.0f);
 
 	GLuint VBO[2], VAO[2];
 	glGenVertexArrays(2, VAO);
@@ -153,10 +153,10 @@ int main(){
 	ourShader.setVec3(glm::vec3(0.5f), "light.diffuse");
 	ourShader.setVec3(glm::vec3(1.0f), "light.specular");
 
-	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.position");
+	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.lightVect");
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 
-	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
+	glUniform4fv(lightPosLoc, 1, glm::value_ptr(glm::vec4(lightPos, 0.0f)));
 	
 
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
@@ -191,7 +191,7 @@ int main(){
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
-			std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
+		//	std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
@@ -202,8 +202,8 @@ int main(){
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
-		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
-		glUniform3fv(lightPosLoc,1, glm::value_ptr(lightPos));
+//		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
+//		glUniform4fv(lightPosLoc,1, glm::value_ptr(glm::vec4(lightPos, 0.0f)));
 
 
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
