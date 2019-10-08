@@ -149,8 +149,8 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-	ourShader.setVec3(glm::vec3(1.0f), "light.ambient");
-	ourShader.setVec3(glm::vec3(1.0f), "light.diffuse");
+	ourShader.setVec3(glm::vec3(0.5f), "light.ambient");
+	ourShader.setVec3(glm::vec3(0.5f), "light.diffuse");
 	ourShader.setVec3(glm::vec3(1.0f), "light.specular");
 
 	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.position");
@@ -166,10 +166,19 @@ int main(){
 	glEnable(GL_DEPTH_TEST);
 
 	GLuint texture[] = {
-		loadTexture("./textures/container.jpg"),
-		loadTexture("./textures/awesomeface.png"),
 		loadTexture("./textures/container2.png"),
+		loadTexture("./textures/container2_specular.png"),
+		loadTexture("./textures/awesomeface.png"),
+		loadTexture("./textures/container.jpg"),
 	};
+
+	glUniform1i(glGetUniformLocation(ourShader.Program, "material.diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(ourShader.Program, "material.specularTex"), 1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);	
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture[1]);	
 
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -181,8 +190,8 @@ int main(){
 		
 		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
 		glUniform3fv(lightPosLoc,1, glm::value_ptr(lightPos));
-	
-		glBindVertexArray(VAO[0]);
+
+
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		view = my_cam.getMatrix();
@@ -197,8 +206,11 @@ int main(){
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 		glUniform1i(obj_type_mode, 1);
 		//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+
+
+		glBindVertexArray(VAO[0]);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-		
+
 		glUniform1i(obj_type_mode, 0);
 
 		ourShader.setMaterial(Material::green_plastic);
@@ -210,8 +222,7 @@ int main(){
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture[i%3]);
+
 
 			//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
