@@ -19,6 +19,7 @@ void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
 void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
+GLuint loadTexture(const char * file_path);
 
 Camera my_cam(glm::vec3(1.0f, 1.0f, 3.0f));
 
@@ -56,53 +57,48 @@ int main(){
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
 
 	GLfloat vertices[] = {
-		-0.5, -0.5, 0.5, 0, 0, 1,
-		-0.5, 0.5, 0.5, 0, 0, 1,
-		0.5, 0.5, 0.5, 0, 0, 1,
+		// positions          // normals           // texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-		0.5, 0.5, 0.5, 0, 0, 1,
-		0.5, -0.5, 0.5, 0, 0, 1,
-		-0.5, -0.5, 0.5, 0, 0, 1,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-		-0.5, 0.5, -0.5, 0, 0, -1,
-		0.5, 0.5, -0.5, 0, 0, -1,
-		-0.5, -0.5, -0.5, 0, 0, -1,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-		0.5, 0.5, -0.5, 0, 0, -1,
-		-0.5, -0.5, -0.5, 0, 0, -1,
-		0.5, -0.5, -0.5, 0, 0, -1,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-		-0.5, 0.5, 0.5, 0, 1, 0,
-		-0.5, 0.5, -0.5, 0, 1, 0,
-		0.5, 0.5, 0.5, 0, 1, 0,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-		-0.5, 0.5, -0.5, 0, 1, 0,
-		0.5, 0.5, 0.5, 0, 1, 0,
-		0.5, 0.5, -0.5, 0, 1, 0,
-
-		0.5, -0.5, -0.5, 0, -1, 0,
-		-0.5, -0.5, 0.5, 0, -1, 0,
-		-0.5, -0.5, -0.5, 0, -1, 0,
-
-		0.5, -0.5, -0.5, 0, -1, 0,
-		-0.5, -0.5, 0.5, 0, -1, 0,
-		0.5, -0.5, 0.5, 0, -1, 0,
-
-		0.5, -0.5, 0.5, 1, 0, 0,
-		0.5, 0.5, 0.5, 1, 0, 0,
-		0.5, 0.5, -0.5, 1, 0, 0,
-
-		0.5, -0.5, 0.5, 1, 0, 0,
-		0.5, 0.5, -0.5, 1, 0, 0,
-		0.5, -0.5, -0.5, 1, 0, 0,
-
-		-0.5, -0.5, 0.5, -1, 0, 0,
-		-0.5, 0.5, 0.5, -1, 0, 0,
-		-0.5, 0.5, -0.5, -1, 0, 0,
-
-		-0.5, -0.5, 0.5, -1, 0, 0,
-		-0.5, -0.5, -0.5, -1, 0, 0,
-		-0.5, 0.5, -0.5, -1, 0, 0
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
 	glm::vec3 cubePositions[] = {
@@ -126,10 +122,12 @@ int main(){
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid*)0);//pos
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)0);//pos
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat))); //normals
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat))); //normals
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(6*sizeof(GLfloat))); //texture
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	glBindVertexArray(0);
@@ -166,6 +164,13 @@ int main(){
 	float lightrad = glm::length(lightPos);
 
 	glEnable(GL_DEPTH_TEST);
+
+	GLuint texture[] = {
+		loadTexture("./textures/container.jpg"),
+		loadTexture("./textures/awesomeface.png"),
+		loadTexture("./textures/container2.png"),
+	};
+
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		do_movement();
@@ -204,6 +209,9 @@ int main(){
 				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture[i%3]);
 
 			//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -266,6 +274,22 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 		keys[key] = true;
 	if(action == GLFW_RELEASE)
 		keys[key] = false;
+}
+
+GLuint loadTexture(const char * file_path){
+	int width, height;
+	unsigned char * image = SOIL_load_image(file_path, &width, &height, 0, SOIL_LOAD_RGB);
+	if (image == 0)
+		std::cout<<"LOAD IMAGE FAILED"<<std::endl;
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return texture;
 }
 
 
