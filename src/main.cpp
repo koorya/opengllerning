@@ -149,12 +149,7 @@ int main(){
 	glm::mat4 proj = glm::mat4(1.0f);
 
 
-
-
-
-	ourShader.setVec3(glm::vec3(1.0f, 0.5f, 0.31f), "material.ambient");
-	ourShader.setVec3(glm::vec3(1.0f, 0.5f, 0.31f), "material.diffuse");
-	ourShader.setVec3(glm::vec3(1.0f, 0.5f, 0.31f), "material.specular");
+	ourShader.setMaterial(Material::jade);
 
 	ourShader.setVec3(glm::vec3(0.2f, 0.2f, 0.2f), "light.ambient");
 	ourShader.setVec3(glm::vec3(0.5f, 0.5f, 0.5f), "light.diffuse");
@@ -207,6 +202,7 @@ int main(){
 				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+			ourShader.setMaterial(static_cast<Material>(i));
 
 			//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);

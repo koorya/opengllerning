@@ -10,14 +10,42 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+enum Material{
+	jade = 0,
+	obsidian,
+	pearl,
+	ruby,
+	turquoise,
+	brass,
+	bronze,
+	chrome,
+	copper,
+	gold,
+	silver,
+	black_plastic,
+	cyan_plastic,
+	green_plastic,
+	red_plastic,
+	white_plastic,
+	yellow_plastic,
+	black_rubber,
+	cyan_rubber,
+	green_rubber,
+	red_rubber,
+	white_rubber,
+	yellow_rubber
+};
 class Shader{
 public:
-    GLuint Program;
+	GLuint Program;
 
-    Shader(const GLchar * vertexPath, const GLchar * fragmentPath);
+	Shader(const GLchar * vertexPath, const GLchar * fragmentPath);
 
-    void use();
-    void setVec3(glm::vec3 value, const GLchar * name);
+	void use();
+	void setVec3(glm::vec3 value, const GLchar * name);
+	void setFloat(GLfloat value, const GLchar * name);
+	void setMaterial(Material mat);
+	
 };
 
 
