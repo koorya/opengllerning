@@ -14,8 +14,7 @@ enum Camera_movement{
 };
 
 class Camera{
-	glm::vec3 Position;
-	glm::vec3 Direction;
+
 	glm::vec3 Up;
 	glm::vec3 Right;
 	glm::vec3 WorldUp;
@@ -29,6 +28,9 @@ class Camera{
 	bool plane_moveing;
 
 public:
+	glm::vec3 Position;
+	glm::vec3 Direction;
+
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = -90.0f, GLfloat pitch = 0.0f, bool pm = false);
 	glm::mat4 getMatrix();
 	void processKeyboard(Camera_movement direction, GLfloat delta_time);

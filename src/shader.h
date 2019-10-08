@@ -44,6 +44,7 @@ public:
 
 	void use();
 	void setVec3(glm::vec3 value, const GLchar * name);
+	void setVec4(glm::vec4 value, const GLchar * name);
 	void setFloat(GLfloat value, const GLchar * name);
 	void setMaterial(Material mat);
 	

@@ -22,7 +22,7 @@ void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
 GLuint loadTexture(const char * file_path);
 
 Camera my_cam(glm::vec3(1.0f, 1.0f, 3.0f));
-
+bool keys[1024] = {false};
 
 int main(){
 	glfwInit();
@@ -149,18 +149,21 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-	ourShader.setVec3(glm::vec3(1.0f), "light.ambient");
-	ourShader.setVec3(glm::vec3(1.0f), "light.diffuse");
-	ourShader.setVec3(glm::vec3(1.0f), "light.specular");
+	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f)/5.0f, "light.ambient");
+	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "light.diffuse");
+	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "light.specular");
 	ourShader.setFloat(1.0f, "light.constatnt");
 	ourShader.setFloat(0.22f, "light.linear");
 	ourShader.setFloat(0.2f, "light.quadratic");
 
+	ourShader.setVec4(glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), "light.direction");
+	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "light.cutOff");
 
-	GLuint lightPosLoc = glGetUniformLocation(ourShader.Program, "light.lightVect");
+
+
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 
-	glUniform4fv(lightPosLoc, 1, glm::value_ptr(glm::vec4(lightPos, 1.0f)));
+
 	
 
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
@@ -206,9 +209,13 @@ int main(){
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
-		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
-		glUniform4fv(lightPosLoc,1, glm::value_ptr(glm::vec4(lightPos, 1.0f)));
+//		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
+//		ourShader.setVec4(glm::vec4(lightPos, 1.0f), "light.position");
 
+		if(keys[GLFW_KEY_B]){
+			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "light.position");
+			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "light.direction");
+		}
 
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -258,7 +265,7 @@ int main(){
 	glfwTerminate();
 	return 0;
 }
-bool keys[1024] = {false};
+
 
 void do_movement(){
 	GLfloat currentFrame = glfwGetTime();

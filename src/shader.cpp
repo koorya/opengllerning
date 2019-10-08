@@ -95,7 +95,10 @@ void Shader::setVec3(glm::vec3 value, const GLchar * name){
 	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
 	glUniform3fv(uniformLoc, 1, glm::value_ptr(value));
 }
-
+void Shader::setVec4(glm::vec4 value, const GLchar * name){
+	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
+	glUniform4fv(uniformLoc, 1, glm::value_ptr(value));
+}
 void Shader::setFloat(GLfloat value, const GLchar * name){
 	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
 	glUniform1f(uniformLoc, value);
