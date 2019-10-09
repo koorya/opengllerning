@@ -179,9 +179,9 @@ int main(){
 	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "spotLight.cutOff");
 	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "spotLight.outerCutOff");
 
-	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "dirLight.ambient");
-	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.diffuse");
-	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.specular");
+	ourShader.setVec3(glm::vec3(0x00/255.0f, 0x00/255.0f, 0x00/255.0f)/10.0f, "dirLight.ambient");
+	ourShader.setVec3(glm::vec3(0x00/255.0f, 0x00/255.0f, 0x00/255.0f), "dirLight.diffuse");
+	ourShader.setVec3(glm::vec3(0x00/255.0f, 0x00/255.0f, 0x00/255.0f), "dirLight.specular");
 	ourShader.setVec4(glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
 
 
@@ -216,6 +216,7 @@ int main(){
 	ourShader.setFloat(0.22f, "pointLights[3].linear");
 	ourShader.setFloat(0.2f, "pointLights[3].quadratic");
 	ourShader.setVec4(glm::vec4(lightPositions[3], 1.0f), "pointLights[3].position");
+
 
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 
@@ -283,7 +284,16 @@ int main(){
 		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
 
 		for(int i = 0; i < 4; i++){
-			model = glm::translate(glm::mat4(1.0f), lightPositions[i]);
+			glm::vec3 lightpos = lightPositions[i];
+			float t = glfwGetTime()/(i+1);
+			lightpos.x += glm::sin(sin(7*t)+sin(i*t*0.5f));
+			lightpos.y += glm::cos(5*t)-cos(2*t)+-cos(i*t);
+			lightpos.z += glm::cos(t*3.7f/(i*i+1))*glm::sin(t*4.2f/(i+1));
+
+			std::string uniformname = "pointLights["+std::to_string(i)+"].position";
+			ourShader.setVec4(	glm::vec4(lightpos, 1.0f), uniformname.c_str());
+
+			model = glm::translate(glm::mat4(1.0f), lightpos);
 			model = glm::scale(model, glm::vec3(0.2f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 			glUniform1i(obj_type_mode, i);
@@ -297,6 +307,8 @@ int main(){
 
 		for(int i = 10; i--;){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+			if(i % 4 == 0)
+				model = glm::translate(model, glm::vec3(glm::sin(glfwGetTime()*3), 0.0f, 0.0f));
 			if(i % 3 == 0)
 				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));

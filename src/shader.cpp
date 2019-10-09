@@ -103,7 +103,10 @@ void Shader::setFloat(GLfloat value, const GLchar * name){
 	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
 	glUniform1f(uniformLoc, value);
 }
-
+void Shader::setInt(GLint value, const GLchar * name){
+	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
+	glUniform1i(uniformLoc, value);
+}
 
 void Shader::setMaterial(Material mat){
 	GLfloat * material = materials[mat];
