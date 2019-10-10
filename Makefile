@@ -8,7 +8,7 @@ run: aplication.exe
 	aplication.exe
 
 aplication.exe: obj/main.o obj/shader.o obj/camera.o obj/mesh.o
-	g++ -Wall -o aplication.exe -Lc:/opengl/lib obj/*.o -lassimp -lSOIL -lglew32s -llibglfw3 -lopengl32 -lgdi32 -static
+	g++ -Wall -o aplication.exe -Lc:/opengl/lib obj/*.o -lassimp.dll -lSOIL -lglew32s -llibglfw3 -lopengl32 -lgdi32 -static
 
 obj/main.o: src/main.cpp 
 	g++ -Wall -c -Ic:/opengl/include src/main.cpp -o obj/main.o

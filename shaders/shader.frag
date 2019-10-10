@@ -89,7 +89,7 @@ void main(){
 	}
 	result += calcSpotLight(spotLight, norm, fragPos, viewDir);
 	color = vec4(result, 1.0f);
-	
+//	color = vec4(1.0f);
 }
 
 
