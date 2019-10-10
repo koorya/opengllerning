@@ -21,6 +21,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
+#include "model.h"
 
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
@@ -243,12 +244,14 @@ int main(){
 	std::vector <Texture> vect_textures;
 	Mesh my_mesh(vect_vertices, vect_indices, vect_textures);
 
+	Model my_model("./3d_models/nanosuit/nanosuit.obj");
+
 	GLfloat timestamp = glfwGetTime();
 	int time_cnt = 0;
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
-//			std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
+			std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
@@ -289,7 +292,6 @@ int main(){
 			glUniform1i(obj_type_mode, i);
 
 			my_mesh.Draw(ourShader);
-
 		}
 		glUniform1i(obj_type_mode, -1);
 
@@ -303,8 +305,14 @@ int main(){
 				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-
-			my_mesh.Draw(ourShader);
+			if(i % 2 == 1)
+				my_mesh.Draw(ourShader);
+			else{
+				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+				model = glm::scale(model, glm::vec3(0.2f));
+				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+				my_model.Draw(ourShader);
+			}
 		}
 
 		glfwSwapBuffers(window);
