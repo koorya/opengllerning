@@ -39,7 +39,17 @@ int main(){
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
+
+
+#ifdef FULL_SCREEN
+	GLFWmonitor * monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode * mode = glfwGetVideoMode(monitor);
+	GLFWwindow * window = glfwCreateWindow(mode->width, mode->height, "OpenGL Learning", monitor, nullptr);
+	glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+#else
 	GLFWwindow * window = glfwCreateWindow(800, 600, "OpenGL Learning", nullptr, nullptr);
+#endif
+
 	if (window == nullptr){
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -111,9 +121,9 @@ int main(){
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(  0.0f,  0.0f,  0.0f),
-		glm::vec3(  2.0f,  5.0f, -15.0f),
+		glm::vec3(  2.0f,  5.0f, 2.0f),
 		glm::vec3( -1.5f, -2.2f, -2.5f),
-		glm::vec3( -3.8f, -2.0f, -12.3f),
+		glm::vec3( -3.8f, -2.0f, 3.3f),
 		glm::vec3(  2.4f, -0.4f, -3.5f),
 		glm::vec3( -1.7f,  3.0f, -7.5f),
 		glm::vec3(  1.3f, -2.0f, -2.5f),
@@ -149,7 +159,6 @@ int main(){
 	glm::mat4 proj = glm::mat4(1.0f);
 
 
-	ourShader.setMaterial(Material::jade);
 
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "spotLight.ambient");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "spotLight.diffuse");
@@ -250,6 +259,8 @@ int main(){
 	Model my_model("./3d_models/nanosuit/nanosuit.obj");
 
 	std:: vector<Model> models;
+	models.push_back(Model("./3d_models/nanosuit/nanosuit.obj"));
+
 	models.push_back(Model("./3D_models/manipulator/Component18.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component31.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component1_reduce.stl"));
@@ -262,7 +273,6 @@ int main(){
 	models.push_back(Model("./3D_models/manipulator/Component5_3.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component5_1.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
-
 
 	GLfloat timestamp = glfwGetTime();
 	int time_cnt = 0;
@@ -280,6 +290,7 @@ int main(){
 		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+	
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
 		if(keys[GLFW_KEY_B]){
@@ -314,18 +325,24 @@ int main(){
 		glUniform1i(obj_type_mode, -1);
 
 		ourShader.setMaterial(Material::green_plastic);
+		ourShader.setMaterial(Material::chrome);
+
 
 		for(int i = 0; i < models.size(); i++){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-			if(i % 4 == 0)
-				model = glm::translate(model, glm::vec3(glm::sin(glfwGetTime()*3), 0.0f, 0.0f));
-			if(i % 3 == 0)
-				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
+			// if(i % 4 == 0)
+			// 	model = glm::translate(model, glm::vec3(glm::sin(glfwGetTime()*3), 0.0f, 0.0f));
+			// if(i % 3 == 0)
+			// 	model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-			if(i % 1 == 1)
-				my_mesh.Draw(ourShader);
-			else{
+			if(i == 0){
+				model = glm::scale(model, glm::vec3(0.2f));
+				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+				models[i].Draw(ourShader);
+			}else{
+				ourShader.setMaterial(static_cast<Material> (i));
+
 				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 				model = glm::scale(model, glm::vec3(0.002f));
 				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
@@ -335,7 +352,6 @@ int main(){
 
 		glfwSwapBuffers(window);
 	}
-
 	glfwTerminate();
 	return 0;
 }

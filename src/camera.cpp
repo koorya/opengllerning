@@ -1,6 +1,6 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, bool pm) :  MovementSpeed(3.0f), MouseSensitivity(0.1f), Zoom(45.0f), Direction(glm::vec3(0.0f, 0.0f, 1.0f))
+Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, bool pm) :  MovementSpeed(7.0f), MouseSensitivity(0.1f), Zoom(45.0f), Direction(glm::vec3(0.0f, 0.0f, 1.0f))
 {
 	this->WorldUp = up;
 	this->Position = position;
@@ -42,8 +42,8 @@ void Camera::processKeyboard(Camera_movement direction, GLfloat delta_time){
 }
 
 void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset){
-	xoffset *= this->MouseSensitivity;
-	yoffset *= this->MouseSensitivity;
+	xoffset *= this->MouseSensitivity*this->Zoom/45.0f;
+	yoffset *= this->MouseSensitivity*this->Zoom/45.0f;
 	
 	this->Yaw -= xoffset;
 	this->Pitch += yoffset;
