@@ -54,9 +54,15 @@ void Mesh::Draw(Shader shader){
 			texname = "material.texture_specular";
 			texname +=  std::to_string(specularNr++);
 		}
+		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		shader.setInt(i,  texname.c_str());
 	}
 	glActiveTexture(GL_TEXTURE0);
+
+	if(textures.size() > 0)
+		shader.setInt(1, "material.textured");
+	else
+		shader.setInt(0, "material.textured");
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

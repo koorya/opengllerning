@@ -18,6 +18,7 @@ enum TextureType{
 struct Texture{
 	unsigned int id;
 	TextureType type;
+	const char * path;
 };
 
 class Mesh{

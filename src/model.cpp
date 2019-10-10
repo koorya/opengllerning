@@ -1,4 +1,6 @@
 #include "model.h"
+#include "load_tex.h"
+
 
 Model::Model(char * path){
 	loadModel(path);
@@ -60,8 +62,37 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
 			vect_indices.push_back(face.mIndices[j]);
 	}
 
+	if(mesh->mMaterialIndex >= 0){
+		aiMaterial * material = scene->mMaterials[mesh->mMaterialIndex];
+		std::vector <Texture> diffuseMap = loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
+		vect_textures.insert(vect_textures.end(), diffuseMap.begin(), diffuseMap.end());
+		std::vector <Texture> specularMap = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::SPECULAR);
+		vect_textures.insert(vect_textures.end(), specularMap.begin(), specularMap.end());
+	}
+
 	Mesh my_mesh(vect_vertices, vect_indices, vect_textures);
 
 	return my_mesh;
 }
+
+
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, TextureType tex_type){
+	std::vector <Texture> textures;
+	for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
+		aiString str;
+		mat->GetTexture(type, i, &str);
+		Texture texture;
+		std::string full_path = directory;
+		full_path += "/";
+		full_path += str.C_Str();
+
+		texture.id = loadTexture(full_path.c_str());
+
+		texture.type = tex_type;
+		texture.path = str.C_Str();
+		textures.push_back(texture);
+	} 
+	return textures;
+}
+
 

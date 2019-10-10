@@ -23,11 +23,13 @@
 #include "mesh.h"
 #include "model.h"
 
+#include "load_tex.h"
+
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
 void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
-GLuint loadTexture(const char * file_path);
+
 
 Camera my_cam(glm::vec3(0.942951f, -2.274822f, -0.723970f));
 bool keys[1024] = {false};
@@ -406,20 +408,5 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 	}
 }
 
-GLuint loadTexture(const char * file_path){
-	int width, height;
-	unsigned char * image = SOIL_load_image(file_path, &width, &height, 0, SOIL_LOAD_RGB);
-	if (image == 0)
-		std::cout<<"LOAD IMAGE FAILED"<<std::endl;
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(image);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	return texture;
-}
 
 
