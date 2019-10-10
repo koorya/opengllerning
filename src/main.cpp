@@ -122,8 +122,8 @@ int main(){
 	};
 
 	glm::vec3 cubePositions[] = {
-		glm::vec3(  0.0f,  0.0f,  0.0f),
-		glm::vec3(  2.0f,  5.0f, 2.0f),
+		glm::vec3(  -1.0f,  0.0f,  -0.3f),
+		glm::vec3(  -2.0f,  0.0f, -2.0f),
 		glm::vec3( -1.5f, -2.2f, -2.5f),
 		glm::vec3( -3.8f, -2.0f, 3.3f),
 		glm::vec3(  2.4f, -0.4f, -3.5f),
@@ -258,12 +258,14 @@ int main(){
 	std::vector <Texture> vect_textures;
 	Mesh my_mesh(vect_vertices, vect_indices, vect_textures);
 
-	Model my_model("./3d_models/nanosuit/nanosuit.obj");
+//	Model my_model("./3d_models/nanosuit/nanosuit.obj");
 
 	std:: vector<Model> models;
+
+	models.push_back(Model("3d_models/slim girl/slim girl.obj"));
 	models.push_back(Model("./3d_models/nanosuit/nanosuit.obj"));
 
-	models.push_back(Model("./3D_models/manipulator/Component18.stl"));
+//	models.push_back(Model("./3D_models/manipulator/Component18.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component31.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component1_reduce.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component129.stl"));
@@ -339,9 +341,13 @@ int main(){
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 			if(i == 0){
-				model = glm::scale(model, glm::vec3(0.2f));
+				model = glm::scale(model, glm::vec3(0.02f));
 				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 				models[i].Draw(ourShader);
+			}else if (i == 1){
+				model = glm::scale(model, glm::vec3(0.2f));
+				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+				models[i].Draw(ourShader);				
 			}else{
 				ourShader.setMaterial(static_cast<Material> (i));
 
