@@ -1,7 +1,10 @@
 #include "mesh.h"
 
+<<<<<<< HEAD
 #include <glm/gtx/string_cast.hpp>
 
+=======
+>>>>>>> origin/lesson_3.1
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
 {
 	this->vertices = vertices;
@@ -12,12 +15,16 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 void Mesh::setupMesh(){
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/lesson_3.1
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	
 	glBindVertexArray(VAO);
+<<<<<<< HEAD
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
@@ -86,3 +93,11 @@ void Mesh::Draw(Shader shader){
 
 
 
+=======
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(), GL_STATIC_DRAW);
+
+
+}
+>>>>>>> origin/lesson_3.1
