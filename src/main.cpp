@@ -20,6 +20,7 @@
 
 #include "shader.h"
 #include "camera.h"
+#include "mesh.h"
 
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
@@ -128,24 +129,6 @@ int main(){
 		glm::vec3(-1.309989f, 0.969520f, -7.091900f)
 	};
 
-	glm::vec3 lightPos = glm::vec3(-0.5f, 0.0f, -4.0f);
-
-	GLuint VBO[2], VAO[2];
-	glGenVertexArrays(2, VAO);
-	glGenBuffers(2, VBO);
-	glBindVertexArray(VAO[0]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)0);//pos
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat))); //normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(6*sizeof(GLfloat))); //texture
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER,0);
-	glBindVertexArray(0);
 
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -164,9 +147,6 @@ int main(){
 
 	ourShader.setMaterial(Material::jade);
 
-//	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f)/50.0f, "spotLight.ambient");
-//	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.diffuse");
-//	ourShader.setVec3(glm::vec3(0xD6/255.0f, 0x70/255.0f, 0xD6/255.0f), "spotLight.specular");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "spotLight.ambient");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "spotLight.diffuse");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "spotLight.specular");
@@ -225,7 +205,6 @@ int main(){
 
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
  
-	float lightrad = glm::length(lightPos);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -249,6 +228,20 @@ int main(){
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texture[2]);	
 
+	std::vector <Vertex> vect_vertices;
+	for(int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 8){
+		Vertex vertex;
+		vertex.Position = glm::vec3 (vertices[i], vertices[i+1], vertices[i+2]);
+		vertex.Normal = glm::vec3 (vertices[i+3], vertices[i+4], vertices[i+5]);
+		vertex.TexCoords = glm::vec2 (vertices[i+6], vertices[i+7]);
+		vect_vertices.push_back(vertex);
+	}
+	std::vector <unsigned int> vect_indices;
+	for (int i = 0; i < sizeof(vertices)/sizeof(*vertices)/8; i++){
+		vect_indices.push_back(i);
+	}
+	std::vector <Texture> vect_textures;
+	Mesh my_mesh(vect_vertices, vect_indices, vect_textures);
 
 	GLfloat timestamp = glfwGetTime();
 	int time_cnt = 0;
@@ -259,23 +252,20 @@ int main(){
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
+
 		glfwPollEvents();
 		do_movement();
-//		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
-//		lightPos = glm::vec3( sin(glfwGetTime())*lightrad, lightPos.y, cos(glfwGetTime())*lightrad);
-//		ourShader.setVec4(glm::vec4(lightPos, 1.0f), "light.position");
-
 		if(keys[GLFW_KEY_B]){
 			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
 			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 		}
 
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		view = my_cam.getMatrix();
 		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
@@ -298,8 +288,8 @@ int main(){
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 			glUniform1i(obj_type_mode, i);
 
-			glBindVertexArray(VAO[0]);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			my_mesh.Draw(ourShader);
+
 		}
 		glUniform1i(obj_type_mode, -1);
 
@@ -314,20 +304,11 @@ int main(){
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 
-
-
-			//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			my_mesh.Draw(ourShader);
 		}
-
-		glBindVertexArray(0);
-
 
 		glfwSwapBuffers(window);
 	}
-	glDeleteVertexArrays(2, VAO);
-	glDeleteBuffers(2, VBO);
-
 
 	glfwTerminate();
 	return 0;
