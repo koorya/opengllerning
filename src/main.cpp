@@ -119,7 +119,10 @@ int main(){
 		glm::vec3(  1.3f, -2.0f, -2.5f),
 		glm::vec3(  1.5f,  2.0f, -2.5f),
 		glm::vec3(  1.5f,  0.2f, -1.5f),
-		glm::vec3( -1.3f,  1.0f, -1.5f)
+		glm::vec3( -1.3f,  1.0f, -1.5f),
+		glm::vec3(  1.5f,  4.3f, -2.5f),
+		glm::vec3(  2.2f,  0.2f, -1.5f),
+		glm::vec3( -1.3f,  -1.0f, -3.5f)
 	};
 
 	glm::vec3 lightPositions[] = {
@@ -160,9 +163,9 @@ int main(){
 	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "spotLight.cutOff");
 	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "spotLight.outerCutOff");
 
-	ourShader.setVec3(glm::vec3(0x00/255.0f, 0x00/255.0f, 0x00/255.0f)/10.0f, "dirLight.ambient");
-	ourShader.setVec3(glm::vec3(0x00/255.0f, 0x00/255.0f, 0x00/255.0f), "dirLight.diffuse");
-	ourShader.setVec3(glm::vec3(0x00/255.0f, 0x00/255.0f, 0x00/255.0f), "dirLight.specular");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "dirLight.ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.diffuse");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.specular");
 	ourShader.setVec4(glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
 
 
@@ -246,6 +249,21 @@ int main(){
 
 	Model my_model("./3d_models/nanosuit/nanosuit.obj");
 
+	std:: vector<Model> models;
+	models.push_back(Model("./3D_models/manipulator/Component18.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component31.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component1_reduce.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component129.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component26.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component19.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component21.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component20.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component40.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component5_3.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component5_1.stl"));
+	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
+
+
 	GLfloat timestamp = glfwGetTime();
 	int time_cnt = 0;
 	while(!glfwWindowShouldClose(window)){
@@ -297,7 +315,7 @@ int main(){
 
 		ourShader.setMaterial(Material::green_plastic);
 
-		for(int i = 10; i--;){
+		for(int i = 0; i < models.size(); i++){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
 			if(i % 4 == 0)
 				model = glm::translate(model, glm::vec3(glm::sin(glfwGetTime()*3), 0.0f, 0.0f));
@@ -305,13 +323,13 @@ int main(){
 				model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-			if(i % 2 == 1)
+			if(i % 1 == 1)
 				my_mesh.Draw(ourShader);
 			else{
 				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.2f));
+				model = glm::scale(model, glm::vec3(0.002f));
 				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-				my_model.Draw(ourShader);
+				models[i].Draw(ourShader);
 			}
 		}
 
