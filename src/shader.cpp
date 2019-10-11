@@ -92,24 +92,29 @@ void Shader::use(){
 }
 
 void Shader::setVec3(glm::vec3 value, const GLchar * name){
-	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
-	glUniform3fv(uniformLoc, 1, glm::value_ptr(value));
+	GLint uniformLoc = glGetUniformLocation(this->Program, name);
+	if(uniformLoc != -1)
+		glUniform3fv(uniformLoc, 1, glm::value_ptr(value));
 }
 void Shader::setVec4(glm::vec4 value, const GLchar * name){
-	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
-	glUniform4fv(uniformLoc, 1, glm::value_ptr(value));
+	GLint uniformLoc = glGetUniformLocation(this->Program, name);
+	if(uniformLoc != -1)
+		glUniform4fv(uniformLoc, 1, glm::value_ptr(value));
 }
 void Shader::setMat4(glm::mat4 value, const GLchar * name){
-	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
-	glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(value) );
+	GLint uniformLoc = glGetUniformLocation(this->Program, name);
+	if(uniformLoc != -1)
+		glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(value) );
 }
 void Shader::setFloat(GLfloat value, const GLchar * name){
-	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
-	glUniform1f(uniformLoc, value);
+	GLint uniformLoc = glGetUniformLocation(this->Program, name);
+	if(uniformLoc != -1)
+		glUniform1f(uniformLoc, value);
 }
 void Shader::setInt(GLint value, const GLchar * name){
-	GLuint uniformLoc = glGetUniformLocation(this->Program, name);
-	glUniform1i(uniformLoc, value);
+	GLint uniformLoc = glGetUniformLocation(this->Program, name);
+	if(uniformLoc != -1)
+		glUniform1i(uniformLoc, value);
 }
 
 void Shader::setMaterial(Material mat){
