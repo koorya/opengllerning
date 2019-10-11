@@ -223,28 +223,8 @@ int main(){
 
 	glEnable(GL_DEPTH_TEST);
 
-	// GLuint texture[] = {
-	// 	loadTexture("./textures/container2.png"),
-	// 	loadTexture("./textures/container2_specular.png"),
-	// 	loadTexture("./textures/matrix.jpg"),
-	// 	loadTexture("./textures/lighting_maps_specular_color.png"),
-	// 	loadTexture("./textures/awesomeface.png"),
-	// 	loadTexture("./textures/container.jpg"),
-	// };
-
-	// glUniform1i(glGetUniformLocation(ourShader.Program, "material.diffuseTex"), 0);
-	// glUniform1i(glGetUniformLocation(ourShader.Program, "material.specularTex"), 1);
-	// glUniform1i(glGetUniformLocation(ourShader.Program, "material.emissionTex"), 2);
-
-	// glActiveTexture(GL_TEXTURE0);
-	// glBindTexture(GL_TEXTURE_2D, texture[0]);	
-	// glActiveTexture(GL_TEXTURE1);
-	// glBindTexture(GL_TEXTURE_2D, texture[1]);	
-	// glActiveTexture(GL_TEXTURE2);
-	// glBindTexture(GL_TEXTURE_2D, texture[2]);	
-
 	std::vector <Vertex> vect_vertices;
-	for(int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 8){
+	for(unsigned int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 8){
 		Vertex vertex;
 		vertex.Position = glm::vec3 (vertices[i], vertices[i+1], vertices[i+2]);
 		vertex.Normal = glm::vec3 (vertices[i+3], vertices[i+4], vertices[i+5]);
@@ -252,7 +232,7 @@ int main(){
 		vect_vertices.push_back(vertex);
 	}
 	std::vector <unsigned int> vect_indices;
-	for (int i = 0; i < sizeof(vertices)/sizeof(*vertices)/8; i++){
+	for (unsigned int i = 0; i < sizeof(vertices)/sizeof(*vertices)/8; i++){
 		vect_indices.push_back(i);
 	}
 	std::vector <Texture> vect_textures;
@@ -332,7 +312,7 @@ int main(){
 		ourShader.setMaterial(Material::chrome);
 
 
-		for(int i = 0; i < models.size(); i++){
+		for(unsigned int i = 0; i < models.size(); i++){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
 			// if(i % 4 == 0)
 			// 	model = glm::translate(model, glm::vec3(glm::sin(glfwGetTime()*3), 0.0f, 0.0f));

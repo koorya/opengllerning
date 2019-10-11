@@ -2,7 +2,7 @@
 #include "load_tex.h"
 
 
-Model::Model(char * path){
+Model::Model(const char * path){
 	loadModel(path);
 }
 
