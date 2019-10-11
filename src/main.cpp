@@ -152,9 +152,6 @@ int main(){
 	ourShader.use();
 
 
-	GLuint model_loc = glGetUniformLocation(ourShader.Program, "model");
-	GLuint view_loc = glGetUniformLocation(ourShader.Program, "view");
-	GLuint proj_loc = glGetUniformLocation(ourShader.Program, "proj");
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
@@ -221,7 +218,7 @@ int main(){
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
  
 
-	glEnable(GL_DEPTH_TEST);
+
 
 	std::vector <Vertex> vect_vertices;
 	for(unsigned int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 8){
@@ -260,6 +257,11 @@ int main(){
 
 	GLfloat timestamp = glfwGetTime();
 	int time_cnt = 0;
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
+
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
@@ -272,7 +274,7 @@ int main(){
 		do_movement();
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		
 	
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
@@ -284,10 +286,10 @@ int main(){
 
 
 		view = my_cam.getMatrix();
-		glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view) );
+		ourShader.setMat4(view, "view");
 
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
-		glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj) );
+		ourShader.setMat4(proj, "proj");
 
 		for(int i = 0; i < 4; i++){
 			glm::vec3 lightpos = lightPositions[i];
@@ -301,7 +303,7 @@ int main(){
 
 			model = glm::translate(glm::mat4(1.0f), lightpos);
 			model = glm::scale(model, glm::vec3(0.2f));
-			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
+			ourShader.setMat4(model, "model");
 			glUniform1i(obj_type_mode, i);
 
 			my_mesh.Draw(ourShader);
@@ -319,23 +321,18 @@ int main(){
 			// if(i % 3 == 0)
 			// 	model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
-			glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
 			if(i == 0){
 				model = glm::scale(model, glm::vec3(0.02f));
-				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-				models[i].Draw(ourShader);
 			}else if (i == 1){
 				model = glm::scale(model, glm::vec3(0.2f));
-				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-				models[i].Draw(ourShader);				
 			}else{
 				ourShader.setMaterial(static_cast<Material> (i));
 
 				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 				model = glm::scale(model, glm::vec3(0.002f));
-				glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model) );
-				models[i].Draw(ourShader);
 			}
+			ourShader.setMat4(model, "model");
+			models[i].Draw(ourShader);
 		}
 
 		glfwSwapBuffers(window);
