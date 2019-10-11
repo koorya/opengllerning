@@ -86,11 +86,22 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
 		full_path += "/";
 		full_path += str.C_Str();
 
-		texture.id = loadTexture(full_path.c_str());
+		bool skip = false;
+		for(unsigned int i = 0; i < loaded_textures.size(); i++){
+			if(std::strcmp(loaded_textures[i].path.c_str(), full_path.c_str())==0){
+				skip = true;
+				textures.push_back(loaded_textures[i]);
+				break;
+			}
+		}
+		if(!skip){
+			texture.id = loadTexture(full_path.c_str());
 
-		texture.type = tex_type;
-		texture.path = str.C_Str();
-		textures.push_back(texture);
+			texture.type = tex_type;
+			texture.path = full_path;
+			textures.push_back(texture);
+			loaded_textures.push_back(texture);
+		}
 	} 
 	return textures;
 }

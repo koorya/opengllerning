@@ -18,7 +18,7 @@ enum TextureType{
 struct Texture{
 	unsigned int id;
 	TextureType type;
-	const char * path;
+	std::string path;
 };
 
 class Mesh{
