@@ -259,8 +259,10 @@ int main(){
 	int time_cnt = 0;
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
+
+  	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
 
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
@@ -269,13 +271,16 @@ int main(){
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
-
+		
 		glfwPollEvents();
 		do_movement();
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
+		glStencilMask(0xFF);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glStencilMask(0x00);
 		
+
 	
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		
@@ -322,18 +327,47 @@ int main(){
 			// 	model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			if(i == 0){
+				
 				model = glm::scale(model, glm::vec3(0.02f));
+				ourShader.setMat4(model, "model");
+
+				glStencilFunc(GL_ALWAYS, 1, 0xFF);
+				glStencilMask(0xFF);
+				models[i].Draw(ourShader);				
+
+
+				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+				glStencilMask(0x00);
+
+				stensilShader.use();
+				stensilShader.setFloat(1.0f, "scale");
+				stensilShader.setMat4(model, "model");
+				stensilShader.setMat4(view, "view");
+				stensilShader.setMat4(proj, "proj");
+
+//				glDisable(GL_DEPTH_TEST);
+				models[i].Draw(stensilShader);
+//				glEnable(GL_DEPTH_TEST);
+
+				glStencilFunc(GL_ALWAYS, 1, 0xFF);
+				glStencilMask(0x00);
+
+				ourShader.use();
+
 			}else if (i == 1){
 				model = glm::scale(model, glm::vec3(0.2f));
+				ourShader.setMat4(model, "model");
+				models[i].Draw(ourShader);
 			}else{
 				ourShader.setMaterial(static_cast<Material> (i));
 
 				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 				model = glm::scale(model, glm::vec3(0.002f));
+				ourShader.setMat4(model, "model");
+				models[i].Draw(ourShader);
 			}
-			ourShader.setMat4(model, "model");
-			models[i].Draw(ourShader);
 		}
+
 
 		glfwSwapBuffers(window);
 	}
