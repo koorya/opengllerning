@@ -40,7 +40,7 @@ int main(){
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 
 #ifdef FULL_SCREEN
@@ -374,6 +374,8 @@ int main(){
 	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
 
 
+	glEnable(GL_MULTISAMPLE);
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -394,7 +396,8 @@ int main(){
 			time_cnt = 0;
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		ourShader.use();
 		glEnable(GL_DEPTH_TEST);
 		glfwPollEvents();
@@ -517,15 +520,16 @@ int main(){
 		glDepthMask(GL_TRUE);
 
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		screenShader.use();
-		glDisable(GL_DEPTH_TEST);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glBindVertexArray(screen_vao);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		// glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		// screenShader.use();
+		// glDisable(GL_DEPTH_TEST);
+		// glClear(GL_COLOR_BUFFER_BIT);
+		// glBindVertexArray(screen_vao);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+		// glDrawArrays(GL_TRIANGLES, 0, 6);
+		// glBindVertexArray(0);
+	
 		glfwSwapBuffers(window);
 
 	}
