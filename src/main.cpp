@@ -29,7 +29,7 @@ void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
 void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
-
+unsigned int loadCubeMap(std::vector<std::string> faces);
 
 Camera my_cam(glm::vec3(0.942951f, -2.274822f, -0.723970f));
 bool keys[1024] = {false};
@@ -77,6 +77,8 @@ int main(){
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
   	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
 	Shader screenShader("./shaders/screen.vert", "./shaders/screen.frag");
+	Shader skyboxShader("./shaders/skybox.vert", "./shaders/skybox.frag");
+
 
 	GLfloat screen_vertices[] = {
 		-1.0f, -1.0f, 0.0f, 0.0f,
@@ -156,6 +158,72 @@ int main(){
 		glm::vec3(-0.820750f, 1.761344f, -3.465433f),
 		glm::vec3(-1.309989f, 0.969520f, -7.091900f)
 	};
+
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+
+	std::vector<std::string> faces({
+		"./textures/skybox/right.jpg",
+		"./textures/skybox/left.jpg",
+		"./textures/skybox/top.jpg",
+		"./textures/skybox/bottom.jpg",
+		"./textures/skybox/front.jpg",
+		"./textures/skybox/back.jpg"
+	});
+
+	unsigned int cubemapTexture = loadCubeMap(faces);
+
+	GLuint skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+	glBindVertexArray(0);
 
 
 	GLuint screen_vao, screen_vbo;
@@ -337,6 +405,16 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glStencilMask(0x00);
 
+		skyboxShader.use();
+		skyboxShader.setMat4(proj, "proj");
+		skyboxShader.setMat4(glm::mat4(glm::mat3(view)), "view");
+		glDepthMask(GL_FALSE);
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);
+
+		ourShader.use();
 		for(int i = 0; i < 4; i++){
 			glm::vec3 lightpos = lightPositions[i];
 			float t = glfwGetTime()/(i+1);
@@ -470,5 +548,27 @@ void key_callback (GLFWwindow* window, int key, int scancode, int action, int mo
 	}
 }
 
+unsigned int loadCubeMap(std::vector<std::string> faces){
+	GLuint cubeTextureID;
+	glGenTextures(1, &cubeTextureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTextureID);
 
+	int width, height, nrChannels;
+	for(unsigned int i = 0; i < faces.size(); i++){
+		unsigned char * data = SOIL_load_image(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if(data){
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			SOIL_free_image_data(data);
+		}else{
+			std::cout<<"Cubemap texture failed to load at path: "<<faces[i]<<std::endl;
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return cubeTextureID;
+}
 
