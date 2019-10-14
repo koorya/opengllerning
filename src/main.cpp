@@ -75,6 +75,18 @@ int main(){
 
 
 	Shader ourShader( "./shaders/shader.vert", "./shaders/shader.frag");
+  	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
+	Shader screenShader("./shaders/screen.vert", "./shaders/screen.frag");
+
+	GLfloat screen_vertices[] = {
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f, 1.0f,
+
+		 1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f, 0.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f
+	};
 
 	GLfloat vertices[] = {
 		// positions          // normals           // texture coords
@@ -146,8 +158,45 @@ int main(){
 	};
 
 
+	GLuint screen_vao, screen_vbo;
+	glGenVertexArrays(1, &screen_vao);
+	glGenBuffers(1, &screen_vbo);
+	glBindVertexArray(screen_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, screen_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertices), screen_vertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float)));
+	glBindVertexArray(0);
+	
+	GLuint framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	GLuint textureColorBuffer; 
+//	textureColorBuffer = loadTexture("./textures/container.jpg");
+	glGenTextures(1, &textureColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+	
+	GLuint rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout<<"ERROR::FRAMEBUFFER:: framebuffer is not complete"<< std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	ourShader.use();
 
@@ -211,14 +260,7 @@ int main(){
 
 
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
-
-
-	
-
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
- 
-
-
 
 	std::vector <Vertex> vect_vertices;
 	for(unsigned int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 8){
@@ -234,8 +276,6 @@ int main(){
 	}
 	std::vector <Texture> vect_textures;
 	Mesh my_mesh(vect_vertices, vect_indices, vect_textures);
-
-//	Model my_model("./3d_models/nanosuit/nanosuit.obj");
 
 	std:: vector<Model> models;
 
@@ -255,8 +295,8 @@ int main(){
 	models.push_back(Model("./3D_models/manipulator/Component5_1.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
 
-	GLfloat timestamp = glfwGetTime();
-	int time_cnt = 0;
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -264,8 +304,9 @@ int main(){
 
 	glEnable(GL_CULL_FACE);
 
-  	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
 
+	GLfloat timestamp = glfwGetTime();
+	int time_cnt = 0;
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
@@ -273,30 +314,28 @@ int main(){
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
-		
+
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		ourShader.use();
+		glEnable(GL_DEPTH_TEST);
 		glfwPollEvents();
 		do_movement();
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
-		glStencilMask(0xFF);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glStencilMask(0x00);
-		
-
-	
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
-		
 		if(keys[GLFW_KEY_B]){
 			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
 			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 		}
-
-
 		view = my_cam.getMatrix();
 		ourShader.setMat4(view, "view");
 
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
 		ourShader.setMat4(proj, "proj");
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
+		glStencilMask(0xFF);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glStencilMask(0x00);
 
 		for(int i = 0; i < 4; i++){
 			glm::vec3 lightpos = lightPositions[i];
@@ -311,22 +350,16 @@ int main(){
 			model = glm::translate(glm::mat4(1.0f), lightpos);
 			model = glm::scale(model, glm::vec3(0.2f));
 			ourShader.setMat4(model, "model");
-			glUniform1i(obj_type_mode, i);
 
+			glUniform1i(obj_type_mode, i);
 			my_mesh.Draw(ourShader);
 		}
+
 		glUniform1i(obj_type_mode, -1);
-
 		ourShader.setMaterial(Material::green_plastic);
-		ourShader.setMaterial(Material::chrome);
-
 
 		for(unsigned int i = 0; i < models.size(); i++){
 			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-			// if(i % 4 == 0)
-			// 	model = glm::translate(model, glm::vec3(glm::sin(glfwGetTime()*3), 0.0f, 0.0f));
-			// if(i % 3 == 0)
-			// 	model = glm::rotate(model, (float)glfwGetTime(),  glm::vec3(1.0f, 0.0f, 0.0f));
 			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
 			if(i == 0){
 				
@@ -347,9 +380,9 @@ int main(){
 				stensilShader.setMat4(view, "view");
 				stensilShader.setMat4(proj, "proj");
 
-//				glDisable(GL_DEPTH_TEST);
+				// glDisable(GL_DEPTH_TEST);
 				models[i].Draw(stensilShader);
-//				glEnable(GL_DEPTH_TEST);
+				// glEnable(GL_DEPTH_TEST);
 
 				glStencilFunc(GL_ALWAYS, 1, 0xFF);
 				glStencilMask(0x00);
@@ -371,7 +404,17 @@ int main(){
 		}
 
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		screenShader.use();
+		glDisable(GL_DEPTH_TEST);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBindVertexArray(screen_vao);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 		glfwSwapBuffers(window);
+
 	}
 	glfwTerminate();
 	return 0;
