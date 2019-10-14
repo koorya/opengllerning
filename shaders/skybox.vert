@@ -12,4 +12,5 @@ void main(){
 	TexCoords = aPos;
 	
 	gl_Position = proj * view * vec4(aPos, 1.0f);
+	gl_Position = gl_Position.xyww;
 }

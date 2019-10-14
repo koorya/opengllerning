@@ -78,6 +78,8 @@ int main(){
   	Shader stensilShader( "./shaders/shader.vert", "./shaders/stencil.frag"); 
 	Shader screenShader("./shaders/screen.vert", "./shaders/screen.frag");
 	Shader skyboxShader("./shaders/skybox.vert", "./shaders/skybox.frag");
+	Shader reflectShader("./shaders/reflect.vert", "./shaders/reflect.frag");
+	Shader refractShader("./shaders/refract.vert", "./shaders/refract.frag");
 
 
 	GLfloat screen_vertices[] = {
@@ -291,7 +293,7 @@ int main(){
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "dirLight.ambient");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.diffuse");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.specular");
-	ourShader.setVec4(glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
+	ourShader.setVec4(glm::vec4(1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
 
 
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0x0F/255.0f)/10.0f, "pointLights[0].ambient");
@@ -366,6 +368,7 @@ int main(){
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -405,14 +408,7 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glStencilMask(0x00);
 
-		skyboxShader.use();
-		skyboxShader.setMat4(proj, "proj");
-		skyboxShader.setMat4(glm::mat4(glm::mat3(view)), "view");
-		glDepthMask(GL_FALSE);
-		glBindVertexArray(skyboxVAO);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glDepthMask(GL_TRUE);
+
 
 		ourShader.use();
 		for(int i = 0; i < 4; i++){
@@ -480,6 +476,37 @@ int main(){
 				models[i].Draw(ourShader);
 			}
 		}
+
+		reflectShader.use();
+		reflectShader.setVec3(my_cam.Position, "cameraPos");
+		reflectShader.setMat4(view, "view");
+		reflectShader.setMat4(proj, "proj");
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0, 0.0, 0.0));
+		model = glm::scale(model, glm::vec3(0.02f));
+		reflectShader.setMat4(model, "model");
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		models[0].Draw(reflectShader);
+
+		refractShader.use();
+		refractShader.setVec3(my_cam.Position, "cameraPos");
+		refractShader.setMat4(view, "view");
+		refractShader.setMat4(proj, "proj");
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(3.0, 0.0, 0.0));
+		model = glm::rotate(model, (float)glm::radians(20.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.02f));
+		refractShader.setMat4(model, "model");
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		models[0].Draw(refractShader);
+
+
+		skyboxShader.use();
+		skyboxShader.setMat4(proj, "proj");
+		skyboxShader.setMat4(glm::mat4(glm::mat3(view)), "view");
+		glDepthMask(GL_FALSE);
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
