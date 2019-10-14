@@ -206,13 +206,21 @@ int main(){
 		1.0f, -1.0f,  1.0f
 	};
 
+	// std::vector<std::string> faces({
+	// 	"./textures/skybox/right.jpg",
+	// 	"./textures/skybox/left.jpg",
+	// 	"./textures/skybox/top.jpg",
+	// 	"./textures/skybox/bottom.jpg",
+	// 	"./textures/skybox/front.jpg",
+	// 	"./textures/skybox/back.jpg"
+	// });
 	std::vector<std::string> faces({
-		"./textures/skybox/right.jpg",
-		"./textures/skybox/left.jpg",
-		"./textures/skybox/top.jpg",
-		"./textures/skybox/bottom.jpg",
-		"./textures/skybox/front.jpg",
-		"./textures/skybox/back.jpg"
+		"./textures/Yokohama3/posx.jpg",
+		"./textures/Yokohama3/negx.jpg",
+		"./textures/Yokohama3/posy.jpg",
+		"./textures/Yokohama3/negy.jpg",
+		"./textures/Yokohama3/posz.jpg",
+		"./textures/Yokohama3/negz.jpg"
 	});
 
 	unsigned int cubemapTexture = loadCubeMap(faces);
