@@ -34,8 +34,14 @@ float kernel_contrast [9] = float [](
 	-1, -1, -1
 );
 
+float kernel_identity [9] = float [](
+	0, 0, 0,
+	0, 1, 0,
+	0, 0, 0
+);
+
 void main(){
-	float kernel[] = kernel_blur;
+	float kernel[] = kernel_identity;
 	vec3 samleTex[9];
 	for(int i = 0; i < 9; i++){
 		samleTex[i] = vec3(texture(screenTexture, TexCoords.st + offsets[i]));
