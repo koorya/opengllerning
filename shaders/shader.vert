@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -8,9 +8,11 @@ out vec3 vertexNormal;
 out vec3 fragPos;
 out vec2 texPos;
 
-uniform mat4 model;//помещает обект на сцену
-uniform mat4 view; //ориентирует всю сцену для наблюдателя
-uniform mat4 proj; // переводит сцену в 2D
+layout (std140, binding = 2) uniform transformBlock{
+	mat4 model;
+	mat4 proj;
+	mat4 view;
+};
 
 uniform float scale;
 

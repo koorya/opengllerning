@@ -81,6 +81,13 @@ int main(){
 	Shader reflectShader("./shaders/reflect.vert", "./shaders/reflect.frag");
 	Shader refractShader("./shaders/refract.vert", "./shaders/refract.frag");
 
+	GLuint uboTransform;
+	glGenBuffers(1, &uboTransform);
+	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*3, NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 2, uboTransform);
+
 
 	GLfloat screen_vertices[] = {
 		-1.0f, -1.0f, 0.0f, 0.0f,
@@ -388,6 +395,9 @@ int main(){
 
 	GLfloat timestamp = glfwGetTime();
 	int time_cnt = 0;
+
+	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
+
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
@@ -413,6 +423,11 @@ int main(){
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
 		ourShader.setMat4(proj, "proj");
 
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(proj));
+		glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+
+
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
 		glStencilMask(0xFF);
@@ -434,7 +449,7 @@ int main(){
 
 			model = glm::translate(glm::mat4(1.0f), lightpos);
 			model = glm::scale(model, glm::vec3(0.2f));
-			ourShader.setMat4(model, "model");
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 
 			glUniform1i(obj_type_mode, i);
 			my_mesh.Draw(ourShader);
@@ -449,7 +464,7 @@ int main(){
 			if(i == 0){
 				
 				model = glm::scale(model, glm::vec3(0.02f));
-				ourShader.setMat4(model, "model");
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 
 				glStencilFunc(GL_ALWAYS, 1, 0xFF);
 				glStencilMask(0xFF);
@@ -461,9 +476,6 @@ int main(){
 
 				stensilShader.use();
 				stensilShader.setFloat(1.0f, "scale");
-				stensilShader.setMat4(model, "model");
-				stensilShader.setMat4(view, "view");
-				stensilShader.setMat4(proj, "proj");
 
 				// glDisable(GL_DEPTH_TEST);
 				models[i].Draw(stensilShader);
@@ -476,36 +488,32 @@ int main(){
 
 			}else if (i == 1){
 				model = glm::scale(model, glm::vec3(0.2f));
-				ourShader.setMat4(model, "model");
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 				models[i].Draw(ourShader);
 			}else{
 				ourShader.setMaterial(static_cast<Material> (i));
 
 				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 				model = glm::scale(model, glm::vec3(0.002f));
-				ourShader.setMat4(model, "model");
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 				models[i].Draw(ourShader);
 			}
 		}
 
 		reflectShader.use();
 		reflectShader.setVec3(my_cam.Position, "cameraPos");
-		reflectShader.setMat4(view, "view");
-		reflectShader.setMat4(proj, "proj");
 		model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0, 0.0, 0.0));
 		model = glm::scale(model, glm::vec3(0.02f));
-		reflectShader.setMat4(model, "model");
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		models[0].Draw(reflectShader);
 
 		refractShader.use();
 		refractShader.setVec3(my_cam.Position, "cameraPos");
-		refractShader.setMat4(view, "view");
-		refractShader.setMat4(proj, "proj");
 		model = glm::translate(glm::mat4(1.0f), glm::vec3(3.0, 0.0, 0.0));
 		model = glm::rotate(model, (float)glm::radians(20.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.02f));
-		refractShader.setMat4(model, "model");
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 		models[0].Draw(refractShader);
 
