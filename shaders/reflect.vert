@@ -8,8 +8,8 @@ out vec3 Normal;
 out vec3 Position;
 
 uniform mat4 model;
-uniform mat4 proj;
 uniform mat4 view;
+uniform mat4 proj;
 
 
 void main(){

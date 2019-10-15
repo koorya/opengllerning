@@ -11,6 +11,7 @@ out vec2 texPos;
 uniform mat4 model;//помещает обект на сцену
 uniform mat4 view; //ориентирует всю сцену для наблюдателя
 uniform mat4 proj; // переводит сцену в 2D
+
 uniform float scale;
 
 void main(){
