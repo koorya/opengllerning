@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include <glm/glm.hpp>
+#include <assimp/scene.h>
 #include "shader.h"
 #include <vector>
 
@@ -27,12 +28,13 @@ class Mesh{
 		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures);
+
 		void Draw(Shader shader);
 
 	private:
 		unsigned int VAO, VBO, EBO;
 
-		void setupMesh();
 };
 
 #endif
