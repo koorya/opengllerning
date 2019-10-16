@@ -31,7 +31,7 @@ class Mesh{
 		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures);
 
 		void Draw(Shader shader);
-
+		void Draw(Shader shader, unsigned int count);
 	private:
 		unsigned int VAO, VBO, EBO;
 
