@@ -87,6 +87,84 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath){
 	this->Program = shader_program;
 }
 
+Shader::Shader(const GLchar * vertexPath, const GLchar * geometryPath, const GLchar * fragmentPath){
+	std::string vertexCode;
+	std::string geometryCode;
+	std::string fragmentCode;
+	
+	std::ifstream vShaderFile;
+	std::ifstream gShaderFile;
+	std::ifstream fShaderFile;
+
+	vShaderFile.exceptions(std::ifstream::failbit);
+	gShaderFile.exceptions(std::ifstream::failbit);
+	fShaderFile.exceptions(std::ifstream::failbit);
+	
+	try{
+		vShaderFile.open(vertexPath);
+		gShaderFile.open(geometryPath);
+		fShaderFile.open(fragmentPath);
+		std::stringstream vShaderStream, gShaderStream, fShaderStream;
+		vShaderStream << vShaderFile.rdbuf();
+		gShaderStream << gShaderFile.rdbuf();
+		fShaderStream << fShaderFile.rdbuf();
+		vShaderFile.close();
+		gShaderFile.close();
+		fShaderFile.close();
+
+		vertexCode = vShaderStream.str();
+		geometryCode = gShaderStream.str();
+		fragmentCode = fShaderStream.str();
+
+	}catch(std::ifstream::failure &e){
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ EXEPTION IS:" <<e.what()<<  std::endl;
+		exit(-1);
+	}
+	const GLchar * vShaderCode = vertexCode.c_str();
+	const GLchar * gShaderCode = geometryCode.c_str();
+	const GLchar * fShaderCode = fragmentCode.c_str();
+
+
+	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertex_shader, 1, &vShaderCode, NULL);
+	glCompileShader(vertex_shader);
+	GLint success;
+	GLchar infoLog[512];
+	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+	if(!success){
+		glGetShaderInfoLog(vertex_shader, sizeof(infoLog), NULL, infoLog);
+		std::cout << "VERTEX SHADER COMPILE FAILED\n" << infoLog << std::endl;
+	}
+	GLuint geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+	glShaderSource(geometry_shader, 1, &gShaderCode, NULL);
+	glCompileShader(geometry_shader);
+	glGetShaderiv(geometry_shader, GL_COMPILE_STATUS, &success);
+	if(!success){
+		glGetShaderInfoLog(geometry_shader, sizeof(infoLog), NULL, infoLog);
+		std::cout << "GEOMETRY SHADER COMPILE FAILED\n" << infoLog << std::endl;
+	}
+	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragment_shader, 1, &fShaderCode, NULL);
+	glCompileShader(fragment_shader);
+	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+	if(!success){
+		glGetShaderInfoLog(fragment_shader, sizeof(infoLog), NULL, infoLog);
+		std::cout << "FRAGMENT SHADER COMPILE FAILED\n" << infoLog << std::endl;
+	}
+	GLuint shader_program = glCreateProgram();
+	glAttachShader(shader_program, vertex_shader);
+	glAttachShader(shader_program, geometry_shader);
+	glAttachShader(shader_program, fragment_shader);
+	glLinkProgram(shader_program);
+	
+
+	glDeleteShader(vertex_shader);
+	glDeleteShader(geometry_shader);
+	glDeleteShader(fragment_shader);
+
+	this->Program = shader_program;
+}
+
 void Shader::use(){
 	glUseProgram(this->Program);
 }
@@ -124,3 +202,6 @@ void Shader::setMaterial(Material mat){
 	this->setVec3(glm::vec3(material[6], material[7], material[8]), "material.specular");
 	this->setFloat(material[9], "material.shininess");
 }
+
+
+
