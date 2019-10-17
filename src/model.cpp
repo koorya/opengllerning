@@ -2,7 +2,9 @@
 #include "load_tex.h"
 
 
-Model::Model(const char * path){
+Model::Model(const char * path, std::vector<float> rad_vect){
+	this->rad_vect = rad_vect;
+
 	loadModel(path);
 }
 
@@ -55,7 +57,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
 		textures.insert(textures.end(), specularMap.begin(), specularMap.end());
 	}
 
-	Mesh my_mesh(mesh, scene, textures);
+	Mesh my_mesh(mesh, scene, textures, rad_vect);
 
 	return my_mesh;
 }

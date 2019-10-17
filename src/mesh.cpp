@@ -31,7 +31,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	glBindVertexArray(0);
 }
 
-Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures)
+Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <float> instance_float)
 {
 	this->textures = textures;
 
@@ -53,13 +53,15 @@ Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, mesh->mNumVertices * ( 3*sizeof(aiVector3D) ), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mesh->mNumVertices * ( 3*sizeof(aiVector3D) ) + instance_float.size()*sizeof(float), NULL, GL_STATIC_DRAW);
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->mNumVertices * (sizeof(aiVector3D)), mesh->mVertices);
 	glBufferSubData(GL_ARRAY_BUFFER, mesh->mNumVertices * (sizeof(aiVector3D)), mesh->mNumVertices * (sizeof(aiVector3D)), mesh->mNormals);
 	if(mesh->mTextureCoords[0]){
 		glBufferSubData(GL_ARRAY_BUFFER, mesh->mNumVertices * ( 2*sizeof(aiVector3D) ), mesh->mNumVertices * (sizeof(aiVector3D)), mesh->mTextureCoords[0]);
 	}
+	glBufferSubData(GL_ARRAY_BUFFER, mesh->mNumVertices * (3*sizeof(aiVector3D)), instance_float.size()*sizeof(float), instance_float.data());
+
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aiVector3D), (void*)0);
@@ -69,6 +71,10 @@ Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures)
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(aiVector3D), (void*)(mesh->mNumVertices * (2*sizeof(aiVector3D))));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)(mesh->mNumVertices * (3*sizeof(aiVector3D))));
+	glVertexAttribDivisor(3, 1);
 
 	glBindVertexArray(0);
 }

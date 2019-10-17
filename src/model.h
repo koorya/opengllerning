@@ -14,13 +14,14 @@
 
 class Model{
 public:
-	Model(const char * path);
+	Model(const char * path, std::vector<float> rad_vect = std::vector<float>());
 	void Draw(Shader shader);
 	void Draw(Shader shader, unsigned int count);
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;
 	std::vector <Texture> loaded_textures;
+	std::vector<float> rad_vect;
 	void loadModel(std::string path);
 	void processNode(aiNode * node, const aiScene * scene);
 	Mesh processMesh(aiMesh * mesh, const aiScene * scene);

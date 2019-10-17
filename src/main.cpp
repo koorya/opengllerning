@@ -380,6 +380,13 @@ int main(){
 	models.push_back(Model("./3D_models/manipulator/Component5_1.stl"));
 	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
 
+	std::vector<float> rad_vect;
+	int ROCK_CNT = 10000;
+	for(int i = 0; i < ROCK_CNT; i++)
+		rad_vect.push_back((float)(std::rand()%200000 + 50000)/1000.0);
+	Model rock("./3D_models/rock/rock.obj", rad_vect);
+
+
 
 	glEnable(GL_MULTISAMPLE);
 
@@ -419,6 +426,7 @@ int main(){
 		}
 		view = my_cam.getMatrix();
 		ourShader.setMat4(view, "view");
+		ourShader.setFloat(glfwGetTime(), "time");
 
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
 		ourShader.setMat4(proj, "proj");
@@ -490,6 +498,9 @@ int main(){
 				model = glm::scale(model, glm::vec3(0.2f));
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 				models[i].Draw(ourShader);
+				model = glm::scale(model, glm::vec3(0.2f));
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+				rock.Draw(ourShader, ROCK_CNT);
 			}else{
 				ourShader.setMaterial(static_cast<Material> (i));
 
