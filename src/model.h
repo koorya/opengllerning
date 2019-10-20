@@ -19,6 +19,7 @@ public:
 	
 	void Draw(Shader shader);
 	void Draw(Shader shader, unsigned int count);
+	void setMatrixByID(unsigned int id, glm::mat4 matrix);
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;
@@ -34,7 +35,18 @@ private:
 
 GLuint loadTexture(const char * file_path);
 
+class ModelContainer{
+public:
+	ModelContainer(const char * path, unsigned int max_cnt);
+	unsigned int getNextID();
+	void setMatrixByID(unsigned int id, glm::mat4 matrix);
+	void Draw(Shader shader);
+private:
+	unsigned int current_id;
+	unsigned int max_cnt;
+	Model * model;
 
+};
 
 
 #endif

@@ -610,19 +610,24 @@ int main(){
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0)));
 
+		static int int_time = 0;
+		if(round(glfwGetTime()*16)>int_time){
+			int_time = round(glfwGetTime()*16);
+			column.setMatrixByID(1, column_matrices[int_time%column_matrices.size()]);
+		}
 		ourShader.setMaterial(Material::yellow_plastic);
-//		column.Draw(ourShader, column_matrices.size());
-		column.Draw(ourShader, (int)glfwGetTime());
+		column.Draw(ourShader, 2);
+//		column.Draw(ourShader, (int)glfwGetTime());
 
 
 		ourShader.setMaterial(Material::red_plastic);
 //		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
-		horizontal_bond.Draw(ourShader, (int)(glfwGetTime()*2));
+//		horizontal_bond.Draw(ourShader, (int)(glfwGetTime()*2));
 
 
 		ourShader.setMaterial(Material::green_plastic);
 //		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
-		tilted_bond.Draw(ourShader, (int)(glfwGetTime()*4));
+//		tilted_bond.Draw(ourShader, (int)(glfwGetTime()*4));
 
 
 		model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));

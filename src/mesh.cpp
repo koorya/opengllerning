@@ -163,8 +163,9 @@ Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, 
 	if(mesh->mTextureCoords[0]){
 		glBufferSubData(GL_ARRAY_BUFFER, mesh->mNumVertices * ( 2*sizeof(aiVector3D) ), mesh->mNumVertices * (sizeof(aiVector3D)), mesh->mTextureCoords[0]);
 	}
+	this->mat4_ptr_offset = mesh->mNumVertices * (3*sizeof(aiVector3D));
 	for(unsigned int i = 0; i < instance_mat4.size(); i++)
-		glBufferSubData(GL_ARRAY_BUFFER, mesh->mNumVertices * (3*sizeof(aiVector3D)) + i*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(instance_mat4[i]));
+		glBufferSubData(GL_ARRAY_BUFFER, this->mat4_ptr_offset + i*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(instance_mat4[i]));
 
 	float some_float = 0.0;
 	glBufferSubData(GL_ARRAY_BUFFER, mesh->mNumVertices * (3*sizeof(aiVector3D)) + sizeof(glm::mat4)*instance_mat4.size(), sizeof(float), &some_float);
@@ -199,6 +200,12 @@ Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, 
 
 
 	glBindVertexArray(0);
+}
+
+void Mesh::setMatrixByID(unsigned int id, glm::mat4 matrix){
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferSubData(GL_ARRAY_BUFFER, this->mat4_ptr_offset + id*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(matrix));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::Draw(Shader shader){

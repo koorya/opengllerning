@@ -25,7 +25,10 @@ void Model::Draw(Shader shader, unsigned int count){
 		meshes[i].Draw(shader, count);
 	}
 }
-
+void Model::setMatrixByID(unsigned int id, glm::mat4 matrix){
+	for(int i = 0; i < meshes.size(); i++)
+		meshes[i].setMatrixByID(id, matrix);
+}
 
 void Model::loadModel(std::string path){
 	Assimp::Importer import;

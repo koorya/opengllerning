@@ -34,7 +34,9 @@ class Mesh{
 		
 		void Draw(Shader shader);
 		void Draw(Shader shader, unsigned int count);
+		void setMatrixByID(unsigned int id, glm::mat4 matrix);
 	private:
+		unsigned int mat4_ptr_offset;
 		unsigned int VAO, VBO, EBO;
 
 };
