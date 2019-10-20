@@ -31,7 +31,7 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
 unsigned int loadCubeMap(std::vector<std::string> faces);
 
-Camera my_cam(glm::vec3(0.942951f, -2.274822f, -0.723970f));
+Camera my_cam(glm::vec3(43.476055, -8.379433, -1.566181));
 bool keys[1024] = {false};
 
 int main(){
@@ -302,10 +302,10 @@ int main(){
 
 	ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
 	ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
-	ourShader.setFloat(glm::cos(glm::radians(12.5f)), "spotLight.cutOff");
-	ourShader.setFloat(glm::cos(glm::radians(17.5f)), "spotLight.outerCutOff");
+	ourShader.setFloat(glm::cos(glm::radians(90.0f)), "spotLight.cutOff");
+	ourShader.setFloat(glm::cos(glm::radians(100.0f)), "spotLight.outerCutOff");
 
-	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/10.0f, "dirLight.ambient");
+	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f)/1.0f, "dirLight.ambient");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.diffuse");
 	ourShader.setVec3(glm::vec3(0xFF/255.0f, 0xFF/255.0f, 0xFF/255.0f), "dirLight.specular");
 	ourShader.setVec4(glm::vec4(1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
@@ -381,7 +381,7 @@ int main(){
 	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
 
 	std::vector<float> rad_vect;
-	int ROCK_CNT = 10000;
+	int ROCK_CNT = 100;
 	for(int i = 0; i < ROCK_CNT; i++)
 		rad_vect.push_back((float)(std::rand()%200000 + 50000)/1000.0);
 	Model rock("./3D_models/rock/rock.obj", rad_vect);
@@ -404,6 +404,102 @@ int main(){
 	int time_cnt = 0;
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
+
+	float stride = 3.514e+03;
+	glm::vec3 column_offset = glm::vec3(-5.610e+03, 507.50f, 5.033e+03); 
+	glm::vec3 hor_bond_offset = glm::vec3(0, 127.0f, -550.0); 
+	glm::vec3 tilt_bond_offset = glm::vec3(0, 600.0f, -465.0); 
+
+	std::vector<glm::mat4> column_matrices;
+	std::vector<glm::mat4> hor_bond_matrices;
+	std::vector<glm::mat4> tilt_bond_matrices;
+
+	for(int floor = -13; floor < 13; floor++)
+		for(int x = 0; x < 4; x++)
+			for(int y = 0; y< 4; y++){
+
+
+				if(y < 3){
+					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset - hor_bond_offset);
+					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+					// ourShader.setMaterial(Material::red_plastic);
+					// horizontal_bond.Draw(ourShader);
+					hor_bond_matrices.push_back(model);
+
+					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
+					model = glm::translate(model, -tilt_bond_offset);
+					model = glm::rotate(model, glm::radians(63.0f), glm::vec3(1.0, 0.0, 0.0));
+					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+					// ourShader.setMaterial(Material::green_plastic);
+					// tilted_bond.Draw(ourShader);
+					tilt_bond_matrices.push_back(model);
+
+					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
+					model = glm::translate(model, glm::vec3(0.0, 0.0, 2*tilt_bond_offset.z + stride) );
+					model = glm::translate(model, -tilt_bond_offset );
+					model = glm::rotate(model, glm::radians(117.0f), glm::vec3(1.0, 0.0, 0.0));
+					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+					// ourShader.setMaterial(Material::green_plastic);
+					// tilted_bond.Draw(ourShader);
+					tilt_bond_matrices.push_back(model);
+				}
+
+				if(x < 3){
+					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
+					model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
+					model = glm::translate(model, -hor_bond_offset);
+					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+					// ourShader.setMaterial(Material::red_plastic);
+					// horizontal_bond.Draw(ourShader);
+					hor_bond_matrices.push_back(model);
+
+					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
+					model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
+					model = glm::translate(model, -tilt_bond_offset);
+					model = glm::rotate(model, glm::radians(63.0f), glm::vec3(1.0, 0.0, 0.0));
+					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+
+					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+					// ourShader.setMaterial(Material::green_plastic);
+					// tilted_bond.Draw(ourShader);
+					tilt_bond_matrices.push_back(model);
+
+					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
+					model = glm::translate(model, glm::vec3(2*tilt_bond_offset.z + stride, 0.0, 0.0) );
+					model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
+					model = glm::translate(model, -tilt_bond_offset );
+					model = glm::rotate(model, glm::radians(117.0f), glm::vec3(1.0, 0.0, 0.0));
+					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+
+					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+					// ourShader.setMaterial(Material::green_plastic);
+					// tilted_bond.Draw(ourShader);
+					tilt_bond_matrices.push_back(model);
+				}
+
+
+				model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+				model = glm::translate(model, glm::vec3(x*stride, -(floor+1)*3000.0, y*stride) - column_offset);
+				model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0, 1.0, 0.0));
+				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+				column_matrices.push_back(model);
+		//		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+		//		ourShader.setMaterial(Material::yellow_plastic);
+			//	column.Draw(ourShader);
+			}
+
+	Model tilted_bond("./3d_models/stl_components/tilted_bond.stl", tilt_bond_matrices);
+	Model horizontal_bond("./3d_models/stl_components/horizontal_bond.stl", hor_bond_matrices);
+	Model column("./3d_models/stl_components/column_light.stl", column_matrices);
+	Model main_frame("./3d_models/stl_components/main_frame.stl");
 
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
@@ -428,7 +524,7 @@ int main(){
 		ourShader.setMat4(view, "view");
 		ourShader.setFloat(glfwGetTime(), "time");
 
-		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 100.0f);
+		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width/(float)height, 0.01f, 200.0f);
 		ourShader.setMat4(proj, "proj");
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
@@ -501,6 +597,7 @@ int main(){
 				model = glm::scale(model, glm::vec3(0.2f));
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 				rock.Draw(ourShader, ROCK_CNT);
+				
 			}else{
 				ourShader.setMaterial(static_cast<Material> (i));
 
@@ -511,22 +608,46 @@ int main(){
 			}
 		}
 
-		reflectShader.use();
-		reflectShader.setVec3(my_cam.Position, "cameraPos");
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0, 0.0, 0.0));
-		model = glm::scale(model, glm::vec3(0.02f));
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		models[0].Draw(reflectShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0)));
 
-		refractShader.use();
-		refractShader.setVec3(my_cam.Position, "cameraPos");
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(3.0, 0.0, 0.0));
-		model = glm::rotate(model, (float)glm::radians(20.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.02f));
+		ourShader.setMaterial(Material::yellow_plastic);
+//		column.Draw(ourShader, column_matrices.size());
+		column.Draw(ourShader, (int)glfwGetTime());
+
+
+		ourShader.setMaterial(Material::red_plastic);
+//		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
+		horizontal_bond.Draw(ourShader, (int)(glfwGetTime()*2));
+
+
+		ourShader.setMaterial(Material::green_plastic);
+//		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
+		tilted_bond.Draw(ourShader, (int)(glfwGetTime()*4));
+
+
+		model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
+		model = glm::translate(model, glm::vec3(0.0, 13*3000.0, 0.0));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		models[0].Draw(refractShader);
+		ourShader.setMaterial(Material::white_plastic);
+		main_frame.Draw(ourShader);
+
+		// reflectShader.use();
+		// reflectShader.setVec3(my_cam.Position, "cameraPos");
+		// model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0, 0.0, 0.0));
+		// model = glm::scale(model, glm::vec3(0.02f));
+		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+		// glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		// models[0].Draw(reflectShader);
+
+		// refractShader.use();
+		// refractShader.setVec3(my_cam.Position, "cameraPos");
+		// model = glm::translate(glm::mat4(1.0f), glm::vec3(3.0, 0.0, 0.0));
+		// model = glm::rotate(model, (float)glm::radians(20.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
+		// model = glm::scale(model, glm::vec3(0.02f));
+		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
+		// glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		// models[0].Draw(refractShader);
 
 
 		skyboxShader.use();

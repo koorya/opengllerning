@@ -247,7 +247,7 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir){
 	lightDir = normalize(light.position.xyz - fragPos);
 	float attenuation = 1.0f;
 	float distance = length(light.position.xyz - fragPos);
-	attenuation = 1.0f/(light.constatnt + (light.linear * distance)+ light.quadratic * distance * distance );
+	attenuation = 1.0f;///(light.constatnt + (light.linear * distance)+ light.quadratic * distance * distance );
 
 	vec3 ambient = material.ambient * light.ambient;
 	result += ambient*attenuation;

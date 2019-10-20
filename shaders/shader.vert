@@ -4,7 +4,8 @@ layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texture;
 layout (location = 3) in float orbit_radius;
-
+layout (location = 4) in mat4 instance_mat;
+//5, 6, 7 are busy. 8 is free
 out vec3 vertexNormal;
 out vec3 fragPos;
 out vec2 texPos;
@@ -24,7 +25,9 @@ void main(){
 	float phase;
 	if(orbit_radius != 0.0)
 		phase = (time+1000.0) * 200 / pow(orbit_radius, 3.0/2.0);
-	vec4 pos = model * vec4(position + orbit_radius*vec3(sin(phase), gl_InstanceID/10000.0, cos(phase)) + scale*normal, 1.0f) ;
+	mat4 instance_mat_ = mat4(1.0);
+	mat4 model_ = instance_mat * model;
+	vec4 pos = model_ * vec4(position + orbit_radius*vec3(sin(phase), gl_InstanceID/10000.0, cos(phase)) + scale*normal, 1.0f) ;
 
 	fragPos = pos.xyz;
 	gl_Position =  proj * view * pos;

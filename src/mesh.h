@@ -29,7 +29,8 @@ class Mesh{
 		std::vector<Texture> textures;
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 //		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures);
-		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <float> instance_float = std::vector <float>());
+		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <float> instance_float = std::vector <float>({0.0}));
+		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <glm::mat4> instance_mat4);
 		
 		void Draw(Shader shader);
 		void Draw(Shader shader, unsigned int count);
