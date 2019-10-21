@@ -31,7 +31,7 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset);
 unsigned int loadCubeMap(std::vector<std::string> faces);
 
-Camera my_cam(glm::vec3(43.476055, -8.379433, -1.566181));
+Camera my_cam(glm::vec3(0.0, 0.0, 0.0));
 bool keys[1024] = {false};
 
 int main(){
@@ -99,66 +99,6 @@ int main(){
 		 1.0f, -1.0f, 1.0f, 0.0f
 	};
 
-	GLfloat vertices[] = {
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f
-	};
-
-	glm::vec3 cubePositions[] = {
-		glm::vec3(  -1.0f,  0.0f,  -0.3f),
-		glm::vec3(  -2.0f,  0.0f, -2.0f),
-		glm::vec3( -1.5f, -2.2f, -2.5f),
-		glm::vec3( -3.8f, -2.0f, 3.3f),
-		glm::vec3(  2.4f, -0.4f, -3.5f),
-		glm::vec3( -1.7f,  3.0f, -7.5f),
-		glm::vec3(  1.3f, -2.0f, -2.5f),
-		glm::vec3(  1.5f,  2.0f, -2.5f),
-		glm::vec3(  1.5f,  0.2f, -1.5f),
-		glm::vec3( -1.3f,  1.0f, -1.5f),
-		glm::vec3(  1.5f,  4.3f, -2.5f),
-		glm::vec3(  2.2f,  0.2f, -1.5f),
-		glm::vec3( -1.3f,  -1.0f, -3.5f)
-	};
 
 	glm::vec3 lightPositions[] = {
 		glm::vec3(1.003572f, 1.105885f, -2.825360f),
@@ -213,22 +153,22 @@ int main(){
 		1.0f, -1.0f,  1.0f
 	};
 
-	// std::vector<std::string> faces({
-	// 	"./textures/skybox/right.jpg",
-	// 	"./textures/skybox/left.jpg",
-	// 	"./textures/skybox/top.jpg",
-	// 	"./textures/skybox/bottom.jpg",
-	// 	"./textures/skybox/front.jpg",
-	// 	"./textures/skybox/back.jpg"
-	// });
 	std::vector<std::string> faces({
-		"./textures/Yokohama3/posx.jpg",
-		"./textures/Yokohama3/negx.jpg",
-		"./textures/Yokohama3/posy.jpg",
-		"./textures/Yokohama3/negy.jpg",
-		"./textures/Yokohama3/posz.jpg",
-		"./textures/Yokohama3/negz.jpg"
+		"./textures/skybox/right.jpg",
+		"./textures/skybox/left.jpg",
+		"./textures/skybox/top.jpg",
+		"./textures/skybox/bottom.jpg",
+		"./textures/skybox/front.jpg",
+		"./textures/skybox/back.jpg"
 	});
+	// std::vector<std::string> faces({
+	// 	"./textures/Yokohama3/posx.jpg",
+	// 	"./textures/Yokohama3/negx.jpg",
+	// 	"./textures/Yokohama3/posy.jpg",
+	// 	"./textures/Yokohama3/negy.jpg",
+	// 	"./textures/Yokohama3/posz.jpg",
+	// 	"./textures/Yokohama3/negz.jpg"
+	// });
 
 	unsigned int cubemapTexture = loadCubeMap(faces);
 
@@ -347,44 +287,20 @@ int main(){
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
 
-	std::vector <Vertex> vect_vertices;
-	for(unsigned int i = 0; i < sizeof(vertices)/sizeof(*vertices); i += 8){
-		Vertex vertex;
-		vertex.Position = glm::vec3 (vertices[i], vertices[i+1], vertices[i+2]);
-		vertex.Normal = glm::vec3 (vertices[i+3], vertices[i+4], vertices[i+5]);
-		vertex.TexCoords = glm::vec2 (vertices[i+6], vertices[i+7]);
-		vect_vertices.push_back(vertex);
-	}
-	std::vector <unsigned int> vect_indices;
-	for (unsigned int i = 0; i < sizeof(vertices)/sizeof(*vertices)/8; i++){
-		vect_indices.push_back(i);
-	}
-	std::vector <Texture> vect_textures;
-	Mesh my_mesh(vect_vertices, vect_indices, vect_textures);
 
-	std:: vector<Model> models;
 
-	models.push_back(Model("3d_models/slim girl/slim girl.obj"));
-	models.push_back(Model("./3d_models/nanosuit/nanosuit.obj"));
-
-//	models.push_back(Model("./3D_models/manipulator/Component18.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component31.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component1_reduce.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component129.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component26.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component19.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component21.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component20.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component40.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component5_3.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component5_1.stl"));
-	models.push_back(Model("./3D_models/manipulator/Component5_2.stl"));
-
-	std::vector<float> rad_vect;
-	int ROCK_CNT = 100;
-	for(int i = 0; i < ROCK_CNT; i++)
-		rad_vect.push_back((float)(std::rand()%200000 + 50000)/1000.0);
-	Model rock("./3D_models/rock/rock.obj", rad_vect);
+	Model tower_frame("./3D_models/manipulator/Component18.stl", 3);//tower frame
+	Model tower_box("./3D_models/manipulator/Component31.stl", 3);//tower box
+	Model carrige("./3D_models/manipulator/Component1_reduce.stl", 3); // carrige
+	Model rail("./3D_models/manipulator/Component129.stl", 3);//rail
+	Model bond_wrist("./3D_models/manipulator/Component26.stl", 3);//bond wrist
+	Model bond_carrige("./3D_models/manipulator/Component19_orient.stl", 3);//bond carrige
+	Model bond_rail("./3D_models/manipulator/Component21_orient.stl", 3);//bond rail
+	Model column_rail("./3D_models/manipulator/Component20.stl", 3);//column rail
+	Model column_carrige("./3D_models/manipulator/Component40.stl", 3);//column carrige
+	Model bond_handler_middle("./3D_models/manipulator/Component5_3.stl", 3);//bond handler middle
+	Model bond_handlre_left("./3D_models/manipulator/Component5_1.stl", 3);//bond handlre left
+	Model bond_handler_right("./3D_models/manipulator/Component5_2.stl", 3);//bond handler right
 
 
 
@@ -404,6 +320,90 @@ int main(){
 	int time_cnt = 0;
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
+	float frame_level = 13*3000.0;
+	float max_bcar_level = 1500.0;
+	float max_ccar_level = 350.0;
+	struct ManipulatorConfig{
+		float rail;
+		float tower;
+		float bpant;
+		float cpant;
+		float bcar;
+		float ccar;
+		float wrist;
+		float brot;
+	};
+	struct ManipulatorConfig m1, m2, m3;
+	m1.rail = 10000.0;
+	m1.tower = 30.0;
+	m1.bpant = 3000.0;
+	m1.cpant = 2000.0;
+	m1.bcar = 1000.0;
+	m1.ccar = 500.0;
+	m1.wrist = 20.0;
+	m1.brot = 60.0;
+
+	m2.rail = 5000.0;
+	m2.tower = 30.0;
+	m2.bpant = 0.0;
+	m2.cpant = 0.0;
+	m2.bcar = 0.0;
+	m2.ccar = 0.0;
+	m2.wrist = 0.0;
+	m2.brot = 0.0;
+
+	m3.rail = 12000.0;
+	m3.tower = 30.0;
+	m3.bpant = 3000.0;
+	m3.cpant = 2000.0;
+	m3.bcar = 1000.0;
+	m3.ccar = 500.0;
+	m3.wrist = 20.0;
+	m3.brot = 60.0;
+
+
+	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 mat_A  = glm::translate(mat_world, glm::vec3(0.0, 0.0, frame_level));
+	//rail position on frame
+	glm::mat4 mat_B1 = glm::translate(mat_A, glm::vec3(2100.0, 6760.0, -400.0));
+	glm::mat4 mat_B2 = glm::translate(mat_A, glm::vec3(200.0, -245.0, -400.0));
+	glm::mat4 mat_B3 = glm::translate(mat_A, glm::vec3(2100.0, -7250.0, -400.0));
+
+	glm::mat4 mat_C1 = glm::translate(mat_B1, glm::vec3(m1.rail, 0.0, -400.0));
+	glm::mat4 mat_C2 = glm::translate(mat_B2, glm::vec3(m2.rail, 0.0, -400.0));
+	glm::mat4 mat_C3 = glm::translate(mat_B3, glm::vec3(m3.rail, 0.0, -400.0));
+	glm::mat4 mat_D1 = glm::rotate(mat_C1, glm::radians(m1.tower), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_D2 = glm::rotate(mat_C2, glm::radians(m2.tower), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_D3 = glm::rotate(mat_C3, glm::radians(m3.tower), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_E1 = glm::translate(glm::rotate(mat_D1, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(m1.bpant, 0.0f, 0.0f));
+	glm::mat4 mat_E2 = glm::translate(mat_D1, glm::vec3(m1.cpant, 0.0f, 0.0f));
+	glm::mat4 mat_E3 = glm::translate(glm::rotate(mat_D2, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(m2.bpant, 0.0f, 0.0f));
+	glm::mat4 mat_E4 = glm::translate(mat_D2, glm::vec3(m2.cpant, 0.0f, 0.0f));
+	glm::mat4 mat_E5 = glm::translate(glm::rotate(mat_D3, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(m2.bpant, 0.0f, 0.0f));
+	glm::mat4 mat_E6 = glm::translate(mat_D3, glm::vec3(m3.cpant, 0.0f, 0.0f));
+
+	glm::mat4 mat_F1 = glm::translate(mat_E1, glm::vec3(627.0, 0.0, -max_bcar_level + m1.bcar));
+	glm::mat4 mat_F2 = glm::translate(mat_E2, glm::vec3(0.0, 0.0, -max_ccar_level + m1.ccar));
+	glm::mat4 mat_F3 = glm::translate(mat_E3, glm::vec3(627.0, 0.0, -max_bcar_level + m2.bcar));
+	glm::mat4 mat_F4 = glm::translate(mat_E4, glm::vec3(0.0, 0.0, -max_ccar_level + m2.ccar));
+	glm::mat4 mat_F5 = glm::translate(mat_E5, glm::vec3(627.0, 0.0, -max_bcar_level + m3.bcar));
+	glm::mat4 mat_F6 = glm::translate(mat_E6, glm::vec3(0.0, 0.0, -max_ccar_level + m3.ccar));
+	glm::mat4 mat_G1 = glm::rotate(mat_F1, glm::radians(m1.wrist), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G2 = glm::rotate(glm::translate(mat_F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G3 = glm::rotate(mat_F3, glm::radians(m1.wrist), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G4 = glm::rotate(glm::translate(mat_F4, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G5 = glm::rotate(mat_F5, glm::radians(m1.wrist), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G6 = glm::rotate(glm::translate(mat_F6, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_H1 = mat_world;
+	glm::mat4 mat_H2 = mat_world;
+	glm::mat4 mat_H3 = mat_world;
+	glm::mat4 mat_I1 = mat_world;
+	glm::mat4 mat_I2 = mat_world;
+	glm::mat4 mat_I3 = mat_world;
 
 	float stride = 3.514e+03;
 	glm::vec3 column_offset = glm::vec3(-5.610e+03, 507.50f, 5.033e+03); 
@@ -541,118 +541,113 @@ int main(){
 
 
 		ourShader.use();
-		for(int i = 0; i < 4; i++){
-			glm::vec3 lightpos = lightPositions[i];
-			float t = glfwGetTime()/(i+1);
-			lightpos.x += glm::sin(sin(7*t)+sin(i*t*0.5f));
-			lightpos.y += glm::cos(5*t)-cos(2*t)+-cos(i*t);
-			lightpos.z += glm::cos(t*3.7f/(i*i+1))*glm::sin(t*4.2f/(i+1));
-
-			std::string uniformname = "pointLights["+std::to_string(i)+"].position";
-			ourShader.setVec4(	glm::vec4(lightpos, 1.0f), uniformname.c_str());
-
-			model = glm::translate(glm::mat4(1.0f), lightpos);
-			model = glm::scale(model, glm::vec3(0.2f));
-			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-
-			glUniform1i(obj_type_mode, i);
-			my_mesh.Draw(ourShader);
-		}
 
 		glUniform1i(obj_type_mode, -1);
 		ourShader.setMaterial(Material::green_plastic);
-
-		for(unsigned int i = 0; i < models.size(); i++){
-			model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-			model = glm::rotate(model, (float)glm::radians(20.0f*i),  glm::vec3(0.0f, 1.0f, 0.0f));
-			if(i == 0){
-				
-				model = glm::scale(model, glm::vec3(0.02f));
-				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-
-				glStencilFunc(GL_ALWAYS, 1, 0xFF);
-				glStencilMask(0xFF);
-				models[i].Draw(ourShader);				
-
-
-				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				glStencilMask(0x00);
-
-				stensilShader.use();
-				stensilShader.setFloat(1.0f, "scale");
-
-				// glDisable(GL_DEPTH_TEST);
-				models[i].Draw(stensilShader);
-				// glEnable(GL_DEPTH_TEST);
-
-				glStencilFunc(GL_ALWAYS, 1, 0xFF);
-				glStencilMask(0x00);
-
-				ourShader.use();
-
-			}else if (i == 1){
-				model = glm::scale(model, glm::vec3(0.2f));
-				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-				models[i].Draw(ourShader);
-				model = glm::scale(model, glm::vec3(0.2f));
-				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-				rock.Draw(ourShader, ROCK_CNT);
-				
-			}else{
-				ourShader.setMaterial(static_cast<Material> (i));
-
-				model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-				model = glm::scale(model, glm::vec3(0.002f));
-				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-				models[i].Draw(ourShader);
-			}
-		}
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0)));
 
 		static int int_time = 0;
 		if(round(glfwGetTime()*16)>int_time){
 			int_time = round(glfwGetTime()*16);
-			column.setMatrixByID(1, column_matrices[int_time%column_matrices.size()]);
+			column.setMatrixByID(1, mat_G2);
+			column.setMatrixByID(2, mat_G4);
+			column.setMatrixByID(3, mat_G6);
+//			column.setMatrixByID(1, column_matrices[int_time%column_matrices.size()]);
 		}
-		ourShader.setMaterial(Material::yellow_plastic);
-		column.Draw(ourShader, 2);
+		ourShader.setMaterial(Material::white_rubber);
+		column.Draw(ourShader, column_matrices.size());
 //		column.Draw(ourShader, (int)glfwGetTime());
 
 
 		ourShader.setMaterial(Material::red_plastic);
-//		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
+		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
 //		horizontal_bond.Draw(ourShader, (int)(glfwGetTime()*2));
 
 
 		ourShader.setMaterial(Material::green_plastic);
-//		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
+		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
 //		tilted_bond.Draw(ourShader, (int)(glfwGetTime()*4));
 
 
-		model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-		model = glm::translate(model, glm::vec3(0.0, 13*3000.0, 0.0));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-		ourShader.setMaterial(Material::white_plastic);
+		ourShader.setMaterial(Material::chrome);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_A));
 		main_frame.Draw(ourShader);
 
-		// reflectShader.use();
-		// reflectShader.setVec3(my_cam.Position, "cameraPos");
-		// model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0, 0.0, 0.0));
-		// model = glm::scale(model, glm::vec3(0.02f));
-		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-		// glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		// models[0].Draw(reflectShader);
+		// ourShader.setMaterial(Material::yellow_plastic);
+		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B1));
+		// rail.Draw(ourShader);
+		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B2));
+		// rail.Draw(ourShader);
+		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B3));
+		// rail.Draw(ourShader);
 
-		// refractShader.use();
-		// refractShader.setVec3(my_cam.Position, "cameraPos");
-		// model = glm::translate(glm::mat4(1.0f), glm::vec3(3.0, 0.0, 0.0));
-		// model = glm::rotate(model, (float)glm::radians(20.0f),  glm::vec3(0.0f, 1.0f, 0.0f));
-		// model = glm::scale(model, glm::vec3(0.02f));
-		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-		// glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		// models[0].Draw(refractShader);
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C1));
+		carrige.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C2));
+		carrige.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C3));
+		carrige.Draw(ourShader);
+
+		ourShader.setMaterial(Material::yellow_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D1));
+		tower_frame.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D2));
+		tower_frame.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D3));
+		tower_frame.Draw(ourShader);
+
+		ourShader.setMaterial(Material::white_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D1));
+		tower_box.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D2));
+		tower_box.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D3));
+		tower_box.Draw(ourShader);
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E1));
+		bond_rail.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E3));
+		bond_rail.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E5));
+		bond_rail.Draw(ourShader);
+
+		ourShader.setMaterial(Material::red_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F1));
+		bond_carrige.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F3));
+		bond_carrige.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F5));
+		bond_carrige.Draw(ourShader);
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_G1));
+		bond_wrist.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_G3));
+		bond_wrist.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_G5));
+		bond_wrist.Draw(ourShader);		
+
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E2));
+		column_rail.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E4));
+		column_rail.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E6));
+		column_rail.Draw(ourShader);
+
+		ourShader.setMaterial(Material::red_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F2));
+		column_carrige.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F4));
+		column_carrige.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F6));
+		column_carrige.Draw(ourShader);
+
 
 
 		skyboxShader.use();

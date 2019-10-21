@@ -15,6 +15,16 @@ Model::Model(const char * path, std::vector <glm::mat4> instance_mat4){
 	loadModel(path);
 }
 
+Model::Model(const char * path, unsigned int max_inst_cnt){
+	
+	std::vector <glm::mat4> instance_mat4;
+	for (int i = 0; i < max_inst_cnt; i++)
+		instance_mat4.push_back(glm::mat4(1.0f));
+	this->mat4_vect = instance_mat4;
+	
+	loadModel(path);
+}
+
 void Model::Draw(Shader shader){
 	for(unsigned int i = 0; i < meshes.size(); i++){
 		meshes[i].Draw(shader);

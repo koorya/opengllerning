@@ -31,5 +31,5 @@ void main(){
 
 	fragPos = pos.xyz;
 	gl_Position =  proj * view * pos;
-	vertexNormal = vec3(model * vec4(normal, 0.0f));
+	vertexNormal = vec3(model_ * vec4(normal, 0.0f));
 }

@@ -182,7 +182,7 @@ Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, 
 
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)(mesh->mNumVertices * (3*sizeof(aiVector3D))+ sizeof(glm::mat4)*instance_mat4.size()));
-	glVertexAttribDivisor(3, 1000000);
+	glVertexAttribDivisor(3, 1000000);//это тупо - нужно просто отключить атрибут при рисовании. Включать его нужно тоже только при отрисовке.
 
 	glEnableVertexAttribArray(4);
 	glEnableVertexAttribArray(5);
