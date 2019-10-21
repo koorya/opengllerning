@@ -1,3 +1,6 @@
+#ifndef MOVEMENT_PROGRAM_H
+#define MOVEMENT_PROGRAM_H
+
 enum AxisName{
 	none = 0,
 	pantograph = 1,
@@ -8,6 +11,16 @@ enum AxisName{
 	CAR = 7,
 	syncW = 10
 };
+// enum AxisAltName{
+//     bpant = 1,
+//     tower = 2,
+//     bcar = 3,
+//     wrist = 4,
+//     brot = 5,
+//     rail = 7,
+//     cpant = 8,//пантограф колонны
+//     ccar = 9//каретка колонны
+// };
 
 struct AxisDriver{
 	bool activate;
@@ -33,4 +46,6 @@ void resetDrivers(int prg_id);
 int driverSM(float time);
 
 float getAxisValue(AxisName id);
+
+#endif
 

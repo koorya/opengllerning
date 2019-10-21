@@ -7,7 +7,7 @@ rebuild:
 run: aplication.exe
 	aplication.exe
 
-aplication.exe: obj/main.o obj/shader.o obj/camera.o obj/mesh.o obj/model.o obj/load_tex.o obj/movement_program.o
+aplication.exe: obj/main.o obj/shader.o obj/camera.o obj/mesh.o obj/model.o obj/load_tex.o obj/movement_program.o obj/manipulator.o
 	g++ -Wall -o aplication.exe -Lc:/opengl/lib obj/*.o -lassimp.dll -lSOIL -lglew32s -llibglfw3 -lopengl32 -lgdi32 -static
 
 obj/main.o: src/main.cpp 
@@ -31,6 +31,11 @@ obj/load_tex.o: src/load_tex.cpp src/load_tex.h
 
 obj/movement_program.o: src/movement_program.cpp src/movement_program.h
 	g++ -Wall -c -Ic:/opengl/include src/movement_program.cpp -o obj/movement_program.o
+
+obj/manipulator.o: src/manipulator.cpp src/manipulator.h
+	g++ -Wall -c -Ic:/opengl/include src/manipulator.cpp -o obj/manipulator.o
+
+
 
 
 clear:

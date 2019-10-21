@@ -26,6 +26,8 @@
 #include "load_tex.h"
 
 #include "movement_program.h"
+#include "manipulator.h"
+
 
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
@@ -330,130 +332,11 @@ int main(){
 	int time_cnt = 0;
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
-	float frame_level = 1*3000.0 ;//+ 500;
-	float max_bcar_level = 1500.0;
-	float max_ccar_level = 350.0;
-	struct ManipulatorConfig{
-		float rail;
-		float tower;
-		float bpant;
-		float cpant;
-		float bcar;
-		float ccar;
-		float wrist;
-		float brot;
-	};
-	struct ManipulatorConfig m[3];
-	m[0].rail = 10000.0;
-	m[0].tower = 30.0;
-	m[0].bpant = 3000.0;
-	m[0].cpant = 500.0;
-	m[0].bcar = 1000.0;
-	m[0].ccar = 500.0;
-	m[0].wrist = 20.0;
-	m[0].brot = 60.0;
-
-	m[1].rail = 5000.0;
-	m[1].tower = 30.0;
-	m[1].bpant = 0.0;
-	m[1].cpant = 0.0;
-	m[1].bcar = 0.0;
-	m[1].ccar = 0.0;
-	m[1].wrist = 0.0;
-	m[1].brot = 0.0;
-
-	m[2].rail = 12000.0;
-	m[2].tower = 30.0;
-	m[2].bpant = 1500.0;
-	m[2].cpant = 700.0;
-	m[2].bcar = 1000.0;
-	m[2].ccar = 500.0;
-	m[2].wrist = 20.0;
-	m[2].brot = 60.0;
 
 
-	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-	glm::mat4 mat_A  = glm::translate(mat_world, glm::vec3(0.0, 0.0, frame_level));
-	//rail position on frame
-	glm::mat4 mat_B1 = glm::translate(mat_A, glm::vec3(2100.0, 6760.0, -400.0));
-	glm::mat4 mat_B2 = glm::translate(mat_A, glm::vec3(200.0, -245.0, -400.0));
-	glm::mat4 mat_B3 = glm::translate(mat_A, glm::vec3(2100.0, -7250.0, -400.0));
-
-	glm::mat4 mat_C1 = glm::translate(mat_B1, glm::vec3(m[0].rail, 0.0, -400.0));
-	glm::mat4 mat_C2 = glm::translate(mat_B2, glm::vec3(m[1].rail, 0.0, -400.0));
-	glm::mat4 mat_C3 = glm::translate(mat_B3, glm::vec3(m[2].rail, 0.0, -400.0));
-
-	glm::mat4 mat_D[3];
-	mat_D[0] = glm::rotate(mat_C1, glm::radians(m[0].tower), glm::vec3(0.0, 0.0, 1.0));
-	mat_D[1] = glm::rotate(mat_C2, glm::radians(m[1].tower), glm::vec3(0.0, 0.0, 1.0));
-	mat_D[2] = glm::rotate(mat_C3, glm::radians(m[2].tower), glm::vec3(0.0, 0.0, 1.0));
-
-	glm::mat4 mat_E1 = glm::translate(glm::rotate(mat_D[0], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-										glm::vec3(m[0].bpant, 0.0f, 0.0f));
-	glm::mat4 mat_E2 = glm::translate(mat_D[0], glm::vec3(m[0].cpant, 0.0f, 0.0f));
-	glm::mat4 mat_E3 = glm::translate(glm::rotate(mat_D[1], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-										glm::vec3(m[1].bpant, 0.0f, 0.0f));
-	glm::mat4 mat_E4 = glm::translate(mat_D[1], glm::vec3(m[1].cpant, 0.0f, 0.0f));
-	glm::mat4 mat_E5 = glm::translate(glm::rotate(mat_D[2], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-										glm::vec3(m[2].bpant, 0.0f, 0.0f));
-	glm::mat4 mat_E6 = glm::translate(mat_D[2], glm::vec3(m[2].cpant, 0.0f, 0.0f));
-
-	glm::mat4 mat_F1 = glm::translate(mat_E1, glm::vec3(627.0, 0.0, -max_bcar_level + m[0].bcar));
-	glm::mat4 mat_F2 = glm::translate(mat_E2, glm::vec3(0.0, 0.0, -max_ccar_level + m[0].ccar));
-	glm::mat4 mat_F3 = glm::translate(mat_E3, glm::vec3(627.0, 0.0, -max_bcar_level + m[1].bcar));
-	glm::mat4 mat_F4 = glm::translate(mat_E4, glm::vec3(0.0, 0.0, -max_ccar_level + m[1].ccar));
-	glm::mat4 mat_F5 = glm::translate(mat_E5, glm::vec3(627.0, 0.0, -max_bcar_level + m[2].bcar));
-	glm::mat4 mat_F6 = glm::translate(mat_E6, glm::vec3(0.0, 0.0, -max_ccar_level + m[2].ccar));
-	glm::mat4 mat_G1 = glm::rotate(mat_F1, glm::radians(m[0].wrist), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_G2 = glm::rotate(glm::translate(mat_F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_G3 = glm::rotate(mat_F3, glm::radians(m[0].wrist), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_G4 = glm::rotate(glm::translate(mat_F4, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_G5 = glm::rotate(mat_F5, glm::radians(m[0].wrist), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_G6 = glm::rotate(glm::translate(mat_F6, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_H1 = glm::rotate(mat_G1, glm::radians(m[0].brot), glm::vec3(1.0, 0.0, 0.0));
-	glm::mat4 mat_H2 = glm::rotate(mat_G3, glm::radians(m[1].brot), glm::vec3(1.0, 0.0, 0.0));
-	glm::mat4 mat_H3 = glm::rotate(mat_G5, glm::radians(m[2].brot), glm::vec3(1.0, 0.0, 0.0));
-	glm::mat4 mat_I1 = glm::rotate(glm::translate(mat_H1, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_I2 = glm::rotate(glm::translate(mat_H2, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-	glm::mat4 mat_I3 = glm::rotate(glm::translate(mat_H3, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+	initManipulatores();
 
 
-	glm::mat4 mat_pb1[3];
-	glm::mat4 mat_pb2[3];
-	glm::mat4 mat_pb3[3];
-	glm::mat4 mat_pb4[3];
-
-	for(int i=0; i<3; i++){
-		float pant_length = m[i].bpant+334.2;
-		float angle = -asinf((pant_length)/4450);
-		glm::mat4 pant_origin = glm::rotate(mat_D[i], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-
-		pant_origin = glm::translate(pant_origin, glm::vec3(-49.0, 0.0, -224.0));
-		mat_pb1[i] = glm::rotate(pant_origin, angle, glm::vec3(0.0, 1.0, 0.0));
-		mat_pb2[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length/2.0, 0.0f, 0.0f)),
-											angle, glm::vec3(0.0, 1.0, 0.0));
-
-		mat_pb3[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length/2.0, 0.0f, 0.0f)),
-											-angle, glm::vec3(0.0, 1.0, 0.0));
-		mat_pb4[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
-											-angle, glm::vec3(0.0, 1.0, 0.0));
-	}
-
-
-	glm::mat4 mat_pc1[3];
-	glm::mat4 mat_pc2[3];
-
-	for(int i=0; i<3; i++){
-		float pant_length = m[i].cpant + 148.0;
-		float angle = -asinf((pant_length)/1420);
-		glm::mat4 pant_origin = mat_D[i];
-
-		pant_origin = glm::translate(pant_origin, glm::vec3(394.0, 0.0, -511.0));
-		mat_pc1[i] = glm::rotate(pant_origin, angle, glm::vec3(0.0, 1.0, 0.0));
-		mat_pc2[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
-											-angle, glm::vec3(0.0, 1.0, 0.0));
-	}
 
 
 	float stride = 3.514e+03;
@@ -465,7 +348,7 @@ int main(){
 	std::vector<glm::mat4> hor_bond_matrices;
 	std::vector<glm::mat4> tilt_bond_matrices;
 
-	for(int floor = 0; floor < 26; floor++)
+	for(int floor = 0; floor < 3; floor++)
 		for(int x = 0; x < 4; x++)
 			for(int y = 0; y< 4; y++){
 
@@ -566,6 +449,9 @@ int main(){
 		glEnable(GL_DEPTH_TEST);
 		glfwPollEvents();
 		do_movement();
+
+		calculateManipulatorGraphicMatrices();
+
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		if(keys[GLFW_KEY_B]){
 			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
@@ -601,13 +487,13 @@ int main(){
 		static int int_time = 0;
 		if(round(glfwGetTime()*16)>int_time){
 			int_time = round(glfwGetTime()*16);
-			column.setMatrixByID(1, mat_G2);
-			column.setMatrixByID(2, mat_G4);
-			column.setMatrixByID(3, mat_G6);
+			column.setMatrixByID(1, m_mat[0].G2);
+			column.setMatrixByID(2, m_mat[1].G2);
+			column.setMatrixByID(3, m_mat[2].G2);
 
-			horizontal_bond.setMatrixByID(1, mat_I1);
-			horizontal_bond.setMatrixByID(2, mat_I2);
-			tilted_bond.setMatrixByID(3, mat_I3);
+			horizontal_bond.setMatrixByID(1, 	m_mat[0].I);
+			horizontal_bond.setMatrixByID(2, 	m_mat[1].I);
+			tilted_bond.setMatrixByID(3, 		m_mat[2].I);
 
 //			column.setMatrixByID(1, column_matrices[int_time%column_matrices.size()]);
 		}
@@ -627,7 +513,7 @@ int main(){
 
 
 		ourShader.setMaterial(Material::silver);
-		main_frame.setMatrixByID(0, mat_A);
+		main_frame.setMatrixByID(0, f_mat.A);
 		main_frame.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::yellow_plastic);
@@ -640,84 +526,84 @@ int main(){
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		carrige.setMatrixByID(0, mat_C1);
-		carrige.setMatrixByID(1, mat_C2);
-		carrige.setMatrixByID(2, mat_C3);
+		carrige.setMatrixByID(0, m_mat[0].C);
+		carrige.setMatrixByID(1, m_mat[1].C);
+		carrige.setMatrixByID(2, m_mat[2].C);
 		carrige.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::black_plastic);
-		tower_frame.setMatrixByID(0, mat_D[0]);
-		tower_frame.setMatrixByID(1, mat_D[1]);
-		tower_frame.setMatrixByID(2, mat_D[2]);
+		tower_frame.setMatrixByID(0, m_mat[0].D);
+		tower_frame.setMatrixByID(1, m_mat[1].D);
+		tower_frame.setMatrixByID(2, m_mat[2].D);
 		tower_frame.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::white_plastic);
-		tower_box.setMatrixByID(0, mat_D[0]);
-		tower_box.setMatrixByID(1, mat_D[1]);
-		tower_box.setMatrixByID(2, mat_D[2]);
+		tower_box.setMatrixByID(0, m_mat[0].D);
+		tower_box.setMatrixByID(1, m_mat[1].D);
+		tower_box.setMatrixByID(2, m_mat[2].D);
 		tower_box.Draw(ourShader, 3);
 
 	//pantograph
 		ourShader.setMaterial(Material::yellow_plastic);
-		pb1.setMatrixByID(0, mat_pb1[0]);
-		pb1.setMatrixByID(1, mat_pb1[1]);
-		pb1.setMatrixByID(2, mat_pb1[2]);
+		pb1.setMatrixByID(0, m_mat[0].pb1);
+		pb1.setMatrixByID(1, m_mat[1].pb1);
+		pb1.setMatrixByID(2, m_mat[2].pb1);
 		pb1.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pb2.setMatrixByID(0, mat_pb2[0]);
-		pb2.setMatrixByID(1, mat_pb2[1]);
-		pb2.setMatrixByID(2, mat_pb2[2]);
+		pb2.setMatrixByID(0, m_mat[0].pb2);
+		pb2.setMatrixByID(1, m_mat[1].pb2);
+		pb2.setMatrixByID(2, m_mat[2].pb2);
 		pb2.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pb3.setMatrixByID(0, mat_pb3[0]);
-		pb3.setMatrixByID(1, mat_pb3[1]);
-		pb3.setMatrixByID(2, mat_pb3[2]);
+		pb3.setMatrixByID(0, m_mat[0].pb3);
+		pb3.setMatrixByID(1, m_mat[1].pb3);
+		pb3.setMatrixByID(2, m_mat[2].pb3);
 		pb3.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pb4.setMatrixByID(0, mat_pb4[0]);
-		pb4.setMatrixByID(1, mat_pb4[1]);
-		pb4.setMatrixByID(2, mat_pb4[2]);
+		pb4.setMatrixByID(0, m_mat[0].pb4);
+		pb4.setMatrixByID(1, m_mat[1].pb4);
+		pb4.setMatrixByID(2, m_mat[2].pb4);
 		pb4.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		bond_rail.setMatrixByID(0, mat_E1);
-		bond_rail.setMatrixByID(1, mat_E3);
-		bond_rail.setMatrixByID(2, mat_E5);
+		bond_rail.setMatrixByID(0, m_mat[0].E1);
+		bond_rail.setMatrixByID(1, m_mat[1].E1);
+		bond_rail.setMatrixByID(2, m_mat[2].E1);
 		bond_rail.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_carrige.setMatrixByID(0, mat_F1);
-		bond_carrige.setMatrixByID(1, mat_F3);
-		bond_carrige.setMatrixByID(2, mat_F5);
+		bond_carrige.setMatrixByID(0, m_mat[0].F1);
+		bond_carrige.setMatrixByID(1, m_mat[1].F1);
+		bond_carrige.setMatrixByID(2, m_mat[2].F1);
 		bond_carrige.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::green_plastic);
-		bond_wrist.setMatrixByID(0, mat_G1);
-		bond_wrist.setMatrixByID(1, mat_G3);
-		bond_wrist.setMatrixByID(2, mat_G5);
+		bond_wrist.setMatrixByID(0, m_mat[0].G1);
+		bond_wrist.setMatrixByID(1, m_mat[1].G1);
+		bond_wrist.setMatrixByID(2, m_mat[2].G1);
 		bond_wrist.Draw(ourShader, 3);		
 
 
 		ourShader.setMaterial(Material::yellow_plastic);
-		bond_handler_middle.setMatrixByID(0, mat_H1);
-		bond_handler_middle.setMatrixByID(1, mat_H2);
-		bond_handler_middle.setMatrixByID(2, mat_H3);
+		bond_handler_middle.setMatrixByID(0, m_mat[0].H);
+		bond_handler_middle.setMatrixByID(1, m_mat[1].H);
+		bond_handler_middle.setMatrixByID(2, m_mat[2].H);
 		bond_handler_middle.Draw(ourShader, 3);		
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_handler_left.setMatrixByID(0, mat_H1);
-		bond_handler_left.setMatrixByID(1, mat_H2);
-		bond_handler_left.setMatrixByID(2, mat_H3);
+		bond_handler_left.setMatrixByID(0, m_mat[0].H);
+		bond_handler_left.setMatrixByID(1, m_mat[1].H);
+		bond_handler_left.setMatrixByID(2, m_mat[2].H);
 		bond_handler_left.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_handler_right.setMatrixByID(0, mat_H1);
-		bond_handler_right.setMatrixByID(1, mat_H2);
-		bond_handler_right.setMatrixByID(2, mat_H3);
+		bond_handler_right.setMatrixByID(0, m_mat[0].H);
+		bond_handler_right.setMatrixByID(1, m_mat[1].H);
+		bond_handler_right.setMatrixByID(2, m_mat[2].H);
 		bond_handler_right.Draw(ourShader, 3);
 
 
@@ -726,28 +612,28 @@ int main(){
 
 	//pantograph column
 		ourShader.setMaterial(Material::yellow_plastic);
-		pc1.setMatrixByID(0, mat_pc1[0]);
-		pc1.setMatrixByID(1, mat_pc1[1]);
-		pc1.setMatrixByID(2, mat_pc1[2]);
+		pc1.setMatrixByID(0, m_mat[0].pc1);
+		pc1.setMatrixByID(1, m_mat[1].pc1);
+		pc1.setMatrixByID(2, m_mat[2].pc1);
 		pc1.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pc2.setMatrixByID(0, mat_pc2[0]);
-		pc2.setMatrixByID(1, mat_pc2[1]);
-		pc2.setMatrixByID(2, mat_pc2[2]);
+		pc2.setMatrixByID(0, m_mat[0].pc2);
+		pc2.setMatrixByID(1, m_mat[1].pc2);
+		pc2.setMatrixByID(2, m_mat[2].pc2);
 		pc2.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		column_rail.setMatrixByID(0, mat_E2);
-		column_rail.setMatrixByID(1, mat_E4);
-		column_rail.setMatrixByID(2, mat_E6);
+		column_rail.setMatrixByID(0, m_mat[0].E2);
+		column_rail.setMatrixByID(1, m_mat[1].E2);
+		column_rail.setMatrixByID(2, m_mat[2].E2);
 		column_rail.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		column_carrige.setMatrixByID(0, mat_F2);
-		column_carrige.setMatrixByID(1, mat_F4);
-		column_carrige.setMatrixByID(2, mat_F6);
+		column_carrige.setMatrixByID(0, m_mat[0].F2);
+		column_carrige.setMatrixByID(1, m_mat[1].F2);
+		column_carrige.setMatrixByID(2, m_mat[2].F2);
 		column_carrige.Draw(ourShader, 3);
 
 
