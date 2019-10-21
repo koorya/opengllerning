@@ -25,6 +25,8 @@
 
 #include "load_tex.h"
 
+#include "movement_program.h"
+
 void do_movement();
 void key_callback (GLFWwindow*,int,int,int,int);
 void mouse_callback(GLFWwindow * window, double xpos, double ypos);
@@ -328,7 +330,7 @@ int main(){
 	int time_cnt = 0;
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
-	float frame_level = 1*3000.0;
+	float frame_level = 1*3000.0 ;//+ 500;
 	float max_bcar_level = 1500.0;
 	float max_ccar_level = 350.0;
 	struct ManipulatorConfig{
@@ -463,7 +465,7 @@ int main(){
 	std::vector<glm::mat4> hor_bond_matrices;
 	std::vector<glm::mat4> tilt_bond_matrices;
 
-	for(int floor = -13; floor < 13; floor++)
+	for(int floor = 0; floor < 26; floor++)
 		for(int x = 0; x < 4; x++)
 			for(int y = 0; y< 4; y++){
 
@@ -548,7 +550,7 @@ int main(){
 	Model tilted_bond("./3d_models/stl_components/tilted_bond.stl", tilt_bond_matrices);
 	Model horizontal_bond("./3d_models/stl_components/horizontal_bond.stl", hor_bond_matrices);
 	Model column("./3d_models/stl_components/column_light.stl", column_matrices);
-	Model main_frame("./3d_models/stl_components/main_frame.stl");
+	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
 
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
@@ -594,7 +596,7 @@ int main(){
 		glUniform1i(obj_type_mode, -1);
 		ourShader.setMaterial(Material::green_plastic);
 
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0)));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0))); //model to identity
 
 		static int int_time = 0;
 		if(round(glfwGetTime()*16)>int_time){
@@ -610,23 +612,23 @@ int main(){
 //			column.setMatrixByID(1, column_matrices[int_time%column_matrices.size()]);
 		}
 		ourShader.setMaterial(Material::white_rubber);
-		column.Draw(ourShader, 16);
+		column.Draw(ourShader, column_matrices.size());
 //		column.Draw(ourShader, (int)glfwGetTime());
 
 
-		ourShader.setMaterial(Material::chrome);
-		horizontal_bond.Draw(ourShader, 24);
+		ourShader.setMaterial(Material::copper);
+		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
 //		horizontal_bond.Draw(ourShader, (int)(glfwGetTime()*2));
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		tilted_bond.Draw(ourShader, 48);
+		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
 //		tilted_bond.Draw(ourShader, (int)(glfwGetTime()*4));
 
 
-		ourShader.setMaterial(Material::chrome);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_A));
-		main_frame.Draw(ourShader);
+		ourShader.setMaterial(Material::silver);
+		main_frame.setMatrixByID(0, mat_A);
+		main_frame.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::yellow_plastic);
 		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B1));
@@ -638,148 +640,115 @@ int main(){
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C1));
-		carrige.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C2));
-		carrige.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C3));
-		carrige.Draw(ourShader);
+		carrige.setMatrixByID(0, mat_C1);
+		carrige.setMatrixByID(1, mat_C2);
+		carrige.setMatrixByID(2, mat_C3);
+		carrige.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::black_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[0]));
-		tower_frame.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[1]));
-		tower_frame.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[2]));
-		tower_frame.Draw(ourShader);
+		tower_frame.setMatrixByID(0, mat_D[0]);
+		tower_frame.setMatrixByID(1, mat_D[1]);
+		tower_frame.setMatrixByID(2, mat_D[2]);
+		tower_frame.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::white_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[0]));
-		tower_box.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[1]));
-		tower_box.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[2]));
-		tower_box.Draw(ourShader);
+		tower_box.setMatrixByID(0, mat_D[0]);
+		tower_box.setMatrixByID(1, mat_D[1]);
+		tower_box.setMatrixByID(2, mat_D[2]);
+		tower_box.Draw(ourShader, 3);
 
 	//pantograph
 		ourShader.setMaterial(Material::yellow_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[0]));
-		pb1.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[1]));
-		pb1.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[2]));
-		pb1.Draw(ourShader);
+		pb1.setMatrixByID(0, mat_pb1[0]);
+		pb1.setMatrixByID(1, mat_pb1[1]);
+		pb1.setMatrixByID(2, mat_pb1[2]);
+		pb1.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[0]));
-		pb2.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[1]));
-		pb2.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[2]));
-		pb2.Draw(ourShader);
+		pb2.setMatrixByID(0, mat_pb2[0]);
+		pb2.setMatrixByID(1, mat_pb2[1]);
+		pb2.setMatrixByID(2, mat_pb2[2]);
+		pb2.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[0]));
-		pb3.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[1]));
-		pb3.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[2]));
-		pb3.Draw(ourShader);
+		pb3.setMatrixByID(0, mat_pb3[0]);
+		pb3.setMatrixByID(1, mat_pb3[1]);
+		pb3.setMatrixByID(2, mat_pb3[2]);
+		pb3.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[0]));
-		pb4.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[1]));
-		pb4.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[2]));
-		pb4.Draw(ourShader);
+		pb4.setMatrixByID(0, mat_pb4[0]);
+		pb4.setMatrixByID(1, mat_pb4[1]);
+		pb4.setMatrixByID(2, mat_pb4[2]);
+		pb4.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E1));
-		bond_rail.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E3));
-		bond_rail.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E5));
-		bond_rail.Draw(ourShader);
+		bond_rail.setMatrixByID(0, mat_E1);
+		bond_rail.setMatrixByID(1, mat_E3);
+		bond_rail.setMatrixByID(2, mat_E5);
+		bond_rail.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F1));
-		bond_carrige.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F3));
-		bond_carrige.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F5));
-		bond_carrige.Draw(ourShader);
+		bond_carrige.setMatrixByID(0, mat_F1);
+		bond_carrige.setMatrixByID(1, mat_F3);
+		bond_carrige.setMatrixByID(2, mat_F5);
+		bond_carrige.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_G1));
-		bond_wrist.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_G3));
-		bond_wrist.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_G5));
-		bond_wrist.Draw(ourShader);		
+		bond_wrist.setMatrixByID(0, mat_G1);
+		bond_wrist.setMatrixByID(1, mat_G3);
+		bond_wrist.setMatrixByID(2, mat_G5);
+		bond_wrist.Draw(ourShader, 3);		
 
 
 		ourShader.setMaterial(Material::yellow_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H1));
-		bond_handler_middle.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H2));
-		bond_handler_middle.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H3));
-		bond_handler_middle.Draw(ourShader);		
+		bond_handler_middle.setMatrixByID(0, mat_H1);
+		bond_handler_middle.setMatrixByID(1, mat_H2);
+		bond_handler_middle.setMatrixByID(2, mat_H3);
+		bond_handler_middle.Draw(ourShader, 3);		
 
 		ourShader.setMaterial(Material::red_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H1));
-		bond_handler_left.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H2));
-		bond_handler_left.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H3));
-		bond_handler_left.Draw(ourShader);
+		bond_handler_left.setMatrixByID(0, mat_H1);
+		bond_handler_left.setMatrixByID(1, mat_H2);
+		bond_handler_left.setMatrixByID(2, mat_H3);
+		bond_handler_left.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H1));
-		bond_handler_right.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H2));
-		bond_handler_right.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_H3));
-		bond_handler_right.Draw(ourShader);
+		bond_handler_right.setMatrixByID(0, mat_H1);
+		bond_handler_right.setMatrixByID(1, mat_H2);
+		bond_handler_right.setMatrixByID(2, mat_H3);
+		bond_handler_right.Draw(ourShader, 3);
+
 
 
 
 
 	//pantograph column
 		ourShader.setMaterial(Material::yellow_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc1[0]));
-		pc1.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc1[1]));
-		pc1.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc1[2]));
-		pc1.Draw(ourShader);
+		pc1.setMatrixByID(0, mat_pc1[0]);
+		pc1.setMatrixByID(1, mat_pc1[1]);
+		pc1.setMatrixByID(2, mat_pc1[2]);
+		pc1.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc2[0]));
-		pc2.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc2[1]));
-		pc2.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc2[2]));
-		pc2.Draw(ourShader);
+		pc2.setMatrixByID(0, mat_pc2[0]);
+		pc2.setMatrixByID(1, mat_pc2[1]);
+		pc2.setMatrixByID(2, mat_pc2[2]);
+		pc2.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E2));
-		column_rail.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E4));
-		column_rail.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E6));
-		column_rail.Draw(ourShader);
+		column_rail.setMatrixByID(0, mat_E2);
+		column_rail.setMatrixByID(1, mat_E4);
+		column_rail.setMatrixByID(2, mat_E6);
+		column_rail.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F2));
-		column_carrige.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F4));
-		column_carrige.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_F6));
-		column_carrige.Draw(ourShader);
+		column_carrige.setMatrixByID(0, mat_F2);
+		column_carrige.setMatrixByID(1, mat_F4);
+		column_carrige.setMatrixByID(2, mat_F6);
+		column_carrige.Draw(ourShader, 3);
 
 
 
