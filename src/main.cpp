@@ -302,6 +302,11 @@ int main(){
 	Model bond_handler_left("./3D_models/manipulator/bond_handler_left.stl", 3);//bond handlre left
 	Model bond_handler_right("./3D_models/manipulator/bond_handler_right.stl", 3);//bond handler right
 
+	Model pb1("./3D_models/stl_components/pb1.stl", 3);//bond pantograph section 1
+	Model pb2("./3D_models/stl_components/pb2.stl", 3);//bond pantograph section 2
+	Model pb3("./3D_models/stl_components/pb3.stl", 3);//bond pantograph section 3
+	Model pb4("./3D_models/stl_components/pb4.stl", 3);//bond pantograph section 4
+
 
 
 	glEnable(GL_MULTISAMPLE);
@@ -333,35 +338,102 @@ int main(){
 		float wrist;
 		float brot;
 	};
-	struct ManipulatorConfig m1, m2, m3;
-	m1.rail = 10000.0;
-	m1.tower = 30.0;
-	m1.bpant = 3000.0;
-	m1.cpant = 2000.0;
-	m1.bcar = 1000.0;
-	m1.ccar = 500.0;
-	m1.wrist = 20.0;
-	m1.brot = 60.0;
+	struct ManipulatorConfig m[3];
+	m[0].rail = 10000.0;
+	m[0].tower = 30.0;
+	m[0].bpant = 3000.0;
+	m[0].cpant = 2000.0;
+	m[0].bcar = 1000.0;
+	m[0].ccar = 500.0;
+	m[0].wrist = 20.0;
+	m[0].brot = 60.0;
 
-	m2.rail = 5000.0;
-	m2.tower = 30.0;
-	m2.bpant = 0.0;
-	m2.cpant = 0.0;
-	m2.bcar = 0.0;
-	m2.ccar = 0.0;
-	m2.wrist = 0.0;
-	m2.brot = 0.0;
+	m[1].rail = 5000.0;
+	m[1].tower = 30.0;
+	m[1].bpant = 0.0;
+	m[1].cpant = 0.0;
+	m[1].bcar = 0.0;
+	m[1].ccar = 0.0;
+	m[1].wrist = 0.0;
+	m[1].brot = 0.0;
 
-	m3.rail = 12000.0;
-	m3.tower = 30.0;
-	m3.bpant = 3000.0;
-	m3.cpant = 2000.0;
-	m3.bcar = 1000.0;
-	m3.ccar = 500.0;
-	m3.wrist = 20.0;
-	m3.brot = 60.0;
+	m[2].rail = 12000.0;
+	m[2].tower = 30.0;
+	m[2].bpant = 1500.0;
+	m[2].cpant = 2000.0;
+	m[2].bcar = 1000.0;
+	m[2].ccar = 500.0;
+	m[2].wrist = 20.0;
+	m[2].brot = 60.0;
 
 
+	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 mat_A  = glm::translate(mat_world, glm::vec3(0.0, 0.0, frame_level));
+	//rail position on frame
+	glm::mat4 mat_B1 = glm::translate(mat_A, glm::vec3(2100.0, 6760.0, -400.0));
+	glm::mat4 mat_B2 = glm::translate(mat_A, glm::vec3(200.0, -245.0, -400.0));
+	glm::mat4 mat_B3 = glm::translate(mat_A, glm::vec3(2100.0, -7250.0, -400.0));
+
+	glm::mat4 mat_C1 = glm::translate(mat_B1, glm::vec3(m[0].rail, 0.0, -400.0));
+	glm::mat4 mat_C2 = glm::translate(mat_B2, glm::vec3(m[1].rail, 0.0, -400.0));
+	glm::mat4 mat_C3 = glm::translate(mat_B3, glm::vec3(m[2].rail, 0.0, -400.0));
+
+	glm::mat4 mat_D[3];
+	mat_D[0] = glm::rotate(mat_C1, glm::radians(m[0].tower), glm::vec3(0.0, 0.0, 1.0));
+	mat_D[1] = glm::rotate(mat_C2, glm::radians(m[1].tower), glm::vec3(0.0, 0.0, 1.0));
+	mat_D[2] = glm::rotate(mat_C3, glm::radians(m[2].tower), glm::vec3(0.0, 0.0, 1.0));
+
+	glm::mat4 mat_E1 = glm::translate(glm::rotate(mat_D[0], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(m[0].bpant, 0.0f, 0.0f));
+	glm::mat4 mat_E2 = glm::translate(mat_D[0], glm::vec3(m[0].cpant, 0.0f, 0.0f));
+	glm::mat4 mat_E3 = glm::translate(glm::rotate(mat_D[1], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(m[1].bpant, 0.0f, 0.0f));
+	glm::mat4 mat_E4 = glm::translate(mat_D[1], glm::vec3(m[1].cpant, 0.0f, 0.0f));
+	glm::mat4 mat_E5 = glm::translate(glm::rotate(mat_D[2], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(m[2].bpant, 0.0f, 0.0f));
+	glm::mat4 mat_E6 = glm::translate(mat_D[2], glm::vec3(m[2].cpant, 0.0f, 0.0f));
+
+	glm::mat4 mat_F1 = glm::translate(mat_E1, glm::vec3(627.0, 0.0, -max_bcar_level + m[0].bcar));
+	glm::mat4 mat_F2 = glm::translate(mat_E2, glm::vec3(0.0, 0.0, -max_ccar_level + m[0].ccar));
+	glm::mat4 mat_F3 = glm::translate(mat_E3, glm::vec3(627.0, 0.0, -max_bcar_level + m[1].bcar));
+	glm::mat4 mat_F4 = glm::translate(mat_E4, glm::vec3(0.0, 0.0, -max_ccar_level + m[1].ccar));
+	glm::mat4 mat_F5 = glm::translate(mat_E5, glm::vec3(627.0, 0.0, -max_bcar_level + m[2].bcar));
+	glm::mat4 mat_F6 = glm::translate(mat_E6, glm::vec3(0.0, 0.0, -max_ccar_level + m[2].ccar));
+	glm::mat4 mat_G1 = glm::rotate(mat_F1, glm::radians(m[0].wrist), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G2 = glm::rotate(glm::translate(mat_F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G3 = glm::rotate(mat_F3, glm::radians(m[0].wrist), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G4 = glm::rotate(glm::translate(mat_F4, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G5 = glm::rotate(mat_F5, glm::radians(m[0].wrist), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_G6 = glm::rotate(glm::translate(mat_F6, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_H1 = glm::rotate(mat_G1, glm::radians(m[0].brot), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 mat_H2 = glm::rotate(mat_G3, glm::radians(m[1].brot), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 mat_H3 = glm::rotate(mat_G5, glm::radians(m[2].brot), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 mat_I1 = glm::rotate(glm::translate(mat_H1, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_I2 = glm::rotate(glm::translate(mat_H2, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 mat_I3 = glm::rotate(glm::translate(mat_H3, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+
+
+	glm::mat4 mat_pb1[3];
+	glm::mat4 mat_pb2[3];
+	glm::mat4 mat_pb3[3];
+	glm::mat4 mat_pb4[3];
+
+	for(int i=0; i<3; i++){
+		float pant_length = m[i].bpant+334.2;
+		float angle = -asinf((pant_length)/4450);
+		glm::mat4 pant_origin = glm::rotate(mat_D[i], glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+
+		pant_origin = glm::translate(pant_origin, glm::vec3(-49.0, 0.0, -224.0));
+		mat_pb1[i] = glm::rotate(pant_origin, angle, glm::vec3(0.0, 1.0, 0.0));
+		mat_pb2[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length/2.0, 0.0f, 0.0f)),
+											angle, glm::vec3(0.0, 1.0, 0.0));
+
+		mat_pb3[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length/2.0, 0.0f, 0.0f)),
+											-angle, glm::vec3(0.0, 1.0, 0.0));
+		mat_pb4[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
+											-angle, glm::vec3(0.0, 1.0, 0.0));
+	}
 
 	float stride = 3.514e+03;
 	glm::vec3 column_offset = glm::vec3(-5.610e+03, 507.50f, 5.033e+03); 
@@ -460,53 +532,6 @@ int main(){
 	Model main_frame("./3d_models/stl_components/main_frame.stl");
 
 	while(!glfwWindowShouldClose(window)){
-
-		glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-		mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-		glm::mat4 mat_A  = glm::translate(mat_world, glm::vec3(0.0, 0.0, frame_level));
-		//rail position on frame
-		glm::mat4 mat_B1 = glm::translate(mat_A, glm::vec3(2100.0, 6760.0, -400.0));
-		glm::mat4 mat_B2 = glm::translate(mat_A, glm::vec3(200.0, -245.0, -400.0));
-		glm::mat4 mat_B3 = glm::translate(mat_A, glm::vec3(2100.0, -7250.0, -400.0));
-
-		glm::mat4 mat_C1 = glm::translate(mat_B1, glm::vec3(m1.rail, 0.0, -400.0));
-		glm::mat4 mat_C2 = glm::translate(mat_B2, glm::vec3(m2.rail, 0.0, -400.0));
-		glm::mat4 mat_C3 = glm::translate(mat_B3, glm::vec3(m3.rail, 0.0, -400.0));
-		glm::mat4 mat_D1 = glm::rotate(mat_C1, glm::radians(m1.tower), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_D2 = glm::rotate(mat_C2, glm::radians(m2.tower), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_D3 = glm::rotate(mat_C3, glm::radians(m3.tower), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_E1 = glm::translate(glm::rotate(mat_D1, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-											glm::vec3(m1.bpant, 0.0f, 0.0f));
-		glm::mat4 mat_E2 = glm::translate(mat_D1, glm::vec3(m1.cpant, 0.0f, 0.0f));
-		glm::mat4 mat_E3 = glm::translate(glm::rotate(mat_D2, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-											glm::vec3(m2.bpant, 0.0f, 0.0f));
-		glm::mat4 mat_E4 = glm::translate(mat_D2, glm::vec3(m2.cpant, 0.0f, 0.0f));
-		glm::mat4 mat_E5 = glm::translate(glm::rotate(mat_D3, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-											glm::vec3(m2.bpant, 0.0f, 0.0f));
-		glm::mat4 mat_E6 = glm::translate(mat_D3, glm::vec3(m3.cpant, 0.0f, 0.0f));
-
-		glm::mat4 mat_F1 = glm::translate(mat_E1, glm::vec3(627.0, 0.0, -max_bcar_level + m1.bcar));
-		glm::mat4 mat_F2 = glm::translate(mat_E2, glm::vec3(0.0, 0.0, -max_ccar_level + m1.ccar));
-		glm::mat4 mat_F3 = glm::translate(mat_E3, glm::vec3(627.0, 0.0, -max_bcar_level + m2.bcar));
-		glm::mat4 mat_F4 = glm::translate(mat_E4, glm::vec3(0.0, 0.0, -max_ccar_level + m2.ccar));
-		glm::mat4 mat_F5 = glm::translate(mat_E5, glm::vec3(627.0, 0.0, -max_bcar_level + m3.bcar));
-		glm::mat4 mat_F6 = glm::translate(mat_E6, glm::vec3(0.0, 0.0, -max_ccar_level + m3.ccar));
-		glm::mat4 mat_G1 = glm::rotate(mat_F1, glm::radians(m1.wrist), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_G2 = glm::rotate(glm::translate(mat_F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_G3 = glm::rotate(mat_F3, glm::radians(m1.wrist), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_G4 = glm::rotate(glm::translate(mat_F4, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_G5 = glm::rotate(mat_F5, glm::radians(m1.wrist), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_G6 = glm::rotate(glm::translate(mat_F6, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_H1 = glm::rotate(mat_G1, glm::radians(m1.brot), glm::vec3(1.0, 0.0, 0.0));
-		glm::mat4 mat_H2 = glm::rotate(mat_G3, glm::radians(m3.brot), glm::vec3(1.0, 0.0, 0.0));
-		glm::mat4 mat_H3 = glm::rotate(mat_G5, glm::radians(m3.brot), glm::vec3(1.0, 0.0, 0.0));
-		glm::mat4 mat_I1 = glm::rotate(glm::translate(mat_H1, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_I2 = glm::rotate(glm::translate(mat_H2, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-		glm::mat4 mat_I3 = glm::rotate(glm::translate(mat_H3, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-
-
-
-
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
 			std::cout<<"FPS: "<<1000.0/(glfwGetTime() - timestamp)<<std::endl;
@@ -602,20 +627,54 @@ int main(){
 		carrige.Draw(ourShader);
 
 		ourShader.setMaterial(Material::yellow_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D1));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[0]));
 		tower_frame.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D2));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[1]));
 		tower_frame.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D3));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[2]));
 		tower_frame.Draw(ourShader);
 
 		ourShader.setMaterial(Material::white_plastic);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D1));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[0]));
 		tower_box.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D2));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[1]));
 		tower_box.Draw(ourShader);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D3));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[2]));
 		tower_box.Draw(ourShader);
+
+	//pantograph
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[0]));
+		pb1.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[1]));
+		pb1.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[2]));
+		pb1.Draw(ourShader);
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[0]));
+		pb2.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[1]));
+		pb2.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[2]));
+		pb2.Draw(ourShader);
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[0]));
+		pb3.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[1]));
+		pb3.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[2]));
+		pb3.Draw(ourShader);
+
+		ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[0]));
+		pb4.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[1]));
+		pb4.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[2]));
+		pb4.Draw(ourShader);
+
 
 		ourShader.setMaterial(Material::green_plastic);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_E1));
