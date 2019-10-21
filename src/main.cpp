@@ -307,6 +307,9 @@ int main(){
 	Model pb3("./3D_models/stl_components/pb3.stl", 3);//bond pantograph section 3
 	Model pb4("./3D_models/stl_components/pb4.stl", 3);//bond pantograph section 4
 
+	Model pc1("./3D_models/stl_components/pc1.stl", 3);//column pantograph section 1
+	Model pc2("./3D_models/stl_components/pc2.stl", 3);//column pantograph section 2
+
 
 
 	glEnable(GL_MULTISAMPLE);
@@ -342,7 +345,7 @@ int main(){
 	m[0].rail = 10000.0;
 	m[0].tower = 30.0;
 	m[0].bpant = 3000.0;
-	m[0].cpant = 2000.0;
+	m[0].cpant = 500.0;
 	m[0].bcar = 1000.0;
 	m[0].ccar = 500.0;
 	m[0].wrist = 20.0;
@@ -360,7 +363,7 @@ int main(){
 	m[2].rail = 12000.0;
 	m[2].tower = 30.0;
 	m[2].bpant = 1500.0;
-	m[2].cpant = 2000.0;
+	m[2].cpant = 700.0;
 	m[2].bcar = 1000.0;
 	m[2].ccar = 500.0;
 	m[2].wrist = 20.0;
@@ -434,6 +437,22 @@ int main(){
 		mat_pb4[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
 											-angle, glm::vec3(0.0, 1.0, 0.0));
 	}
+
+
+	glm::mat4 mat_pc1[3];
+	glm::mat4 mat_pc2[3];
+
+	for(int i=0; i<3; i++){
+		float pant_length = m[i].cpant + 148.0;
+		float angle = -asinf((pant_length)/1420);
+		glm::mat4 pant_origin = mat_D[i];
+
+		pant_origin = glm::translate(pant_origin, glm::vec3(394.0, 0.0, -511.0));
+		mat_pc1[i] = glm::rotate(pant_origin, angle, glm::vec3(0.0, 1.0, 0.0));
+		mat_pc2[i] = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
+											-angle, glm::vec3(0.0, 1.0, 0.0));
+	}
+
 
 	float stride = 3.514e+03;
 	glm::vec3 column_offset = glm::vec3(-5.610e+03, 507.50f, 5.033e+03); 
@@ -626,7 +645,7 @@ int main(){
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_C3));
 		carrige.Draw(ourShader);
 
-		ourShader.setMaterial(Material::yellow_plastic);
+		ourShader.setMaterial(Material::black_plastic);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[0]));
 		tower_frame.Draw(ourShader);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_D[1]));
@@ -643,7 +662,7 @@ int main(){
 		tower_box.Draw(ourShader);
 
 	//pantograph
-		ourShader.setMaterial(Material::green_plastic);
+		ourShader.setMaterial(Material::yellow_plastic);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[0]));
 		pb1.Draw(ourShader);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[1]));
@@ -651,7 +670,7 @@ int main(){
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb1[2]));
 		pb1.Draw(ourShader);
 
-		ourShader.setMaterial(Material::green_plastic);
+		// ourShader.setMaterial(Material::green_plastic);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[0]));
 		pb2.Draw(ourShader);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[1]));
@@ -659,7 +678,7 @@ int main(){
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb2[2]));
 		pb2.Draw(ourShader);
 
-		ourShader.setMaterial(Material::green_plastic);
+		// ourShader.setMaterial(Material::green_plastic);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[0]));
 		pb3.Draw(ourShader);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[1]));
@@ -667,7 +686,7 @@ int main(){
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb3[2]));
 		pb3.Draw(ourShader);
 
-		ourShader.setMaterial(Material::green_plastic);
+		// ourShader.setMaterial(Material::green_plastic);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[0]));
 		pb4.Draw(ourShader);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pb4[1]));
@@ -726,6 +745,24 @@ int main(){
 		bond_handler_right.Draw(ourShader);
 
 
+
+
+	//pantograph column
+		ourShader.setMaterial(Material::yellow_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc1[0]));
+		pc1.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc1[1]));
+		pc1.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc1[2]));
+		pc1.Draw(ourShader);
+
+		// ourShader.setMaterial(Material::green_plastic);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc2[0]));
+		pc2.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc2[1]));
+		pc2.Draw(ourShader);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_pc2[2]));
+		pc2.Draw(ourShader);
 
 
 		ourShader.setMaterial(Material::green_plastic);
