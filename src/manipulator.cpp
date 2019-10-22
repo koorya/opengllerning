@@ -9,6 +9,15 @@ float section_length = 3500.0;
 
 Manipulator::Manipulator(){
 
+	for(int i = 0; i < 8; i++){
+		sect_move_prg[i].axis = AxisName::none;
+		sect_move_prg[i].POS = 0.0;
+		sect_move_prg[i].Vel = 0.0;
+		sect_move_prg[i].Acc = 0.0;
+		sect_move_prg[i].Dec = 0.0;
+		sect_move_prg[i].Next = 0.0;
+	}
+
 	// add_config.rail = 10000.0;
 	// add_config.tower = 30.0;
 	// add_config.bpant = 3000.0;
@@ -48,10 +57,70 @@ Manipulator::Manipulator(){
 
 
 
+MovementStep * seqToComand(int sq){
+	int ret;
+	bool fw = true;
+	if(sq>100){ //rew
+		fw = false;
+		sq %= 100; //с префиксом 100 обозначаются обратные движения
+	}
+	if(sq == 1)
+		ret = 1;
+	else if (sq == 2)
+		ret = 9;
+	else if (sq == 3)
+		ret = 8;
+	else if (sq == 4)
+		ret = 7;
+	else if (sq == 5)
+		ret = 6;
+	else if (sq == 6)
+		ret = 15;
+	else if (sq == 7)
+		ret = 17;
+	else if (sq == 8)
+		ret = 14;
+	else if (sq == 9)
+		ret = 16;
+	else if (sq == 10)
+		ret = 13;
+	else if (sq == 11)
+		ret = 12;
+	else if (sq == 12)
+		ret = 3;
+	else if (sq == 13)
+		ret = 2;
+	else
+		return 0;
 
-void Manipulator::setProgram(int prg_id, int section){
-	cur_program = prg_id;
+	ret--; //нумерация в массиве команд начинается с нуля
+
+	if(!fw){
+		ret += 17; //во второй половине массива у нас находятся обратные движения
+	}
+	
+	return sp_programs[ret];
+}
+
+void Manipulator::moveToSection(int section){
 	cur_section = section;
+	sect_move_prg[0].axis = AxisName::CAR;
+	sect_move_prg[0].Vel = 500.0;
+	setProgram(sect_move_prg);
+}
+
+void Manipulator::mountBond(int b_id){
+	MovementStep * prg = seqToComand(b_id);
+	setProgram(prg);
+}
+
+void Manipulator::setProgram(MovementStep * prg){
+	cur_program = prg;
+	if(cur_program == 0){
+		std::cout<<"ERROR::INVALID BOND POSITION ID"<<std::endl;
+		return;
+	}
+
 	this->resetDrivers();
 
 	// add_config.rail =  config.rail;
@@ -113,6 +182,10 @@ void Manipulator::resetDrivers(){
 char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate", "__6__", "CAR", "__8__", "__9__", "syncW"};
 
 int Manipulator::driverSM(float time){
+	if(cur_program == 0){
+		std::cout<<"ERROR::driverSM PROGRAM IS NOT SET"<<std::endl;
+		return -1;
+	}
 	// if(cur_step == 1)
 	// 	return 0;
 	float dt = time - last_time;
@@ -122,7 +195,7 @@ int Manipulator::driverSM(float time){
 	int all_axis_complete = 1;
 
 
-	struct MovementStep cstep = sp_programs[cur_program][cur_step];
+	struct MovementStep cstep = cur_program[cur_step];
 	std::cout<<std::endl<<"dt "<<dt<<", step: "<<cur_step<<", axis: "<<axis_names[cstep.axis]<<" activate:"<<config.axes_array[cstep.axis].activate<<std::endl;
 
 	if(config.axes_array[cstep.axis].activate == false){//перешли на следующий шаг
@@ -218,9 +291,9 @@ void calculateManipulatorGraphicMatrices(){
 	f_mat.A  = glm::translate(f_mat.World, glm::vec3(0.0, 0.0, frame_level));
 
 	//rail position on frame
-	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(2100.0, 6760.0, -400.0));
+	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(640.0, 6760.0, -400.0));
 	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(640.0, -245.0, -400.0));
-	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(2100.0, -7250.0, -400.0));
+	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(640.0, -7250.0, -400.0));
 
 	for(int i = 0; i < 3; i++){
 		m_mat[i].C = glm::translate(m_mat[i].B, glm::vec3(m_mat[i].config.rail, 0.0, -400.0));
