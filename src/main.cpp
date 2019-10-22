@@ -334,9 +334,9 @@ int main(){
 
 	fillUpSPProgramsArray();
 
-	m_mat[1].setProgram(2);
-	m_mat[0].setProgram(3);
-	m_mat[2].setProgram(6);
+	m_mat[1].setProgram(7);
+	m_mat[0].setProgram(1);
+	m_mat[2].setProgram(9);
 
 
 	float stride = 3.514e+03;
@@ -450,13 +450,13 @@ int main(){
 		glfwPollEvents();
 		do_movement();
 
-		m_mat[1].driverSM(glfwGetTime()/5.0);
+		m_mat[1].driverSM(glfwGetTime()/10.0);
 		m_mat[1].updateManipConfig();
 
-		m_mat[0].driverSM(glfwGetTime()/5.0);
+		m_mat[0].driverSM(glfwGetTime()/10.0);
 		m_mat[0].updateManipConfig();
 		
-		m_mat[2].driverSM(glfwGetTime()/5.0);
+		m_mat[2].driverSM(glfwGetTime()/10.0);
 		m_mat[2].updateManipConfig();
 
 		calculateManipulatorGraphicMatrices();
@@ -467,6 +467,7 @@ int main(){
 			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 		}
 		view = my_cam.getMatrix();
+		//ourShader.setMat4(m_mat[0].I, "view");
 		ourShader.setMat4(view, "view");
 		ourShader.setFloat(glfwGetTime(), "time");
 
@@ -476,6 +477,8 @@ int main(){
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(proj));
 		glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+		// glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::rotate(m_mat[0].I,
+		// 																							glm::radians(-90.0f), glm::vec3(0.0, 1.0, 0.0))));
 
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -491,7 +494,7 @@ int main(){
 		glUniform1i(obj_type_mode, -1);
 		ourShader.setMaterial(Material::green_plastic);
 
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0))); //model to identity
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0f))); //model to identity
 
 		column.setMatrixByID(1, m_mat[0].G2);
 		column.setMatrixByID(2, m_mat[1].G2);

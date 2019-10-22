@@ -50,13 +50,15 @@ void Manipulator::resetDrivers(){
 
 
 int Manipulator::driverSM(float time){
+	// if(cur_step == 1)
+	// 	return 0;
 	float dt = time - last_time;
 
 	last_time = time;
 	int last_step = 0;
 	int all_axis_complete = 1;
 
-	std::cout<<"dt "<<dt<<", step: "<<cur_step<<std::endl;
+//	std::cout<<"dt "<<dt<<", step: "<<cur_step<<std::endl;
 
 	struct MovementStep cstep = sp_programs[cur_program][cur_step];
 
@@ -90,8 +92,8 @@ int Manipulator::driverSM(float time){
 		float remaining_dist = config.axes_array[i].cur_pos - config.axes_array[i].set_point;
 		float dx = config.axes_array[i].Vel*dt;
 
-		std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
-		if( std::fabs(remaining_dist + dx) < std::fabs(remaining_dist) ){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
+//		std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
+		if( std::fabs(remaining_dist + dx) <= std::fabs(remaining_dist) ){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
 			config.axes_array[i].cur_pos += dx;
 			all_axis_complete = 0;
 		}else{	
@@ -121,7 +123,6 @@ void Manipulator::updateManipConfig(){
 
 void calculateManipulatorGraphicMatrices(){
 
-	std::cout<<m_mat[1].config.bpant<<std::endl;
 
 
 	float frame_level = 1*3000.0 ;//+ 500;
