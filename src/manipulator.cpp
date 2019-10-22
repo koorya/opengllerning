@@ -9,6 +9,8 @@ float section_length = 3500.0;
 
 Manipulator::Manipulator(){
 
+	state = vacant;
+
 	for(int i = 0; i < 8; i++){
 		sect_move_prg[i].axis = AxisName::none;
 		sect_move_prg[i].POS = 0.0;
@@ -55,7 +57,44 @@ Manipulator::Manipulator(){
 	config.brot =  add_config.brot + axes[AxisName::rotate].cur_pos; 
 }
 
-
+int Manipulator::sequenceSM(float time){
+	if(state == ManStates::vacant){
+		if(bond_list.empty())
+			return 1;
+		state = pickup;
+	}else if(state == ManStates::pickup){
+		container->attachBond(&(this->I), bond_list.back());
+		state = move_to_section;
+		this->moveToSection(bond_list.back().section);
+	}else if(state == ManStates::move_to_section){
+		if(driverSM(time)){
+			state = move_to_place;
+			this->mountBond(bond_list.back().name);
+		}
+	}else if(state == ManStates::move_to_place){
+		if(driverSM(time)){
+			state = mount;
+		}
+	}else if(state == ManStates::mount){
+		container->detach(&(this->I));
+		state = move_from_place;
+		this->mountBond(bond_list.back().name + 100);//обратно
+		bond_list.pop_back(); // удалили из списка 
+	}else if(state == ManStates::move_from_place){
+		if(driverSM(time)){
+			state = move_to_origin;
+			this->moveToSection(0);
+		}
+	}else if(state == ManStates::move_to_origin){
+		if(driverSM(time)){
+			if(bond_list.empty()){
+				state = vacant;
+			}else{
+				state = pickup;
+			}
+		}	
+	}
+}
 
 MovementStep * seqToComand(int sq){
 	int ret;
@@ -105,7 +144,7 @@ MovementStep * seqToComand(int sq){
 void Manipulator::moveToSection(int section){
 	cur_section = section;
 	sect_move_prg[0].axis = AxisName::CAR;
-	sect_move_prg[0].Vel = 500.0;
+	sect_move_prg[0].Vel = 2000.0;
 	setProgram(sect_move_prg);
 }
 
@@ -244,7 +283,7 @@ int Manipulator::driverSM(float time){
 		float remaining_dist = config.axes_array[i].cur_pos - config.axes_array[i].set_point;
 		float dx = config.axes_array[i].Vel*dt;
 
-//		std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
+		// std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
 		if( (std::fabs(remaining_dist + dx) <= std::fabs(remaining_dist) ) && (config.axes_array[i].Vel != 0.0f)){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
 			config.axes_array[i].cur_pos += dx;
 			all_axis_complete = 0;
@@ -291,9 +330,9 @@ void calculateManipulatorGraphicMatrices(){
 	f_mat.A  = glm::translate(f_mat.World, glm::vec3(0.0, 0.0, frame_level));
 
 	//rail position on frame
-	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(640.0, 6760.0, -400.0));
-	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(640.0, -245.0, -400.0));
-	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(640.0, -7250.0, -400.0));
+	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(620.0, 6760.0, -400.0));
+	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(620.0, -245.0, -400.0));
+	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(620.0, -7250.0, -400.0));
 
 	for(int i = 0; i < 3; i++){
 		m_mat[i].C = glm::translate(m_mat[i].B, glm::vec3(m_mat[i].config.rail, 0.0, -400.0));

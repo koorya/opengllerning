@@ -5,7 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "movement_program.h"
-
+#include "ConstructionContainer.h"
+#include <vector>
 
 struct ManipulatorConfig{
 	float rail;
@@ -23,11 +24,25 @@ struct FrameMatrices{
 	glm::mat4 World, A;
 };
 
+enum ManStates{
+	vacant = 0,
+	pickup,
+	move_to_section,
+	move_to_place,
+	mount,
+	move_from_place,
+	move_to_origin
+};
+
+
+
 class Manipulator{
 public:
 	glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2;
 	struct ManipulatorConfig config;
 	struct ManipulatorConfig add_config;
+	std::vector <struct BondLocation> bond_list;
+	ConstructionContainer * container;
 
 	Manipulator();
 	void resetDrivers();
@@ -35,6 +50,7 @@ public:
 	void moveToSection(int section);
 	void mountBond(int b_id);
 	int driverSM(float time);
+	int sequenceSM(float time);
 	void updateManipConfig();
 	void resetConfiguration();
 private:
@@ -43,11 +59,7 @@ private:
 	int cur_section;
 	int cur_step;
 	float last_time;
-
-	
-
-
-
+	enum ManStates state;
 };
 
 // struct ManipulatorGraphMatrices{

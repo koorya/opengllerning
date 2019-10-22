@@ -26,6 +26,7 @@
 #include "load_tex.h"
 
 #include "manipulator.h"
+#include "ConstructionContainer.h"
 
 
 void do_movement();
@@ -334,102 +335,12 @@ int main(){
 
 	fillUpSPProgramsArray();
 
+	ConstructionContainer constr_container = ConstructionContainer();
 
-	float stride = 3.514e+03;
-	glm::vec3 column_offset = glm::vec3(-5.610e+03, 507.50f, 5.033e+03); 
-	glm::vec3 hor_bond_offset = glm::vec3(0, 127.0f, -550.0); 
-	glm::vec3 tilt_bond_offset = glm::vec3(0, 600.0f, -465.0); 
+	m_mat[0].container = &constr_container;
+	m_mat[1].container = &constr_container;
+	m_mat[2].container = &constr_container;
 
-	std::vector<glm::mat4> column_matrices;
-	std::vector<glm::mat4> hor_bond_matrices;
-	std::vector<glm::mat4> tilt_bond_matrices;
-
-	for(int floor = 0; floor < 5; floor++)
-		for(int x = 0; x < 4; x++)
-			for(int y = 0; y< 4; y++){
-
-				model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-				model = glm::translate(model, glm::vec3(x*stride, -(floor+1)*3000.0, y*stride) - column_offset);
-				model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0, 1.0, 0.0));
-				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-				column_matrices.push_back(model);
-
-				if(floor == 0)
-					continue;
-
-				if(y < 3){
-					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset - hor_bond_offset);
-					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-					// ourShader.setMaterial(Material::red_plastic);
-					// horizontal_bond.Draw(ourShader);
-					hor_bond_matrices.push_back(model);
-
-					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
-					model = glm::translate(model, -tilt_bond_offset);
-					model = glm::rotate(model, glm::radians(63.0f), glm::vec3(1.0, 0.0, 0.0));
-					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-					// ourShader.setMaterial(Material::green_plastic);
-					// tilted_bond.Draw(ourShader);
-					tilt_bond_matrices.push_back(model);
-
-					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
-					model = glm::translate(model, glm::vec3(0.0, 0.0, 2*tilt_bond_offset.z + stride) );
-					model = glm::translate(model, -tilt_bond_offset );
-					model = glm::rotate(model, glm::radians(117.0f), glm::vec3(1.0, 0.0, 0.0));
-					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-					// ourShader.setMaterial(Material::green_plastic);
-					// tilted_bond.Draw(ourShader);
-					tilt_bond_matrices.push_back(model);
-				}
-
-				if(x < 3){
-					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
-					model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
-					model = glm::translate(model, -hor_bond_offset);
-					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-					// ourShader.setMaterial(Material::red_plastic);
-					// horizontal_bond.Draw(ourShader);
-					hor_bond_matrices.push_back(model);
-
-					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
-					model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
-					model = glm::translate(model, -tilt_bond_offset);
-					model = glm::rotate(model, glm::radians(63.0f), glm::vec3(1.0, 0.0, 0.0));
-					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-
-					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-					// ourShader.setMaterial(Material::green_plastic);
-					// tilted_bond.Draw(ourShader);
-					tilt_bond_matrices.push_back(model);
-
-					model = glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-					model = glm::translate(model, glm::vec3(x*stride, -(floor)*3000.0, y*stride) - column_offset);
-					model = glm::translate(model, glm::vec3(2*tilt_bond_offset.z + stride, 0.0, 0.0) );
-					model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
-					model = glm::translate(model, -tilt_bond_offset );
-					model = glm::rotate(model, glm::radians(117.0f), glm::vec3(1.0, 0.0, 0.0));
-					model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-
-					// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
-					// ourShader.setMaterial(Material::green_plastic);
-					// tilted_bond.Draw(ourShader);
-					tilt_bond_matrices.push_back(model);
-				}
-
-
-
-			}
-
-	Model tilted_bond("./3d_models/stl_components/tilted_bond.stl", tilt_bond_matrices);
-	Model horizontal_bond("./3d_models/stl_components/horizontal_bond.stl", hor_bond_matrices);
-	Model column("./3d_models/stl_components/column_light.stl", column_matrices);
 	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
 
 	int mbond_cnt = 10;
@@ -441,11 +352,74 @@ int main(){
 	// m_mat[0].mountBond(mount_seq0[prg_cnt[0]]);
 	// m_mat[1].mountBond(mount_seq1[prg_cnt[1]]);
 	// m_mat[2].mountBond(mount_seq2[prg_cnt[2]]);
-	int sect = 0;
-	m_mat[0].moveToSection(sect);
-	m_mat[1].moveToSection(sect);
-	m_mat[2].moveToSection(sect);
+	// int sect = 0;
+	// m_mat[0].moveToSection(sect);
+	// m_mat[1].moveToSection(sect);
+	// m_mat[2].moveToSection(sect);
+	BondLocation bl;
+	for(int i = 1; i <= 4; i++ ){
+		
+		bl.section = i;
+		if(i>1){
+			bl.name = 11;
+			m_mat[1].bond_list.push_back(bl);
+			bl.name = 10;
+			m_mat[1].bond_list.push_back(bl);
+			bl.name = 9;
+			m_mat[1].bond_list.push_back(bl);
+			bl.name = 7;
+			m_mat[1].bond_list.push_back(bl);
+			bl.name = 8;
+			m_mat[1].bond_list.push_back(bl);
+			bl.name = 6;
+			m_mat[1].bond_list.push_back(bl);
+		}
+		bl.name = 5;
+		m_mat[1].bond_list.push_back(bl);
+		bl.name = 4;
+		m_mat[1].bond_list.push_back(bl);
+		bl.name = 3;
+		m_mat[1].bond_list.push_back(bl);
+		bl.name = 2;
+		m_mat[1].bond_list.push_back(bl);
+		bl.name = 1;
+		m_mat[1].bond_list.push_back(bl);
+	}
 
+	for(int i = 1; i <= 4; i++ ){
+		bl.section = i;
+		if(i>1){
+			bl.name = 11;
+			m_mat[0].bond_list.push_back(bl);
+			bl.name = 9;
+			m_mat[0].bond_list.push_back(bl);
+			bl.name = 8;
+			m_mat[0].bond_list.push_back(bl);
+		}
+		bl.name = 5;
+		m_mat[0].bond_list.push_back(bl);
+		bl.name = 13;
+		m_mat[0].bond_list.push_back(bl);
+	}
+
+
+	for(int i = 1; i <= 4; i++ ){
+		bl.section = i;
+		if(i>1){
+			bl.name = 10;
+			m_mat[2].bond_list.push_back(bl);
+			bl.name = 7;
+			m_mat[2].bond_list.push_back(bl);
+			bl.name = 6;
+			m_mat[2].bond_list.push_back(bl);
+		}
+		bl.name = 4;
+		m_mat[2].bond_list.push_back(bl);
+		bl.name = 12;
+		m_mat[2].bond_list.push_back(bl);
+	}
+
+	bool trig = false;
 	while(!glfwWindowShouldClose(window)){
 		time_cnt ++;
 		if(time_cnt % 1000 == 0){
@@ -461,44 +435,14 @@ int main(){
 		glfwPollEvents();
 		do_movement();
 		
-		if(keys[GLFW_KEY_0])
-			sect = 0;
-		if(keys[GLFW_KEY_1])
-			sect = 1;
-		if(keys[GLFW_KEY_2])
-			sect = 2;	
-		if(keys[GLFW_KEY_3])
-			sect = 3;	
-		if(keys[GLFW_KEY_4])
-			sect = 4;	
-		if(sect > 5)
-			sect = 0;
-
-
-		for(int i = 0; i < 3; i++){
-			if(m_mat[i].driverSM(glfwGetTime()/0.6)){
-				if(!keys[GLFW_KEY_V])
-					continue;
-				prg_cnt[i] += 1;
-				if(i == 1){
-					if(prg_cnt[i] >= 22)
-						prg_cnt[i] = 0;
-				}else{
-					if(prg_cnt[i] >= 10)
-						prg_cnt[i] = 0;
-				}
-				m_mat[i].moveToSection(sect);
-				// if(i == 0)
-				// 	m_mat[0].mountBond(mount_seq0[prg_cnt[0]]);
-				// else if (i == 1)
-				// 	m_mat[1].mountBond(mount_seq1[prg_cnt[1]]);
-				// else if (i == 2)
-				// 	m_mat[2].mountBond(mount_seq2[prg_cnt[2]]);
-
+		if(keys[GLFW_KEY_T])
+			trig = true;
+			
+		if(trig)
+			for(int i = 0; i < 3; i++){
+				m_mat[i].sequenceSM(glfwGetTime()/0.01);
+				m_mat[i].updateManipConfig();
 			}
-			std::cout<<"prg_cnt"<<prg_cnt[1]<<std::endl;
-			m_mat[i].updateManipConfig();
-		}
 
 		// m_mat[0].driverSM(glfwGetTime()/10.0);
 		// m_mat[0].updateManipConfig();
@@ -547,23 +491,9 @@ int main(){
 		// column.setMatrixByID(2, m_mat[1].G2);
 		// column.setMatrixByID(3, m_mat[2].G2);
 
-		horizontal_bond.setMatrixByID(1, 	m_mat[0].I);
-		horizontal_bond.setMatrixByID(2, 	m_mat[1].I);
-		tilted_bond.setMatrixByID(3, 		m_mat[2].I);
 
-		ourShader.setMaterial(Material::white_rubber);
-		column.Draw(ourShader, column_matrices.size());
-		// column.Draw(ourShader, 20*16);
-
-
-		ourShader.setMaterial(Material::copper);
-		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
-		// horizontal_bond.Draw(ourShader, 20*24);
-
-
-		ourShader.setMaterial(Material::green_plastic);
-		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
-		// tilted_bond.Draw(ourShader, 20*48);
+		constr_container.updateMatrices();
+		constr_container.drawElements(ourShader);
 
 
 		ourShader.setMaterial(Material::silver);
