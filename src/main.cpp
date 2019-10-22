@@ -333,7 +333,7 @@ int main(){
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
 
 	fillUpSPProgramsArray();
-	int prg_cnt = 5;
+	int prg_cnt = 6;
 	m_mat[1].setProgram(prg_cnt, 2);
 	// m_mat[0].setProgram(1);
 	// m_mat[2].setProgram(9);
@@ -450,14 +450,14 @@ int main(){
 		glfwPollEvents();
 		do_movement();
 		
-		if(m_mat[1].driverSM(glfwGetTime()/0.01)){
+		if(m_mat[1].driverSM(glfwGetTime()/0.2)){
 			if(prg_cnt < 17){
-				prg_cnt += 17;
+				// prg_cnt += 17;
 			}else{
-				prg_cnt -= 16;
+				// prg_cnt -= 16;
 			}
 			// prg_cnt = 17;
-			m_mat[1].setProgram(prg_cnt, 2);
+			// m_mat[1].setProgram(prg_cnt, 2);
 		}
 		std::cout<<"prg_cnt"<<prg_cnt<<std::endl;
 		m_mat[1].updateManipConfig();

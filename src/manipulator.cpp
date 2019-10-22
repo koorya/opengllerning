@@ -5,7 +5,7 @@
 
 Manipulator m_mat[3] = {Manipulator(), Manipulator(), Manipulator()};
 struct FrameMatrices f_mat;
-float section_length = 3000.0;
+float section_length = 3500.0;
 
 Manipulator::Manipulator(){
 
@@ -210,7 +210,7 @@ void calculateManipulatorGraphicMatrices(){
 
 
 	float frame_level = 0;//1*3000.0 ;//+ 500;
-	float max_bcar_level = 1500.0;
+	float max_bcar_level = 1345.0;
 	float max_ccar_level = 350.0;
 
 	f_mat.World = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
@@ -219,7 +219,7 @@ void calculateManipulatorGraphicMatrices(){
 
 	//rail position on frame
 	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(2100.0, 6760.0, -400.0));
-	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(200.0, -245.0, -400.0));
+	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(640.0, -245.0, -400.0));
 	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(2100.0, -7250.0, -400.0));
 
 	for(int i = 0; i < 3; i++){
@@ -232,7 +232,7 @@ void calculateManipulatorGraphicMatrices(){
 		m_mat[i].F2 = glm::translate(m_mat[i].E2, glm::vec3(0.0, 0.0, -max_ccar_level + m_mat[i].config.ccar));
 		m_mat[i].G1 = glm::rotate(m_mat[i].F1, glm::radians(m_mat[i].config.wrist), glm::vec3(0.0, 0.0, 1.0));
 		m_mat[i].G2 = glm::rotate(glm::translate(m_mat[i].F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-		m_mat[i].H = glm::rotate(m_mat[i].G1, glm::radians(m_mat[i].config.brot), glm::vec3(1.0, 0.0, 0.0));
+		m_mat[i].H = glm::rotate(m_mat[i].G1, glm::radians(180.0f-m_mat[i].config.brot), glm::vec3(1.0, 0.0, 0.0));
 		m_mat[i].I = glm::rotate(glm::translate(m_mat[i].H, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 	}
 
