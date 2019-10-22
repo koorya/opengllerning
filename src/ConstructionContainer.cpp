@@ -2,13 +2,13 @@
 
 
 ConstructionContainer::ConstructionContainer(){
-	tilted_bond_cnt = 48*2;
-	horizontal_bond_cnt = 24*2;
-	column_cnt = 16*3;
+	tilted_bond_cnt = 48*19;
+	horizontal_bond_cnt = 24*19;
+	column_cnt = 16*20;
 
-	float stride = 3.514e+03;
-	glm::vec3 column_offset = glm::vec3(-5.610e+03, 507.50f, 5.033e+03); 
-	glm::vec3 hor_bond_offset = glm::vec3(0, 127.0f, -550.0); 
+	float stride = 3500.0;;
+	glm::vec3 column_offset = glm::vec3(-5.600e+03, 507.50f, 5.005e+03); 
+	glm::vec3 hor_bond_offset = glm::vec3(0, 127.0f, -555.0); 
 	glm::vec3 tilt_bond_offset = glm::vec3(0, 600.0f, -465.0); 
 
 	std::vector<glm::mat4> column_matrices;

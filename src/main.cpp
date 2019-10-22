@@ -437,10 +437,10 @@ int main(){
 		
 		if(keys[GLFW_KEY_T])
 			trig = true;
-			
+
 		if(trig)
 			for(int i = 0; i < 3; i++){
-				m_mat[i].sequenceSM(glfwGetTime()/0.01);
+				m_mat[i].sequenceSM(glfwGetTime()/1.0);
 				m_mat[i].updateManipConfig();
 			}
 

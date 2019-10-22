@@ -322,17 +322,17 @@ void calculateManipulatorGraphicMatrices(){
 
 
 	float frame_level = 0;//1*3000.0 ;//+ 500;
-	float max_bcar_level = 1345.0;
-	float max_ccar_level = 350.0;
+	float max_bcar_level = 1443.0;
+	float max_ccar_level = 0.0;
 
 	f_mat.World = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
 	f_mat.World = glm::rotate(f_mat.World, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 	f_mat.A  = glm::translate(f_mat.World, glm::vec3(0.0, 0.0, frame_level));
 
 	//rail position on frame
-	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(620.0, 6760.0, -400.0));
-	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(620.0, -245.0, -400.0));
-	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(620.0, -7250.0, -400.0));
+	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(350.0, 6760.0, -400.0));
+	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(350.0, -245.0, -400.0));
+	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(350.0, -7250.0, -400.0));
 
 	for(int i = 0; i < 3; i++){
 		m_mat[i].C = glm::translate(m_mat[i].B, glm::vec3(m_mat[i].config.rail, 0.0, -400.0));
