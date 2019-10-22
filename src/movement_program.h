@@ -13,6 +13,9 @@ enum AxisName{
 	CAR = 7,
 	syncW = 10
 };
+
+
+
 // enum AxisAltName{
 //     bpant = 1,
 //     tower = 2,
@@ -44,7 +47,7 @@ struct MovementStep{
 
 
 void fillUpSPProgramsArray();
-extern struct MovementStep sp_programs[17][8];
+extern struct MovementStep sp_programs[][8];
 
 
 #endif

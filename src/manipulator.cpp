@@ -5,34 +5,94 @@
 
 Manipulator m_mat[3] = {Manipulator(), Manipulator(), Manipulator()};
 struct FrameMatrices f_mat;
-
+float section_length = 3000.0;
 
 Manipulator::Manipulator(){
-	config.rail = 10000.0;
-	config.tower = 30.0;
-	config.bpant = 3000.0;
-	config.cpant = 500.0;
-	config.bcar = 1000.0;
-	config.ccar = 500.0;
-	config.wrist = 20.0;
-	config.brot = 60.0;
+
+	// add_config.rail = 10000.0;
+	// add_config.tower = 30.0;
+	// add_config.bpant = 3000.0;
+	// add_config.cpant = 500.0;
+	// add_config.bcar = 1000.0;
+	// add_config.ccar = 500.0;
+	// add_config.wrist = 20.0;
+	// add_config.brot = 60.0;
+
+	add_config.rail = 0.0;
+	add_config.tower = 0.0;
+	add_config.bpant = 0.0;
+	add_config.cpant = 0.0;
+	add_config.bcar = 0.0;
+	add_config.ccar = 0.0;
+	add_config.wrist = 0.0;
+	add_config.brot = 0.0;
+
 
 	struct AxisDriver * axes 			= 	config.axes_array;
-	axes[AxisName::carrige].cur_pos 	= 	config.bcar;
-	axes[AxisName::pantograph].cur_pos 	= 	config.bpant;
-	axes[AxisName::rotate].cur_pos 		=	config.brot;
-	axes[AxisName::CAR].cur_pos 		= 	config.rail;
-	axes[AxisName::tower].cur_pos 		= 	config.tower;
-	axes[AxisName::turn].cur_pos 		= 	config.wrist;
+	axes[AxisName::carrige].cur_pos 	= 	0.0;
+	axes[AxisName::pantograph].cur_pos 	= 	0.0;
+	axes[AxisName::rotate].cur_pos 		=	0.0;
+	axes[AxisName::CAR].cur_pos 		= 	0.0;
+	axes[AxisName::tower].cur_pos 		= 	0.0;
+	axes[AxisName::turn].cur_pos 		= 	0.0;
 
+	config.rail =  add_config.rail + axes[AxisName::CAR].cur_pos; 
+	config.tower = add_config.tower + axes[AxisName::tower].cur_pos;
+	config.bpant = add_config.bpant + axes[AxisName::pantograph].cur_pos;
+	config.cpant = add_config.cpant;
+	config.bcar =  add_config.bcar + axes[AxisName::carrige].cur_pos; 
+	config.ccar =  add_config.ccar; 
+	config.wrist = add_config.wrist + axes[AxisName::turn].cur_pos;
+	config.brot =  add_config.brot + axes[AxisName::rotate].cur_pos; 
 }
 
 
 
 
-void Manipulator::setProgram(int prg_id){
+void Manipulator::setProgram(int prg_id, int section){
 	cur_program = prg_id;
+	cur_section = section;
 	this->resetDrivers();
+
+	// add_config.rail =  config.rail;
+	// add_config.tower = config.tower;
+	// add_config.bpant = config.bpant;
+	// add_config.cpant = config.cpant;
+	// add_config.bcar =  config.bcar;
+	// add_config.ccar =  config.ccar;
+	// add_config.wrist = config.wrist;
+	// add_config.brot =  config.brot;
+
+	struct AxisDriver * axes 	= 	config.axes_array;
+
+	axes[AxisName::CAR].cur_pos =  config.rail - cur_section*section_length;
+	axes[AxisName::tower].cur_pos = config.tower;
+	axes[AxisName::pantograph].cur_pos = config.bpant;
+
+	axes[AxisName::carrige].cur_pos =  config.bcar;
+
+	axes[AxisName::turn].cur_pos = config.wrist;
+	axes[AxisName::rotate].cur_pos =  config.brot ;
+}
+
+void Manipulator::resetConfiguration(){
+	config.rail = 0.0;
+	config.tower = 0.0;
+	config.bpant = 0.0;
+	config.cpant = 0.0;
+	config.bcar = 0.0;
+	config.ccar = 0.0;
+	config.wrist = 0.0;
+	config.brot = 0.0;
+
+	add_config.rail = 0.0;
+	add_config.tower = 0.0;
+	add_config.bpant = 0.0;
+	add_config.cpant = 0.0;
+	add_config.bcar = 0.0;
+	add_config.ccar = 0.0;
+	add_config.wrist = 0.0;
+	add_config.brot = 0.0;
 }
 
 void Manipulator::resetDrivers(){
@@ -46,8 +106,11 @@ void Manipulator::resetDrivers(){
 		config.axes_array[i].Acc = 0.0;
 		config.axes_array[i].Dec = 0.0;
 	}
+
+
 }
 
+char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate", "__6__", "CAR", "__8__", "__9__", "syncW"};
 
 int Manipulator::driverSM(float time){
 	// if(cur_step == 1)
@@ -58,33 +121,49 @@ int Manipulator::driverSM(float time){
 	int last_step = 0;
 	int all_axis_complete = 1;
 
-//	std::cout<<"dt "<<dt<<", step: "<<cur_step<<std::endl;
 
 	struct MovementStep cstep = sp_programs[cur_program][cur_step];
+	std::cout<<std::endl<<"dt "<<dt<<", step: "<<cur_step<<", axis: "<<axis_names[cstep.axis]<<" activate:"<<config.axes_array[cstep.axis].activate<<std::endl;
 
 	if(config.axes_array[cstep.axis].activate == false){//перешли на следующий шаг
-		if(cstep.axis == AxisName::none)
-			last_step = 1;
+
 		config.axes_array[cstep.axis].activate = true;
 		config.axes_array[cstep.axis].set_point = cstep.POS;
-		config.axes_array[cstep.axis].Vel = cstep.Vel * ((cstep.POS>0)?1:-1);
+		config.axes_array[cstep.axis].Vel = cstep.Vel * (((cstep.POS - config.axes_array[cstep.axis].cur_pos)>0)?1:-1);
+		std::cout<<"!!!!!!!!!!cstep.POS - config.axes_array[cstep.axis].cur_pos!!! "<<cstep.POS<<" - "<<config.axes_array[cstep.axis].cur_pos<<std::endl;
 		config.axes_array[cstep.axis].Acc = cstep.Acc;
 		config.axes_array[cstep.axis].Dec = cstep.Dec;
 		if(cur_step == 0){//означает, что это первый цикл
 			dt = 0.0;
 		}
-	}
-	if(std::fabs(config.axes_array[cstep.axis].cur_pos) >= cstep.Next){
-		if(cstep.Next > 0.0){//это означает, чно порог включения следующего шага достигнут
-			cur_step ++;
-		}else if(std::fabs(config.axes_array[cstep.axis].cur_pos - config.axes_array[cstep.axis].set_point) < EPSILON){//это означает, чно нужно дождаться окончания этого шага
-			cur_step ++;
-		}
-		if(cur_step >= 8){
-			cur_step = 7;
+		if(cstep.axis == AxisName::none){
 			last_step = 1;
+			config.axes_array[cstep.axis].activate = false;
 		}
 	}
+
+
+	if(cstep.Next == 0.0){//это означает, чно порог включения следующего не установлен. Ожидаем завержения
+		if(std::fabs(config.axes_array[cstep.axis].cur_pos - config.axes_array[cstep.axis].set_point) < EPSILON){//это означает, чно нужно дождаться окончания этого шага
+			cur_step ++;
+		}
+	}else{
+		if(config.axes_array[cstep.axis].Vel > 0){
+			if(config.axes_array[cstep.axis].cur_pos > cstep.Next)
+				cur_step ++;
+		}else if(config.axes_array[cstep.axis].Vel < 0){
+			if(config.axes_array[cstep.axis].cur_pos < cstep.Next)
+				cur_step ++;
+		}else{
+			cur_step ++;
+		}
+	}
+	
+	if(cur_step >= 8){
+		cur_step = 7;
+		last_step = 1;
+	}
+	
 
 	for(int i = 0; i < AXIS_CNT; i++){
 		if(config.axes_array[i].activate == false)
@@ -93,9 +172,10 @@ int Manipulator::driverSM(float time){
 		float dx = config.axes_array[i].Vel*dt;
 
 //		std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
-		if( std::fabs(remaining_dist + dx) <= std::fabs(remaining_dist) ){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
+		if( (std::fabs(remaining_dist + dx) <= std::fabs(remaining_dist) ) && (config.axes_array[i].Vel != 0.0f)){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
 			config.axes_array[i].cur_pos += dx;
 			all_axis_complete = 0;
+			std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
 		}else{	
 				// если следующий шаг нас удаляет от конечной точки (т.е. пропустили изза большого шага дискретизации), 
 				// то выключаем скорость и устанавливаем позицию в конечную точку
@@ -105,6 +185,7 @@ int Manipulator::driverSM(float time){
 	}
 	// if(last_step & all_axis_complete)
 	// 	exit(0);
+	std::cout<<"last_step "<<last_step<<", all_axis_complete "<<all_axis_complete<<std::endl;
 	return last_step & all_axis_complete;
 }
 
@@ -112,12 +193,15 @@ int Manipulator::driverSM(float time){
 void Manipulator::updateManipConfig(){
 	struct AxisDriver * axes = config.axes_array;
 
-	config.bcar = axes[AxisName::carrige].cur_pos;
-	config.bpant = axes[AxisName::pantograph].cur_pos;
-	config.brot = axes[AxisName::rotate].cur_pos;
-	config.rail = axes[AxisName::CAR].cur_pos;
-	config.tower = axes[AxisName::tower].cur_pos;
-	config.wrist = axes[AxisName::turn].cur_pos;
+	config.rail =  add_config.rail + axes[AxisName::CAR].cur_pos + cur_section*section_length; 
+	config.tower = add_config.tower + axes[AxisName::tower].cur_pos;
+	config.bpant = add_config.bpant + axes[AxisName::pantograph].cur_pos;
+	config.cpant = add_config.cpant;
+	config.bcar =  add_config.bcar + axes[AxisName::carrige].cur_pos; 
+	config.ccar =  add_config.ccar; 
+	config.wrist = add_config.wrist + axes[AxisName::turn].cur_pos;
+	config.brot =  add_config.brot + axes[AxisName::rotate].cur_pos; 
+
 
 }
 
@@ -125,7 +209,7 @@ void calculateManipulatorGraphicMatrices(){
 
 
 
-	float frame_level = 1*3000.0 ;//+ 500;
+	float frame_level = 0;//1*3000.0 ;//+ 500;
 	float max_bcar_level = 1500.0;
 	float max_ccar_level = 350.0;
 

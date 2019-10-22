@@ -27,16 +27,20 @@ class Manipulator{
 public:
     glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2;
     struct ManipulatorConfig config;
+    struct ManipulatorConfig add_config;
 
     Manipulator();
     void resetDrivers();
-    void setProgram(int prg_id);
+    void setProgram(int prg_id, int section);
     int driverSM(float time);
     void updateManipConfig();
+    void resetConfiguration();
 private:
     int cur_program;
+    int cur_section;
     int cur_step;
     float last_time;
+
 
 
 };

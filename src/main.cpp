@@ -333,10 +333,10 @@ int main(){
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
 
 	fillUpSPProgramsArray();
-
-	m_mat[1].setProgram(7);
-	m_mat[0].setProgram(1);
-	m_mat[2].setProgram(9);
+	int prg_cnt = 5;
+	m_mat[1].setProgram(prg_cnt, 2);
+	// m_mat[0].setProgram(1);
+	// m_mat[2].setProgram(9);
 
 
 	float stride = 3.514e+03;
@@ -449,15 +449,24 @@ int main(){
 		glEnable(GL_DEPTH_TEST);
 		glfwPollEvents();
 		do_movement();
-
-		m_mat[1].driverSM(glfwGetTime()/10.0);
+		
+		if(m_mat[1].driverSM(glfwGetTime()/0.01)){
+			if(prg_cnt < 17){
+				prg_cnt += 17;
+			}else{
+				prg_cnt -= 16;
+			}
+			// prg_cnt = 17;
+			m_mat[1].setProgram(prg_cnt, 2);
+		}
+		std::cout<<"prg_cnt"<<prg_cnt<<std::endl;
 		m_mat[1].updateManipConfig();
 
-		m_mat[0].driverSM(glfwGetTime()/10.0);
-		m_mat[0].updateManipConfig();
+		// m_mat[0].driverSM(glfwGetTime()/10.0);
+		// m_mat[0].updateManipConfig();
 		
-		m_mat[2].driverSM(glfwGetTime()/10.0);
-		m_mat[2].updateManipConfig();
+		// m_mat[2].driverSM(glfwGetTime()/10.0);
+		// m_mat[2].updateManipConfig();
 
 		calculateManipulatorGraphicMatrices();
 
@@ -496,27 +505,27 @@ int main(){
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0f))); //model to identity
 
-		column.setMatrixByID(1, m_mat[0].G2);
-		column.setMatrixByID(2, m_mat[1].G2);
-		column.setMatrixByID(3, m_mat[2].G2);
+		// column.setMatrixByID(1, m_mat[0].G2);
+		// column.setMatrixByID(2, m_mat[1].G2);
+		// column.setMatrixByID(3, m_mat[2].G2);
 
 		horizontal_bond.setMatrixByID(1, 	m_mat[0].I);
 		horizontal_bond.setMatrixByID(2, 	m_mat[1].I);
 		tilted_bond.setMatrixByID(3, 		m_mat[2].I);
 
 		ourShader.setMaterial(Material::white_rubber);
-		column.Draw(ourShader, column_matrices.size());
-//		column.Draw(ourShader, (int)glfwGetTime());
+		// column.Draw(ourShader, column_matrices.size());
+		column.Draw(ourShader, 16);
 
 
 		ourShader.setMaterial(Material::copper);
-		horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
-//		horizontal_bond.Draw(ourShader, (int)(glfwGetTime()*2));
+		// horizontal_bond.Draw(ourShader, hor_bond_matrices.size());
+		horizontal_bond.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
-//		tilted_bond.Draw(ourShader, (int)(glfwGetTime()*4));
+		// tilted_bond.Draw(ourShader, tilt_bond_matrices.size());
+		tilted_bond.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::silver);
