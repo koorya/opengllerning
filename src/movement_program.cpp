@@ -4,7 +4,6 @@
 #include <cmath>
 
 
-#define EPSILON 0.01
 
 
 struct MovementStep sp_programs[17][8];//17 программ по 8 шагов каждая, неиспользуемые шаги в конце с осью none
@@ -41,77 +40,8 @@ void fillUpSPProgramsArray(){
 	}
 }
 
-#define AXIS_CNT 15
-struct AxisDriver axes[AXIS_CNT];
 
-int cur_program;
-int cur_step;
-float last_time;
-void resetDrivers(int prg_id){
-	cur_program = prg_id;
-	cur_step = 0;
-	for(int i = 0; i < AXIS_CNT; i++){
-		axes[i].activate = false;
-		axes[i].Acc = 0.0;
-		axes[i].cur_pos = 0.0;
-		axes[i].set_point = 0.0;
-		axes[i].Vel = 0.0;
-		axes[i].Acc = 0.0;
-		axes[i].Dec = 0.0;
-	}
-}
 
-float getAxisValue(AxisName id){
-	return axes[id].cur_pos;
-}
 
-int driverSM(float time){
-	float dt = last_time - time;
-	last_time = time;
-	int last_step = 0;
-	int all_axis_complete = 1;
 
-	struct MovementStep cstep = sp_programs[cur_program][cur_step];
 
-	if(axes[cstep.axis].activate == false){//перешли на следующий шаг
-		if(cstep.axis == AxisName::none)
-			last_step = 1;
-		axes[cstep.axis].activate = true;
-		axes[cstep.axis].set_point = cstep.POS;
-		axes[cstep.axis].Vel = cstep.Vel * ((cstep.POS>0)?1:-1);
-		axes[cstep.axis].Acc = cstep.Acc;
-		axes[cstep.axis].Dec = cstep.Dec;
-		if(cur_step == 0){//означает, что это первый цикл
-			dt = 0.0;
-		}
-	}
-	if(std::fabs(axes[cstep.axis].cur_pos) >= cstep.Next){
-		if(cstep.Next > 0.0){//это означает, чно порог включения следующего шага достигнут
-			cur_step ++;
-		}else if(std::fabs(axes[cstep.axis].cur_pos - axes[cstep.axis].set_point) < EPSILON){//это означает, чно нужно дождаться окончания этого шага
-			cur_step ++;
-		}
-		if(cur_step >= 8){
-			cur_step = 7;
-			last_step = 1;
-		}
-	}
-
-	for(int i = 0; i < AXIS_CNT; i++){
-		if(axes[i].activate == false)
-			continue;
-		float remaining_dist = axes[i].cur_pos - axes[i].set_point;
-		float dx = axes[i].Vel*dt;
-		if( std::fabs(remaining_dist + dx) < std::fabs(remaining_dist) ){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
-			axes[i].cur_pos += dx;
-			all_axis_complete = 0;
-		}else{	
-				// если следующий шаг нас удаляет от конечной точки (т.е. пропустили изза большого шага дискретизации), 
-				// то выключаем скорость и устанавливаем позицию в конечную точку
-			axes[i].Vel = 0.0;
-			axes[i].cur_pos = axes[i].set_point;
-		}
-	}
-
-	return last_step & all_axis_complete;
-}

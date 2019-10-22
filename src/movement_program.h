@@ -1,6 +1,8 @@
 #ifndef MOVEMENT_PROGRAM_H
 #define MOVEMENT_PROGRAM_H
 
+#define AXIS_CNT 15
+
 enum AxisName{
 	none = 0,
 	pantograph = 1,
@@ -42,10 +44,8 @@ struct MovementStep{
 
 
 void fillUpSPProgramsArray();
-void resetDrivers(int prg_id);
-int driverSM(float time);
+extern struct MovementStep sp_programs[17][8];
 
-float getAxisValue(AxisName id);
 
 #endif
 

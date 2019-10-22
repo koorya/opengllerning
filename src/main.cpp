@@ -25,7 +25,6 @@
 
 #include "load_tex.h"
 
-#include "movement_program.h"
 #include "manipulator.h"
 
 
@@ -333,10 +332,11 @@ int main(){
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
 
+	fillUpSPProgramsArray();
 
-	initManipulatores();
-
-
+	m_mat[1].setProgram(2);
+	m_mat[0].setProgram(3);
+	m_mat[2].setProgram(6);
 
 
 	float stride = 3.514e+03;
@@ -450,6 +450,15 @@ int main(){
 		glfwPollEvents();
 		do_movement();
 
+		m_mat[1].driverSM(glfwGetTime()/5.0);
+		m_mat[1].updateManipConfig();
+
+		m_mat[0].driverSM(glfwGetTime()/5.0);
+		m_mat[0].updateManipConfig();
+		
+		m_mat[2].driverSM(glfwGetTime()/5.0);
+		m_mat[2].updateManipConfig();
+
 		calculateManipulatorGraphicMatrices();
 
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
@@ -484,19 +493,14 @@ int main(){
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0))); //model to identity
 
-		static int int_time = 0;
-		if(round(glfwGetTime()*16)>int_time){
-			int_time = round(glfwGetTime()*16);
-			column.setMatrixByID(1, m_mat[0].G2);
-			column.setMatrixByID(2, m_mat[1].G2);
-			column.setMatrixByID(3, m_mat[2].G2);
+		column.setMatrixByID(1, m_mat[0].G2);
+		column.setMatrixByID(2, m_mat[1].G2);
+		column.setMatrixByID(3, m_mat[2].G2);
 
-			horizontal_bond.setMatrixByID(1, 	m_mat[0].I);
-			horizontal_bond.setMatrixByID(2, 	m_mat[1].I);
-			tilted_bond.setMatrixByID(3, 		m_mat[2].I);
+		horizontal_bond.setMatrixByID(1, 	m_mat[0].I);
+		horizontal_bond.setMatrixByID(2, 	m_mat[1].I);
+		tilted_bond.setMatrixByID(3, 		m_mat[2].I);
 
-//			column.setMatrixByID(1, column_matrices[int_time%column_matrices.size()]);
-		}
 		ourShader.setMaterial(Material::white_rubber);
 		column.Draw(ourShader, column_matrices.size());
 //		column.Draw(ourShader, (int)glfwGetTime());
