@@ -38,6 +38,10 @@ void Camera::processKeyboard(Camera_movement direction, GLfloat delta_time){
 		this->Position += velosity * glm::normalize(glm::cross(shift, this->Up));
 	if(direction == Camera_movement::LEFT)
 		this->Position -= velosity * glm::normalize(glm::cross(shift, this->Up));
+	if(direction == Camera_movement::UP)
+		this->Position -= velosity * glm::normalize(glm::cross(shift,glm::normalize(glm::cross(shift, this->Up))));
+	if(direction == Camera_movement::DOWN)
+		this->Position += velosity * glm::normalize(glm::cross(shift, glm::normalize(glm::cross(shift, this->Up))));
 	this->updateCameraVectors();
 }
 

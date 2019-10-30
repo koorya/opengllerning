@@ -440,7 +440,7 @@ int main(){
 
 		if(trig)
 			for(int i = 0; i < 3; i++){
-				m_mat[i].sequenceSM(glfwGetTime()/1.0);
+				m_mat[i].sequenceSM(glfwGetTime()/0.05);
 				m_mat[i].updateManipConfig();
 			}
 
@@ -664,6 +664,10 @@ void do_movement(){
 		my_cam.processKeyboard(Camera_movement::RIGHT, deltaTime);
 	if(keys[GLFW_KEY_A])
 		my_cam.processKeyboard(Camera_movement::LEFT, deltaTime);
+	if(keys[GLFW_KEY_X])
+		my_cam.processKeyboard(Camera_movement::UP, deltaTime);
+	if(keys[GLFW_KEY_Z])
+		my_cam.processKeyboard(Camera_movement::DOWN, deltaTime);
 
 }
 
