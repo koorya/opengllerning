@@ -218,6 +218,45 @@ void Manipulator::resetDrivers(){
 
 }
 
+/**
+ * Функция выдает позицию исходя из параметров движения и времени.
+ * x - относительное расстояние
+ * a1, a2 - ускорение и замедление
+ * v - максимальная скорость
+ * t - время начиная со старта движения
+ * 0 <= res <= x
+ **/
+
+float calcPos(float a1, float a2, float v, float x, float t){
+	float res = 0;
+	if(x > v*v*(1.0f/a1+ 1.0f/a2)){//параметры некорректные, за такое расстояние он не успеет разогнаться до скорости, считаем по другому алгоритму
+		std::cout<<"calcPos: param is not correct"<<std::endl;
+		float t1 = sqrt(2*x / ( a1 * (1 + a1/a2) ));
+		float t2 = t1 * ( a1 / a2 + 1 );
+		if (t < t1){
+			res = a1 * t * t / 2.0;
+		}else if(t < t2){
+			res = x - a2 * (t2 - t) * (t2 - t)/2;
+		}else{
+			res = x;
+		}
+	}else{
+		float t1 = v/a1;
+		float t3 = 0.5*(v/a2 + t1) + x/v;
+		float t2 = t3 - v/a2;
+		if(t <= t1){
+			res = a1 * t * t / 2.0;
+		}else if(t <= t2){
+			res = v * ( t - t1 / 2.0 );
+		}else if(t <= t3){
+			res = v * ( t + t2 - t1 ) / 2.0;
+		}else{
+			res = x;
+		}
+ 	}
+	return res;
+}
+
 char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate", "__6__", "CAR", "__8__", "__9__", "syncW"};
 
 int Manipulator::driverSM(float time){
