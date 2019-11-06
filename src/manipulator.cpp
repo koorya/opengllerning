@@ -1,3 +1,5 @@
+/** \file */
+
 #include "manipulator.h"
 #include <iostream>
 
@@ -72,6 +74,7 @@ int Manipulator::sequenceSM(float time){
 			this->mountBond(bond_list.back().name);
 		}
 	}else if(state == ManStates::move_to_place){
+		return 1;
 		if(driverSM(time)){
 			state = mount;
 		}
@@ -94,6 +97,7 @@ int Manipulator::sequenceSM(float time){
 			}
 		}	
 	}
+	return 0;
 }
 
 MovementStep * seqToComand(int sq){
@@ -141,18 +145,43 @@ MovementStep * seqToComand(int sq){
 	return sp_programs[ret];
 }
 
+
+/**
+ * \brief задает программу из одного шага для перемещения в заданную секцию
+ */
 void Manipulator::moveToSection(int section){
+	setProgram(sect_move_prg);
+
 	cur_section = section;
 	sect_move_prg[0].axis = AxisName::CAR;
-	sect_move_prg[0].Vel = 2000.0;
-	setProgram(sect_move_prg);
-}
+	sect_move_prg[0].Vel = 200.0;
+	sect_move_prg[0].Acc = 20.0;
+	sect_move_prg[0].Dec = 20.0;
+	sect_move_prg[0].POS = cur_section*section_length;
 
+}
+/**
+ * \brief установка соответсвующей программы установки связи по ее номеру
+ * 
+ * Этой функции передается номер связи в секции для текущего манипулятора (не этажа),
+ * она выбирает соответствующую программу движений и задает ее как текущую выполняемую. 
+ * \callgraph
+ * \callergraph
+ */
 void Manipulator::mountBond(int b_id){
 	MovementStep * prg = seqToComand(b_id);
 	setProgram(prg);
 }
 
+
+/**
+ * \brief подготовка конфигурации к выполнению программы
+ * 
+ * Подготавливает позиции осей под выполняемую программу. А именно, виртуально смещает вдоль рельсов так, чтобы для программы
+ * все выглядело так, будто он находится в нулевой секции. Так же, устанавливает текущую программу в соответствии со входным параметром.
+ * Сбрасывает драйверы приводов.
+ * \callergraph
+ */
 void Manipulator::setProgram(MovementStep * prg){
 	cur_program = prg;
 	if(cur_program == 0){
@@ -202,7 +231,10 @@ void Manipulator::resetConfiguration(){
 	add_config.wrist = 0.0;
 	add_config.brot = 0.0;
 }
-
+/**
+ * \brief сбрасывает параметры осей для записи в них программы
+ * 
+ */
 void Manipulator::resetDrivers(){
 	cur_step = 0;
 	for(int i = 0; i < AXIS_CNT; i++){
@@ -219,16 +251,23 @@ void Manipulator::resetDrivers(){
 }
 
 /**
- * Функция выдает позицию исходя из параметров движения и времени.
- * x - относительное расстояние
- * a1, a2 - ускорение и замедление
- * v - максимальная скорость
- * t - время начиная со старта движения
- * 0 <= res <= x
+ * \brief выдает позицию исходя из параметров движения и времени.
+ * 
+ * Используется для получения позиции привода во время с начала выполнения шага этого привода.
+ * \param x относительное расстояние
+ * \param a1,a2  ускорение и замедление
+ * \param v максимальная скорость
+ * \param t количество секунд с начала движения
+ * 
+ * \returns 0 <= pos(t) <= x
  **/
 
 float calcPos(float a1, float a2, float v, float x, float t){
 	float res = 0;
+	if(v < 0){
+		a1 = -a1;
+		a2 = -a2;
+	}
 	if(x > v*v*(1.0f/a1+ 1.0f/a2)){//параметры некорректные, за такое расстояние он не успеет разогнаться до скорости, считаем по другому алгоритму
 		std::cout<<"calcPos: param is not correct"<<std::endl;
 		float t1 = sqrt(2*x / ( a1 * (1 + a1/a2) ));
@@ -258,23 +297,24 @@ float calcPos(float a1, float a2, float v, float x, float t){
 }
 
 char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate", "__6__", "CAR", "__8__", "__9__", "syncW"};
-
+/*!
+ * \brief Функция, ответственная за выполнения программ движений.
+ * 
+ * 
+ * Функция берет текущую установленную программу движений и в соответсвии с текущим временем устанавливает позиции всех приводов.
+ * Она должна учитывать ускорения, замедления, и запуск следующих шагов по условию на предыдущие шаги.
+ */
 int Manipulator::driverSM(float time){
 	if(cur_program == 0){
 		std::cout<<"ERROR::driverSM PROGRAM IS NOT SET"<<std::endl;
 		return -1;
 	}
-	// if(cur_step == 1)
-	// 	return 0;
-	float dt = time - last_time;
 
-	last_time = time;
 	int last_step = 0;
 	int all_axis_complete = 1;
 
 
 	struct MovementStep cstep = cur_program[cur_step];
-	std::cout<<std::endl<<"dt "<<dt<<", step: "<<cur_step<<", axis: "<<axis_names[cstep.axis]<<" activate:"<<config.axes_array[cstep.axis].activate<<std::endl;
 
 	if(config.axes_array[cstep.axis].activate == false){//перешли на следующий шаг
 
@@ -284,10 +324,9 @@ int Manipulator::driverSM(float time){
 		std::cout<<"!!!!!!!!!!cstep.POS - config.axes_array[cstep.axis].cur_pos!!! "<<cstep.POS<<" - "<<config.axes_array[cstep.axis].cur_pos<<std::endl;
 		config.axes_array[cstep.axis].Acc = cstep.Acc;
 		config.axes_array[cstep.axis].Dec = cstep.Dec;
-		if(cur_step == 0){//означает, что это первый цикл
-			dt = 0.0;
-		}
-		if(cstep.axis == AxisName::none){
+		config.axes_array[cstep.axis].start_time = time; //запоминаем время для расчета движений
+
+		if(cstep.axis == AxisName::none){ //означает, что программа закончилась
 			last_step = 1;
 			config.axes_array[cstep.axis].activate = false;
 		}
@@ -319,19 +358,16 @@ int Manipulator::driverSM(float time){
 	for(int i = 0; i < AXIS_CNT; i++){
 		if(config.axes_array[i].activate == false)
 			continue;
-		float remaining_dist = config.axes_array[i].cur_pos - config.axes_array[i].set_point;
-		float dx = config.axes_array[i].Vel*dt;
+		AxisDriver * ca = &(config.axes_array[i]);
+		float pos = calcPos(ca->Acc, ca->Dec, ca->Vel, ca->set_point, time - ca->start_time);
+		std::cout<<"axis: "<<axis_names[i]<<", remaining_dist: "<<config.axes_array[i].set_point - config.axes_array[i].cur_pos
+					<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos
+					<<", dx: "<<config.axes_array[i].cur_pos - pos
+					<<std::endl;
 
-		// std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
-		if( (std::fabs(remaining_dist + dx) <= std::fabs(remaining_dist) ) && (config.axes_array[i].Vel != 0.0f)){ // если следующий шаг нас приближает к конечной точке, то добавляем шаг
-			config.axes_array[i].cur_pos += dx;
+		if(config.axes_array[i].cur_pos != pos){
+			config.axes_array[i].cur_pos = pos;
 			all_axis_complete = 0;
-			std::cout<<"i: "<<i<<", remaining_dist: "<<remaining_dist<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos<<", dx: "<<dx<<std::endl;
-		}else{	
-				// если следующий шаг нас удаляет от конечной точки (т.е. пропустили изза большого шага дискретизации), 
-				// то выключаем скорость и устанавливаем позицию в конечную точку
-			config.axes_array[i].Vel = 0.0;
-			config.axes_array[i].cur_pos = config.axes_array[i].set_point;
 		}
 	}
 	// if(last_step & all_axis_complete)

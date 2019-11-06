@@ -28,12 +28,14 @@ enum AxisName{
 // };
 
 struct AxisDriver{
-	bool activate;
-	float cur_pos;
-	float set_point;
-	float Vel;
+	bool activate; ///< ось уже стартовала 
+	float cur_pos; ///< текущая позиция (обновляется в функции driverSM)
+	float set_point; ///< конечная позиция на данном шаге
+	float Vel; 
 	float Acc;
 	float Dec;
+	float start_time;///< время начала движения этой оси
+	float next_time;///< время для запуска следующего шага
 };
 
 struct MovementStep{

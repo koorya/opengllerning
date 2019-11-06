@@ -439,8 +439,8 @@ int main(){
 			trig = true;
 
 		if(trig)
-			for(int i = 0; i < 3; i++){
-				m_mat[i].sequenceSM(glfwGetTime()/0.05);
+			for(int i = 0; i < 1; i++){
+				m_mat[i].sequenceSM(glfwGetTime()/2);
 				m_mat[i].updateManipConfig();
 			}
 

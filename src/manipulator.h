@@ -38,11 +38,12 @@ enum ManStates{
 
 class Manipulator{
 public:
-	glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2;
-	struct ManipulatorConfig config;
-	struct ManipulatorConfig add_config;
-	std::vector <struct BondLocation> bond_list;
-	ConstructionContainer * container;
+	glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2; ///< матрицы положений элементов манипулятора
+
+	struct ManipulatorConfig config; ///< актуальная конфигурация манипулятора, считая что текущая секция нулевая
+	struct ManipulatorConfig add_config; ///< смещение на секции
+	std::vector <struct BondLocation> bond_list;///< список позиций связей, которые манипулятор должен установить
+	ConstructionContainer * container;///< ссылка на контейнер связей. Нужна для отображения захваченной связи и ее отображения после установки
 
 	Manipulator();
 	void resetDrivers();
