@@ -5,11 +5,22 @@
 
 #define EPSILON 0.01
 
-Manipulator m_mat[3] = {Manipulator(), Manipulator(), Manipulator()};
+BotManipulator m_mat[3] = {BotManipulator(), BotManipulator(), BotManipulator()};
 struct FrameMatrices f_mat;
 float section_length = 3500.0;
 
 Manipulator::Manipulator(){
+	config.rail = 0.0;
+	config.tower= 0.0;
+	config.bpant= 0.0;
+	config.cpant= 0.0;
+	config.bcar = 0.0;
+	config.ccar = 0.0;
+	config.wrist= 0.0;
+	config.brot = 0.0;
+}
+
+BotManipulator::BotManipulator(){
 
 	state = vacant;
 
@@ -41,7 +52,7 @@ Manipulator::Manipulator(){
 	add_config.brot = 0.0;
 
 
-	struct AxisDriver * axes 			= 	config.axes_array;
+	struct AxisDriver * axes 			= 	axes_array;
 	axes[AxisName::carrige].cur_pos 	= 	0.0;
 	axes[AxisName::pantograph].cur_pos 	= 	0.0;
 	axes[AxisName::rotate].cur_pos 		=	0.0;
@@ -59,7 +70,7 @@ Manipulator::Manipulator(){
 	config.brot =  add_config.brot + axes[AxisName::rotate].cur_pos; 
 }
 
-int Manipulator::sequenceSM(float time){
+int BotManipulator::sequenceSM(float time){
 	if(state == ManStates::vacant){
 		if(bond_list.empty())
 			return 1;
@@ -149,7 +160,7 @@ MovementStep * seqToComand(int sq){
 /**
  * \brief задает программу из одного шага для перемещения в заданную секцию
  */
-void Manipulator::moveToSection(int section){
+void BotManipulator::moveToSection(int section){
 	setProgram(sect_move_prg);
 
 	cur_section = section;
@@ -168,7 +179,7 @@ void Manipulator::moveToSection(int section){
  * \callgraph
  * \callergraph
  */
-void Manipulator::mountBond(int b_id){
+void BotManipulator::mountBond(int b_id){
 	MovementStep * prg = seqToComand(b_id);
 	setProgram(prg);
 }
@@ -182,7 +193,7 @@ void Manipulator::mountBond(int b_id){
  * Сбрасывает драйверы приводов.
  * \callergraph
  */
-void Manipulator::setProgram(MovementStep * prg){
+void BotManipulator::setProgram(MovementStep * prg){
 	cur_program = prg;
 	if(cur_program == 0){
 		std::cout<<"ERROR::INVALID BOND POSITION ID"<<std::endl;
@@ -200,7 +211,7 @@ void Manipulator::setProgram(MovementStep * prg){
 	// add_config.wrist = config.wrist;
 	// add_config.brot =  config.brot;
 
-	struct AxisDriver * axes 	= 	config.axes_array;
+	struct AxisDriver * axes 	= 	axes_array;
 
 	axes[AxisName::CAR].cur_pos =  config.rail - cur_section*section_length;
 	axes[AxisName::tower].cur_pos = config.tower;
@@ -212,7 +223,7 @@ void Manipulator::setProgram(MovementStep * prg){
 	axes[AxisName::rotate].cur_pos =  config.brot ;
 }
 
-void Manipulator::resetConfiguration(){
+void BotManipulator::resetConfiguration(){
 	config.rail = 0.0;
 	config.tower = 0.0;
 	config.bpant = 0.0;
@@ -235,16 +246,16 @@ void Manipulator::resetConfiguration(){
  * \brief сбрасывает параметры осей для записи в них программы
  * 
  */
-void Manipulator::resetDrivers(){
+void BotManipulator::resetDrivers(){
 	cur_step = 0;
 	for(int i = 0; i < AXIS_CNT; i++){
-		config.axes_array[i].activate = false;
-		config.axes_array[i].Acc = 0.0;
-		config.axes_array[i].cur_pos = 0.0;
-		config.axes_array[i].set_point = 0.0;
-		config.axes_array[i].Vel = 0.0;
-		config.axes_array[i].Acc = 0.0;
-		config.axes_array[i].Dec = 0.0;
+		axes_array[i].activate = false;
+		axes_array[i].Acc = 0.0;
+		axes_array[i].cur_pos = 0.0;
+		axes_array[i].set_point = 0.0;
+		axes_array[i].Vel = 0.0;
+		axes_array[i].Acc = 0.0;
+		axes_array[i].Dec = 0.0;
 	}
 
 
@@ -304,7 +315,7 @@ char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate
  * Функция берет текущую установленную программу движений и в соответсвии с текущим временем устанавливает позиции всех приводов.
  * Она должна учитывать ускорения, замедления, и запуск следующих шагов по условию на предыдущие шаги.
  */
-int Manipulator::driverSM(float time){
+int BotManipulator::driverSM(float time){
 	if(cur_program == 0){
 		std::cout<<"ERROR::driverSM PROGRAM IS NOT SET"<<std::endl;
 		return -1;
@@ -316,33 +327,33 @@ int Manipulator::driverSM(float time){
 
 	struct MovementStep cstep = cur_program[cur_step];
 
-	if(config.axes_array[cstep.axis].activate == false){//перешли на следующий шаг
+	if(axes_array[cstep.axis].activate == false){//перешли на следующий шаг
 
-		config.axes_array[cstep.axis].activate = true;
-		config.axes_array[cstep.axis].set_point = cstep.POS;
-		config.axes_array[cstep.axis].Vel = cstep.Vel * (((cstep.POS - config.axes_array[cstep.axis].cur_pos)>0)?1:-1);
-		std::cout<<"!!!!!!!!!!cstep.POS - config.axes_array[cstep.axis].cur_pos!!! "<<cstep.POS<<" - "<<config.axes_array[cstep.axis].cur_pos<<std::endl;
-		config.axes_array[cstep.axis].Acc = cstep.Acc;
-		config.axes_array[cstep.axis].Dec = cstep.Dec;
-		config.axes_array[cstep.axis].start_time = time; //запоминаем время для расчета движений
+		axes_array[cstep.axis].activate = true;
+		axes_array[cstep.axis].set_point = cstep.POS;
+		axes_array[cstep.axis].Vel = cstep.Vel * (((cstep.POS - axes_array[cstep.axis].cur_pos)>0)?1:-1);
+		std::cout<<"!!!!!!!!!!cstep.POS - axes_array[cstep.axis].cur_pos!!! "<<cstep.POS<<" - "<<axes_array[cstep.axis].cur_pos<<std::endl;
+		axes_array[cstep.axis].Acc = cstep.Acc;
+		axes_array[cstep.axis].Dec = cstep.Dec;
+		axes_array[cstep.axis].start_time = time; //запоминаем время для расчета движений
 
 		if(cstep.axis == AxisName::none){ //означает, что программа закончилась
 			last_step = 1;
-			config.axes_array[cstep.axis].activate = false;
+			axes_array[cstep.axis].activate = false;
 		}
 	}
 
 
 	if(cstep.Next == 0.0){//это означает, чно порог включения следующего не установлен. Ожидаем завержения
-		if(std::fabs(config.axes_array[cstep.axis].cur_pos - config.axes_array[cstep.axis].set_point) < EPSILON){//это означает, чно нужно дождаться окончания этого шага
+		if(std::fabs(axes_array[cstep.axis].cur_pos - axes_array[cstep.axis].set_point) < EPSILON){//это означает, чно нужно дождаться окончания этого шага
 			cur_step ++;
 		}
 	}else{
-		if(config.axes_array[cstep.axis].Vel > 0){
-			if(config.axes_array[cstep.axis].cur_pos > cstep.Next)
+		if(axes_array[cstep.axis].Vel > 0){
+			if(axes_array[cstep.axis].cur_pos > cstep.Next)
 				cur_step ++;
-		}else if(config.axes_array[cstep.axis].Vel < 0){
-			if(config.axes_array[cstep.axis].cur_pos < cstep.Next)
+		}else if(axes_array[cstep.axis].Vel < 0){
+			if(axes_array[cstep.axis].cur_pos < cstep.Next)
 				cur_step ++;
 		}else{
 			cur_step ++;
@@ -356,17 +367,17 @@ int Manipulator::driverSM(float time){
 	
 
 	for(int i = 0; i < AXIS_CNT; i++){
-		if(config.axes_array[i].activate == false)
+		if(axes_array[i].activate == false)
 			continue;
-		AxisDriver * ca = &(config.axes_array[i]);
+		AxisDriver * ca = &(axes_array[i]);
 		float pos = calcPos(ca->Acc, ca->Dec, ca->Vel, ca->set_point, time - ca->start_time);
-		std::cout<<"axis: "<<axis_names[i]<<", remaining_dist: "<<config.axes_array[i].set_point - config.axes_array[i].cur_pos
-					<<", config.axes_array[i].cur_pos: "<<config.axes_array[i].cur_pos
-					<<", dx: "<<config.axes_array[i].cur_pos - pos
+		std::cout<<"axis: "<<axis_names[i]<<", remaining_dist: "<<axes_array[i].set_point - axes_array[i].cur_pos
+					<<", axes_array[i].cur_pos: "<<axes_array[i].cur_pos
+					<<", dx: "<<axes_array[i].cur_pos - pos
 					<<std::endl;
 
-		if(config.axes_array[i].cur_pos != pos){
-			config.axes_array[i].cur_pos = pos;
+		if(axes_array[i].cur_pos != pos){
+			axes_array[i].cur_pos = pos;
 			all_axis_complete = 0;
 		}
 	}
@@ -377,8 +388,8 @@ int Manipulator::driverSM(float time){
 }
 
 
-void Manipulator::updateManipConfig(){
-	struct AxisDriver * axes = config.axes_array;
+void BotManipulator::updateManipConfig(){
+	struct AxisDriver * axes = axes_array;
 
 	config.rail =  add_config.rail + axes[AxisName::CAR].cur_pos + cur_section*section_length; 
 	config.tower = add_config.tower + axes[AxisName::tower].cur_pos;

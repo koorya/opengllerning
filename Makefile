@@ -7,7 +7,7 @@ rebuild:
 run: aplication.exe
 	aplication.exe
 
-aplication.exe: obj/main.o obj/shader.o obj/camera.o obj/mesh.o obj/model.o obj/load_tex.o obj/movement_program.o obj/manipulator.o obj/ConstructionContainer.o
+aplication.exe: obj/main.o obj/shader.o obj/camera.o obj/mesh.o obj/model.o obj/load_tex.o obj/movement_program.o obj/manipulator.o obj/remote_manipulator.o obj/ConstructionContainer.o
 	g++ -Wall -o aplication.exe -Lc:/opengl/lib obj/*.o -lassimp.dll -lSOIL -lglew32s -llibglfw3 -lopengl32 -lgdi32 -static
 
 obj/main.o: src/main.cpp 
@@ -34,6 +34,10 @@ obj/movement_program.o: src/movement_program.cpp src/movement_program.h
 
 obj/manipulator.o: src/manipulator.cpp src/manipulator.h
 	g++ -Wall -c -Ic:/opengl/include src/manipulator.cpp -o obj/manipulator.o
+
+obj/remote_manipulator.o: src/remote_manipulator.cpp src/remote_manipulator.h
+	g++ -Wall -c -Ic:/opengl/include src/remote_manipulator.cpp -o obj/remote_manipulator.o
+
 
 obj/ConstructionContainer.o: src/ConstructionContainer.cpp src/ConstructionContainer.h
 	g++ -Wall -c -Ic:/opengl/include src/ConstructionContainer.cpp -o obj/ConstructionContainer.o
