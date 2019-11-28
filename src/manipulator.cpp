@@ -5,7 +5,7 @@
 
 #define EPSILON 0.01
 
-BotManipulator m_mat[3] = {BotManipulator(), BotManipulator(), BotManipulator()};
+
 struct FrameMatrices f_mat;
 float section_length = 3500.0;
 
@@ -20,7 +20,10 @@ Manipulator::Manipulator(){
 	config.brot = 0.0;
 }
 
-BotManipulator::BotManipulator(){
+
+BotManipulator::BotManipulator(double (*time_funct)(void)) : Manipulator(){
+
+	this->time_funct = time_funct;
 
 	state = vacant;
 
@@ -387,6 +390,10 @@ int BotManipulator::driverSM(float time){
 	return last_step & all_axis_complete;
 }
 
+void BotManipulator::doStep(){
+	this->sequenceSM((*(this->time_funct))()/2);
+	this->updateManipConfig();
+}
 
 void BotManipulator::updateManipConfig(){
 	struct AxisDriver * axes = axes_array;
@@ -403,64 +410,51 @@ void BotManipulator::updateManipConfig(){
 
 }
 
-void calculateManipulatorGraphicMatrices(){
 
 
+void Manipulator::calculateMatrices(){
 
-	float frame_level = 0;//1*3000.0 ;//+ 500;
 	float max_bcar_level = 1443.0;
 	float max_ccar_level = 0.0;
 
-	f_mat.World = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-	f_mat.World = glm::rotate(f_mat.World, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-	f_mat.A  = glm::translate(f_mat.World, glm::vec3(0.0, 0.0, frame_level));
 
-	//rail position on frame
-	m_mat[0].B = glm::translate(f_mat.A, glm::vec3(350.0, 6760.0, -400.0));
-	m_mat[1].B = glm::translate(f_mat.A, glm::vec3(350.0, -245.0, -400.0));
-	m_mat[2].B = glm::translate(f_mat.A, glm::vec3(350.0, -7250.0, -400.0));
-
-	for(int i = 0; i < 3; i++){
-		m_mat[i].C = glm::translate(m_mat[i].B, glm::vec3(m_mat[i].config.rail, 0.0, -400.0));
-		m_mat[i].D = glm::rotate(m_mat[i].C, glm::radians(m_mat[i].config.tower), glm::vec3(0.0, 0.0, 1.0));
-		m_mat[i].E1 = glm::translate(glm::rotate(m_mat[i].D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-											glm::vec3(m_mat[i].config.bpant, 0.0f, 0.0f));
-		m_mat[i].E2 = glm::translate(m_mat[i].D, glm::vec3(m_mat[i].config.cpant, 0.0f, 0.0f));
-		m_mat[i].F1 = glm::translate(m_mat[i].E1, glm::vec3(627.0, 0.0, -max_bcar_level + m_mat[i].config.bcar));
-		m_mat[i].F2 = glm::translate(m_mat[i].E2, glm::vec3(0.0, 0.0, -max_ccar_level + m_mat[i].config.ccar));
-		m_mat[i].G1 = glm::rotate(m_mat[i].F1, glm::radians(m_mat[i].config.wrist), glm::vec3(0.0, 0.0, 1.0));
-		m_mat[i].G2 = glm::rotate(glm::translate(m_mat[i].F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-		m_mat[i].H = glm::rotate(m_mat[i].G1, glm::radians(180.0f-m_mat[i].config.brot), glm::vec3(1.0, 0.0, 0.0));
-		m_mat[i].I = glm::rotate(glm::translate(m_mat[i].H, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
-	}
+	this->C = glm::translate(this->B, glm::vec3(this->config.rail, 0.0, -400.0));
+	this->D = glm::rotate(this->C, glm::radians(this->config.tower), glm::vec3(0.0, 0.0, 1.0));
+	this->E1 = glm::translate(glm::rotate(this->D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
+										glm::vec3(this->config.bpant, 0.0f, 0.0f));
+	this->E2 = glm::translate(this->D, glm::vec3(this->config.cpant, 0.0f, 0.0f));
+	this->F1 = glm::translate(this->E1, glm::vec3(627.0, 0.0, -max_bcar_level + this->config.bcar));
+	this->F2 = glm::translate(this->E2, glm::vec3(0.0, 0.0, -max_ccar_level + this->config.ccar));
+	this->G1 = glm::rotate(this->F1, glm::radians(this->config.wrist), glm::vec3(0.0, 0.0, 1.0));
+	this->G2 = glm::rotate(glm::translate(this->F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+	this->H = glm::rotate(this->G1, glm::radians(180.0f-this->config.brot), glm::vec3(1.0, 0.0, 0.0));
+	this->I = glm::rotate(glm::translate(this->H, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 
 
-	for(int i=0; i<3; i++){
-		float pant_length = m_mat[i].config.bpant+334.2;
-		float angle = -asinf((pant_length)/4450);
-		glm::mat4 pant_origin = glm::rotate(m_mat[i].D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+	float bpant_length = this->config.bpant+334.2;
+	float bangle = -asinf((bpant_length)/4450);
+	glm::mat4 bpant_origin = glm::rotate(this->D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 
-		pant_origin = glm::translate(pant_origin, glm::vec3(-49.0, 0.0, -224.0));
-		m_mat[i].pb1 = glm::rotate(pant_origin, angle, glm::vec3(0.0, 1.0, 0.0));
-		m_mat[i].pb2 = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length/2.0, 0.0f, 0.0f)),
-											angle, glm::vec3(0.0, 1.0, 0.0));
+	bpant_origin = glm::translate(bpant_origin, glm::vec3(-49.0, 0.0, -224.0));
+	this->pb1 = glm::rotate(bpant_origin, bangle, glm::vec3(0.0, 1.0, 0.0));
+	this->pb2 = glm::rotate(glm::translate(bpant_origin, glm::vec3(bpant_length/2.0, 0.0f, 0.0f)),
+										bangle, glm::vec3(0.0, 1.0, 0.0));
 
-		m_mat[i].pb3 = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length/2.0, 0.0f, 0.0f)),
-											-angle, glm::vec3(0.0, 1.0, 0.0));
-		m_mat[i].pb4 = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
-											-angle, glm::vec3(0.0, 1.0, 0.0));
-	}
+	this->pb3 = glm::rotate(glm::translate(bpant_origin, glm::vec3(bpant_length/2.0, 0.0f, 0.0f)),
+										-bangle, glm::vec3(0.0, 1.0, 0.0));
+	this->pb4 = glm::rotate(glm::translate(bpant_origin, glm::vec3(bpant_length, 0.0f, 0.0f)),
+										-bangle, glm::vec3(0.0, 1.0, 0.0));
 
 
-	for(int i=0; i<3; i++){
-		float pant_length = m_mat[i].config.cpant + 148.0;
-		float angle = -asinf((pant_length)/1420);
-		glm::mat4 pant_origin = m_mat[i].D;
 
-		pant_origin = glm::translate(pant_origin, glm::vec3(394.0, 0.0, -511.0));
-		m_mat[i].pc1 = glm::rotate(pant_origin, angle, glm::vec3(0.0, 1.0, 0.0));
-		m_mat[i].pc2 = glm::rotate(glm::translate(pant_origin, glm::vec3(pant_length, 0.0f, 0.0f)),
-											-angle, glm::vec3(0.0, 1.0, 0.0));
-	}
+	float cpant_length = this->config.cpant + 148.0;
+	float cangle = -asinf((cpant_length)/1420);
+	glm::mat4 cpant_origin = this->D;
+
+	cpant_origin = glm::translate(cpant_origin, glm::vec3(394.0, 0.0, -511.0));
+	this->pc1 = glm::rotate(cpant_origin, cangle, glm::vec3(0.0, 1.0, 0.0));
+	this->pc2 = glm::rotate(glm::translate(cpant_origin, glm::vec3(cpant_length, 0.0f, 0.0f)),
+										-cangle, glm::vec3(0.0, 1.0, 0.0));
+
 
 }

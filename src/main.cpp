@@ -26,6 +26,7 @@
 #include "load_tex.h"
 
 #include "manipulator.h"
+#include "remote_manipulator.h"
 #include "ConstructionContainer.h"
 
 
@@ -335,71 +336,53 @@ int main(){
 
 	fillUpSPProgramsArray();
 
-	ConstructionContainer constr_container = ConstructionContainer();
-
-	m_mat[0].container = &constr_container;
-	m_mat[1].container = &constr_container;
-	m_mat[2].container = &constr_container;
-
-	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
-
-	int mbond_cnt = 10;
-	int mount_seq0[] = {13, 113, 5, 105, 8, 108, 9, 109, 11, 111};
-	int mount_seq1[] = {1, 101, 2, 102, 3, 103, 4, 104, 5, 105, 6, 106, 8, 108, 7, 107, 9, 109, 10, 110, 11, 111};
-	int mount_seq2[] = {12, 112, 4, 104, 6, 106, 7, 107, 10, 110};
-	
-	int prg_cnt[] = {0, 0, 0};
-	// m_mat[0].mountBond(mount_seq0[prg_cnt[0]]);
-	// m_mat[1].mountBond(mount_seq1[prg_cnt[1]]);
-	// m_mat[2].mountBond(mount_seq2[prg_cnt[2]]);
-	// int sect = 0;
-	// m_mat[0].moveToSection(sect);
-	// m_mat[1].moveToSection(sect);
-	// m_mat[2].moveToSection(sect);
+	BotManipulator l_m = BotManipulator(&glfwGetTime);
+	BotManipulator m_m = BotManipulator(&glfwGetTime);
+	BotManipulator r_m = BotManipulator(&glfwGetTime);
 	BondLocation bl;
 	for(int i = 1; i <= 4; i++ ){
 		
 		bl.section = i;
 		if(i>1){
 			bl.name = 11;
-			m_mat[1].bond_list.push_back(bl);
+			m_m.bond_list.push_back(bl);
 			bl.name = 10;
-			m_mat[1].bond_list.push_back(bl);
+			m_m.bond_list.push_back(bl);
 			bl.name = 9;
-			m_mat[1].bond_list.push_back(bl);
+			m_m.bond_list.push_back(bl);
 			bl.name = 7;
-			m_mat[1].bond_list.push_back(bl);
+			m_m.bond_list.push_back(bl);
 			bl.name = 8;
-			m_mat[1].bond_list.push_back(bl);
+			m_m.bond_list.push_back(bl);
 			bl.name = 6;
-			m_mat[1].bond_list.push_back(bl);
+			m_m.bond_list.push_back(bl);
 		}
 		bl.name = 5;
-		m_mat[1].bond_list.push_back(bl);
+		m_m.bond_list.push_back(bl);
 		bl.name = 4;
-		m_mat[1].bond_list.push_back(bl);
+		m_m.bond_list.push_back(bl);
 		bl.name = 3;
-		m_mat[1].bond_list.push_back(bl);
+		m_m.bond_list.push_back(bl);
 		bl.name = 2;
-		m_mat[1].bond_list.push_back(bl);
+		m_m.bond_list.push_back(bl);
 		bl.name = 1;
-		m_mat[1].bond_list.push_back(bl);
+		m_m.bond_list.push_back(bl);
 	}
 
 	for(int i = 1; i <= 4; i++ ){
 		bl.section = i;
 		if(i>1){
 			bl.name = 11;
-			m_mat[0].bond_list.push_back(bl);
+			l_m.bond_list.push_back(bl);
 			bl.name = 9;
-			m_mat[0].bond_list.push_back(bl);
+			l_m.bond_list.push_back(bl);
 			bl.name = 8;
-			m_mat[0].bond_list.push_back(bl);
+			l_m.bond_list.push_back(bl);
 		}
 		bl.name = 5;
-		m_mat[0].bond_list.push_back(bl);
+		l_m.bond_list.push_back(bl);
 		bl.name = 13;
-		m_mat[0].bond_list.push_back(bl);
+		l_m.bond_list.push_back(bl);
 	}
 
 
@@ -407,17 +390,44 @@ int main(){
 		bl.section = i;
 		if(i>1){
 			bl.name = 10;
-			m_mat[2].bond_list.push_back(bl);
+			r_m.bond_list.push_back(bl);
 			bl.name = 7;
-			m_mat[2].bond_list.push_back(bl);
+			r_m.bond_list.push_back(bl);
 			bl.name = 6;
-			m_mat[2].bond_list.push_back(bl);
+			r_m.bond_list.push_back(bl);
 		}
 		bl.name = 4;
-		m_mat[2].bond_list.push_back(bl);
+		r_m.bond_list.push_back(bl);
 		bl.name = 12;
-		m_mat[2].bond_list.push_back(bl);
+		r_m.bond_list.push_back(bl);
 	}
+
+	
+	RemoteManipulator remote_man = RemoteManipulator();
+	
+	Manipulator * m_mat[3] = {&remote_man, &m_m, &r_m};
+	
+	ConstructionContainer constr_container = ConstructionContainer();
+
+	m_mat[0]->container = &constr_container;
+	m_mat[1]->container = &constr_container;
+	m_mat[2]->container = &constr_container;
+
+	float frame_level = 0;//1*3000.0 ;//+ 500;
+	f_mat.World = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+	f_mat.World = glm::rotate(f_mat.World, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+	f_mat.A  = glm::translate(f_mat.World, glm::vec3(0.0, 0.0, frame_level));
+
+	//rail position on frame
+	m_mat[0]->B = glm::translate(f_mat.A, glm::vec3(350.0, 6760.0, -400.0));
+	m_mat[1]->B = glm::translate(f_mat.A, glm::vec3(350.0, -245.0, -400.0));
+	m_mat[2]->B = glm::translate(f_mat.A, glm::vec3(350.0, -7250.0, -400.0));
+
+
+	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
+
+
+
 
 	bool trig = false;
 	while(!glfwWindowShouldClose(window)){
@@ -439,18 +449,20 @@ int main(){
 			trig = true;
 
 		if(trig)
-			for(int i = 0; i < 1; i++){
-				m_mat[i].sequenceSM(glfwGetTime()/2);
-				m_mat[i].updateManipConfig();
+			for(int i = 0; i < 3; i++){
+				m_mat[i]->doStep();
 			}
 
-		// m_mat[0].driverSM(glfwGetTime()/10.0);
-		// m_mat[0].updateManipConfig();
+		// m_mat[0]->driverSM(glfwGetTime()/10.0);
+		// m_mat[0]->updateManipConfig();
 		
-		// m_mat[2].driverSM(glfwGetTime()/10.0);
-		// m_mat[2].updateManipConfig();
+		// m_mat[2]->driverSM(glfwGetTime()/10.0);
+		// m_mat[2]->updateManipConfig();
 
-		calculateManipulatorGraphicMatrices();
+	
+		m_mat[0]->calculateMatrices();
+		m_mat[1]->calculateMatrices();
+		m_mat[2]->calculateMatrices();
 
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 		if(keys[GLFW_KEY_B]){
@@ -458,7 +470,7 @@ int main(){
 			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 		}
 		view = my_cam.getMatrix();
-		//ourShader.setMat4(m_mat[0].I, "view");
+		//ourShader.setMat4(m_mat[0]->I, "view");
 		ourShader.setMat4(view, "view");
 		ourShader.setFloat(glfwGetTime(), "time");
 
@@ -468,7 +480,7 @@ int main(){
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(proj));
 		glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-		// glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::rotate(m_mat[0].I,
+		// glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::rotate(m_mat[0]->I,
 		// 																							glm::radians(-90.0f), glm::vec3(0.0, 1.0, 0.0))));
 
 
@@ -487,9 +499,9 @@ int main(){
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0f))); //model to identity
 
-		// column.setMatrixByID(1, m_mat[0].G2);
-		// column.setMatrixByID(2, m_mat[1].G2);
-		// column.setMatrixByID(3, m_mat[2].G2);
+		// column.setMatrixByID(1, m_mat[0]->G2);
+		// column.setMatrixByID(2, m_mat[1]->G2);
+		// column.setMatrixByID(3, m_mat[2]->G2);
 
 
 		constr_container.updateMatrices();
@@ -510,84 +522,84 @@ int main(){
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		carrige.setMatrixByID(0, m_mat[0].C);
-		carrige.setMatrixByID(1, m_mat[1].C);
-		carrige.setMatrixByID(2, m_mat[2].C);
+		carrige.setMatrixByID(0, m_mat[0]->C);
+		carrige.setMatrixByID(1, m_mat[1]->C);
+		carrige.setMatrixByID(2, m_mat[2]->C);
 		carrige.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::black_plastic);
-		tower_frame.setMatrixByID(0, m_mat[0].D);
-		tower_frame.setMatrixByID(1, m_mat[1].D);
-		tower_frame.setMatrixByID(2, m_mat[2].D);
+		tower_frame.setMatrixByID(0, m_mat[0]->D);
+		tower_frame.setMatrixByID(1, m_mat[1]->D);
+		tower_frame.setMatrixByID(2, m_mat[2]->D);
 		tower_frame.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::white_plastic);
-		tower_box.setMatrixByID(0, m_mat[0].D);
-		tower_box.setMatrixByID(1, m_mat[1].D);
-		tower_box.setMatrixByID(2, m_mat[2].D);
+		tower_box.setMatrixByID(0, m_mat[0]->D);
+		tower_box.setMatrixByID(1, m_mat[1]->D);
+		tower_box.setMatrixByID(2, m_mat[2]->D);
 		tower_box.Draw(ourShader, 3);
 
 	//pantograph
 		ourShader.setMaterial(Material::yellow_plastic);
-		pb1.setMatrixByID(0, m_mat[0].pb1);
-		pb1.setMatrixByID(1, m_mat[1].pb1);
-		pb1.setMatrixByID(2, m_mat[2].pb1);
+		pb1.setMatrixByID(0, m_mat[0]->pb1);
+		pb1.setMatrixByID(1, m_mat[1]->pb1);
+		pb1.setMatrixByID(2, m_mat[2]->pb1);
 		pb1.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pb2.setMatrixByID(0, m_mat[0].pb2);
-		pb2.setMatrixByID(1, m_mat[1].pb2);
-		pb2.setMatrixByID(2, m_mat[2].pb2);
+		pb2.setMatrixByID(0, m_mat[0]->pb2);
+		pb2.setMatrixByID(1, m_mat[1]->pb2);
+		pb2.setMatrixByID(2, m_mat[2]->pb2);
 		pb2.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pb3.setMatrixByID(0, m_mat[0].pb3);
-		pb3.setMatrixByID(1, m_mat[1].pb3);
-		pb3.setMatrixByID(2, m_mat[2].pb3);
+		pb3.setMatrixByID(0, m_mat[0]->pb3);
+		pb3.setMatrixByID(1, m_mat[1]->pb3);
+		pb3.setMatrixByID(2, m_mat[2]->pb3);
 		pb3.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pb4.setMatrixByID(0, m_mat[0].pb4);
-		pb4.setMatrixByID(1, m_mat[1].pb4);
-		pb4.setMatrixByID(2, m_mat[2].pb4);
+		pb4.setMatrixByID(0, m_mat[0]->pb4);
+		pb4.setMatrixByID(1, m_mat[1]->pb4);
+		pb4.setMatrixByID(2, m_mat[2]->pb4);
 		pb4.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		bond_rail.setMatrixByID(0, m_mat[0].E1);
-		bond_rail.setMatrixByID(1, m_mat[1].E1);
-		bond_rail.setMatrixByID(2, m_mat[2].E1);
+		bond_rail.setMatrixByID(0, m_mat[0]->E1);
+		bond_rail.setMatrixByID(1, m_mat[1]->E1);
+		bond_rail.setMatrixByID(2, m_mat[2]->E1);
 		bond_rail.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_carrige.setMatrixByID(0, m_mat[0].F1);
-		bond_carrige.setMatrixByID(1, m_mat[1].F1);
-		bond_carrige.setMatrixByID(2, m_mat[2].F1);
+		bond_carrige.setMatrixByID(0, m_mat[0]->F1);
+		bond_carrige.setMatrixByID(1, m_mat[1]->F1);
+		bond_carrige.setMatrixByID(2, m_mat[2]->F1);
 		bond_carrige.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::green_plastic);
-		bond_wrist.setMatrixByID(0, m_mat[0].G1);
-		bond_wrist.setMatrixByID(1, m_mat[1].G1);
-		bond_wrist.setMatrixByID(2, m_mat[2].G1);
+		bond_wrist.setMatrixByID(0, m_mat[0]->G1);
+		bond_wrist.setMatrixByID(1, m_mat[1]->G1);
+		bond_wrist.setMatrixByID(2, m_mat[2]->G1);
 		bond_wrist.Draw(ourShader, 3);		
 
 
 		ourShader.setMaterial(Material::yellow_plastic);
-		bond_handler_middle.setMatrixByID(0, m_mat[0].H);
-		bond_handler_middle.setMatrixByID(1, m_mat[1].H);
-		bond_handler_middle.setMatrixByID(2, m_mat[2].H);
+		bond_handler_middle.setMatrixByID(0, m_mat[0]->H);
+		bond_handler_middle.setMatrixByID(1, m_mat[1]->H);
+		bond_handler_middle.setMatrixByID(2, m_mat[2]->H);
 		bond_handler_middle.Draw(ourShader, 3);		
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_handler_left.setMatrixByID(0, m_mat[0].H);
-		bond_handler_left.setMatrixByID(1, m_mat[1].H);
-		bond_handler_left.setMatrixByID(2, m_mat[2].H);
+		bond_handler_left.setMatrixByID(0, m_mat[0]->H);
+		bond_handler_left.setMatrixByID(1, m_mat[1]->H);
+		bond_handler_left.setMatrixByID(2, m_mat[2]->H);
 		bond_handler_left.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_handler_right.setMatrixByID(0, m_mat[0].H);
-		bond_handler_right.setMatrixByID(1, m_mat[1].H);
-		bond_handler_right.setMatrixByID(2, m_mat[2].H);
+		bond_handler_right.setMatrixByID(0, m_mat[0]->H);
+		bond_handler_right.setMatrixByID(1, m_mat[1]->H);
+		bond_handler_right.setMatrixByID(2, m_mat[2]->H);
 		bond_handler_right.Draw(ourShader, 3);
 
 
@@ -596,28 +608,28 @@ int main(){
 
 	//pantograph column
 		ourShader.setMaterial(Material::yellow_plastic);
-		pc1.setMatrixByID(0, m_mat[0].pc1);
-		pc1.setMatrixByID(1, m_mat[1].pc1);
-		pc1.setMatrixByID(2, m_mat[2].pc1);
+		pc1.setMatrixByID(0, m_mat[0]->pc1);
+		pc1.setMatrixByID(1, m_mat[1]->pc1);
+		pc1.setMatrixByID(2, m_mat[2]->pc1);
 		pc1.Draw(ourShader, 3);
 
 		// ourShader.setMaterial(Material::green_plastic);
-		pc2.setMatrixByID(0, m_mat[0].pc2);
-		pc2.setMatrixByID(1, m_mat[1].pc2);
-		pc2.setMatrixByID(2, m_mat[2].pc2);
+		pc2.setMatrixByID(0, m_mat[0]->pc2);
+		pc2.setMatrixByID(1, m_mat[1]->pc2);
+		pc2.setMatrixByID(2, m_mat[2]->pc2);
 		pc2.Draw(ourShader, 3);
 
 
 		ourShader.setMaterial(Material::green_plastic);
-		column_rail.setMatrixByID(0, m_mat[0].E2);
-		column_rail.setMatrixByID(1, m_mat[1].E2);
-		column_rail.setMatrixByID(2, m_mat[2].E2);
+		column_rail.setMatrixByID(0, m_mat[0]->E2);
+		column_rail.setMatrixByID(1, m_mat[1]->E2);
+		column_rail.setMatrixByID(2, m_mat[2]->E2);
 		column_rail.Draw(ourShader, 3);
 
 		ourShader.setMaterial(Material::red_plastic);
-		column_carrige.setMatrixByID(0, m_mat[0].F2);
-		column_carrige.setMatrixByID(1, m_mat[1].F2);
-		column_carrige.setMatrixByID(2, m_mat[2].F2);
+		column_carrige.setMatrixByID(0, m_mat[0]->F2);
+		column_carrige.setMatrixByID(1, m_mat[1]->F2);
+		column_carrige.setMatrixByID(2, m_mat[2]->F2);
 		column_carrige.Draw(ourShader, 3);
 
 

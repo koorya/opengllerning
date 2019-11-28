@@ -40,7 +40,9 @@ public:
 	ConstructionContainer * container;///< ссылка на контейнер связей. Нужна для отображения захваченной связи и ее отображения после установки
 
 	Manipulator();
-
+//	~Manipulator();
+	void calculateMatrices();
+	virtual void doStep() = 0;
 };
 
 
@@ -52,7 +54,7 @@ public:
 	struct ManipulatorConfig add_config; ///< смещение на секции, например
 	std::vector <struct BondLocation> bond_list;///< список позиций связей, которые манипулятор должен установить
 	
-	BotManipulator();
+	BotManipulator(double (*time_funct)(void));
 	void resetDrivers();
 	void setProgram(MovementStep * prg);
 	void moveToSection(int section);
@@ -61,7 +63,9 @@ public:
 	int sequenceSM(float time);
 	void updateManipConfig();
 	void resetConfiguration();
+	void doStep();
 private:
+	double (*time_funct)(void);
 	struct MovementStep * cur_program;
 	struct MovementStep sect_move_prg[8];
 	int cur_section;
@@ -74,12 +78,8 @@ private:
 //     glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2;
 // };
 
-extern BotManipulator m_mat[3];
+
 extern struct FrameMatrices f_mat;
-
-
-void calculateManipulatorGraphicMatrices();
-
 
 
 #endif
