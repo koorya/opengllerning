@@ -2,9 +2,9 @@
 
 
 ConstructionContainer::ConstructionContainer(){
-	tilted_bond_cnt = 48*19;
-	horizontal_bond_cnt = 24*19;
-	column_cnt = 16*20;
+	tilted_bond_cnt = 48*1;//19;
+	horizontal_bond_cnt = 24*1;//19;
+	column_cnt = 16*2;//20;
 
 	float stride = 3500.0;;
 	glm::vec3 column_offset = glm::vec3(-5.600e+03, 507.50f, 5.005e+03); 

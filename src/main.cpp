@@ -403,9 +403,11 @@ int main(){
 	}
 
 	
-	RemoteManipulator remote_man = RemoteManipulator();
+	RemoteManipulator remote_man = RemoteManipulator(1);
+	RemoteManipulator remote_man1 = RemoteManipulator(2);
+	RemoteManipulator remote_man2 = RemoteManipulator(3);
 	
-	Manipulator * m_mat[3] = {&remote_man, &m_m, &r_m};
+	Manipulator * m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
 	
 	ConstructionContainer constr_container = ConstructionContainer();
 

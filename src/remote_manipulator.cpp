@@ -1,10 +1,12 @@
 
 #include "remote_manipulator.h"
 
-RemoteManipulator::RemoteManipulator() : Manipulator(){
+RemoteManipulator::RemoteManipulator(unsigned int manip_id){
 
-	MYSQL_RES *res;
-	MYSQL_ROW row;
+	SQL_query = "SELECT kareta, tower, link_pantograph, column_pantograph, link_carige, column_carrige, wrist, link_rotation \
+	 FROM configuration_new WHERE id=";
+	SQL_query += std::to_string(manip_id);
+
 	// Получаем дескриптор соединения
 	conn = mysql_init(NULL);
 	if (conn == NULL)
@@ -26,28 +28,55 @@ RemoteManipulator::RemoteManipulator() : Manipulator(){
 		fprintf(stdout, "Success!\n");
 	}
 
-	mysql_query(conn, "SELECT id, link_pantograph FROM configuration_new"); //Делаем запрос к таблице по имени МНУ =)
+	recieve_data = new std::mutex();
+
+	this->destroy_flag = false;
+	std::thread thr(updateThread, this);
+	thr.detach();
+
+}
+
+RemoteManipulator::~RemoteManipulator(){
+	this->destroy_flag = true;
+	while(this->destroy_flag);//ожидаем, пока завершится поток для общения с БД
+
+	mysql_close(conn);
+	delete recieve_data;
+}
+
+void RemoteManipulator::updateManipConfig(){
+
+	MYSQL_RES * res;
+	MYSQL_ROW row;
+	mysql_query(conn, SQL_query.c_str()); 
 
 	if (res = mysql_store_result(conn))
 	{
 		while (row = mysql_fetch_row(res))
 		{
-			for (int i = 0; i < mysql_num_fields(res); i++)
-			{
-				std::cout << row[i] << "\n"; //Выводим все что есть в базе через цикл
-			}
+			recieve_data->lock();
+			config_rec.rail = -atof(row[0]);
+			config_rec.tower = atof(row[1]);
+			config_rec.bpant = atof(row[2]);
+			config_rec.cpant = atof(row[3]);
+			config_rec.bcar = atof(row[4]);
+			config_rec.ccar = atof(row[5]);
+			config_rec.wrist = atof(row[6]);
+			config_rec.brot = atof(row[7]);
+			recieve_data->unlock();
+			// for (int i = 0; i < mysql_num_fields(res); i++)
+			// {
+			// 	std::cout << row[i] << "\n"; //Выводим все что есть в базе через цикл
+			// }
 		}
+		mysql_free_result(res);
 	}
-	else
+	else{
 		fprintf(stderr, "%s\n", mysql_error(conn));
+	}
 
-	// Закрываем соединение с сервером базы данных
-	mysql_close(conn);
-
-}
-
-void RemoteManipulator::updateManipConfig(){
-	config.rail += 1.0;
+//	config.rail += 100;
+//	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 void RemoteManipulator::resetConfiguration(){
@@ -63,5 +92,17 @@ void RemoteManipulator::resetConfiguration(){
 }
 
 void RemoteManipulator::doStep(){
-	this->updateManipConfig();
+//	std::cout<<"doStep"<<std::endl;
+	recieve_data->lock();
+//	std::cout<<"doStep LOCK"<<std::endl;
+	config.rail = config_rec.rail;
+	config.tower = config_rec.tower;
+	config.bpant = config_rec.bpant;
+	config.cpant = config_rec.cpant;
+	config.bcar = config_rec.bcar;
+	config.ccar = config_rec.ccar;
+	config.wrist = config_rec.wrist;
+	config.brot = config_rec.brot;
+	recieve_data->unlock();
+//	this->updateManipConfig();
 }
