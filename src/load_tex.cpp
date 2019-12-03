@@ -2,7 +2,8 @@
 
 #include "load_tex.h"
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
+#include <glad/glad.h>
 #include <SOIL/SOIL.h>
 #include <iostream>
 
