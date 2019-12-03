@@ -45,6 +45,18 @@ public:
 	virtual void doStep() = 0;
 };
 
+class guiManipulator : public Manipulator{
+public:
+
+	guiManipulator(float *val){
+		fl_val = val;
+	}
+	void doStep(){
+		config.tower = (*fl_val)*1000.0;
+	};
+private:
+	float *fl_val;
+};
 
 
 class BotManipulator : public Manipulator{

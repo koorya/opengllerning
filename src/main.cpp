@@ -387,11 +387,23 @@ int main()
 		r_m.bond_list.push_back(bl);
 	}
 
+	float some_gui_var = 0;
+	
+	std::thread thr([](float & float_var){	
+		nanogui::ref<ExampleApplication> app = new ExampleApplication(float_var);
+		app->drawAll();
+		app->setVisible(true);
+		nanogui::mainloop();
+		}, std::ref(some_gui_var));
+	thr.detach();
+
+
 	RemoteManipulator remote_man = RemoteManipulator(1);
 	RemoteManipulator remote_man1 = RemoteManipulator(2);
 	RemoteManipulator remote_man2 = RemoteManipulator(3);
+	guiManipulator gui_man = guiManipulator(&some_gui_var);
 
-	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
+	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &gui_man};
 
 	ConstructionContainer constr_container = ConstructionContainer();
 
@@ -413,19 +425,12 @@ int main()
 
 	bool trig = false;
 
-	
-	std::thread thr([]{	
-		nanogui::ref<ExampleApplication> app = new ExampleApplication();
-		app->drawAll();
-		app->setVisible(true);
-		nanogui::mainloop();
-		});
-	thr.detach();
 
 
 
 	while (!glfwWindowShouldClose(window))
 	{
+//		std::cout<<some_gui_var<<std::endl;
 		time_cnt++;
 		if (time_cnt % 1000 == 0)
 		{
@@ -445,11 +450,11 @@ int main()
 			trig = true;
 
 		if (trig)
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				m_mat[i]->doStep();
 			}
-
+		m_mat[2]->doStep();
 		// m_mat[0]->driverSM(glfwGetTime()/10.0);
 		// m_mat[0]->updateManipConfig();
 
