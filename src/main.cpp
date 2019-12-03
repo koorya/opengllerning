@@ -17,6 +17,8 @@
 #include <iostream>
 #include <math.h>
 
+#include "gui.h"
+
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
@@ -410,6 +412,18 @@ int main()
 	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
 
 	bool trig = false;
+
+	
+	std::thread thr([]{	
+		nanogui::ref<ExampleApplication> app = new ExampleApplication();
+		app->drawAll();
+		app->setVisible(true);
+		nanogui::mainloop();
+		});
+	thr.detach();
+
+
+
 	while (!glfwWindowShouldClose(window))
 	{
 		time_cnt++;
