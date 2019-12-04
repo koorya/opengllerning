@@ -32,6 +32,7 @@
 void do_movement();
 void key_callback(GLFWwindow *, int, int, int, int);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 unsigned int loadCubeMap(std::vector<std::string> faces);
 
@@ -95,6 +96,8 @@ int main()
 
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+
 	glfwSetScrollCallback(window, scroll_callback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -695,6 +698,7 @@ void do_movement()
 		my_cam.processKeyboard(Camera_movement::DOWN, deltaTime);
 }
 
+bool mouse_pressed = false;
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
 	static GLfloat lastX = xpos;
@@ -704,9 +708,16 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 	GLfloat yoffset = lastY - ypos;
 	lastX = xpos;
 	lastY = ypos;
-
-	my_cam.processMouseMovement(xoffset, yoffset);
+	if(mouse_pressed)
+		my_cam.processMouseMovement(xoffset, yoffset);
 }
+void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods){
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        mouse_pressed = true;
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+        mouse_pressed = false;
+}
+
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
