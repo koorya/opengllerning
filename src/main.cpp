@@ -423,16 +423,21 @@ int main()
 		nanogui::ref<ExampleApplication> app = new ExampleApplication(man_ref);
 		app->drawAll();
 		app->setVisible(true);
+
+		nanogui::ref<ExampleApplication> app1 = new ExampleApplication(man_ref);
+		app1->drawAll();
+		app1->setVisible(true);
+
 		 nanogui::mainloop();
 	//	nanogui::shutdown();
 		}, std::ref(gui_man));
 	thr.detach();
 
-	RemoteManipulator remote_man = RemoteManipulator(1);
-	RemoteManipulator remote_man1 = RemoteManipulator(2);
-	RemoteManipulator remote_man2 = RemoteManipulator(3);
+	// RemoteManipulator remote_man = RemoteManipulator(1);
+	// RemoteManipulator remote_man1 = RemoteManipulator(2);
+	// RemoteManipulator remote_man2 = RemoteManipulator(3);
 
-	Manipulator *m_mat[3] = {&remote_man, &gui_man, &remote_man1};
+	Manipulator *m_mat[3] = {&l_m, &gui_man, &r_m};
 	m_mat[0]->config.rail = 3000.0;
 	m_mat[2]->config.rail = 6000.0;
 
