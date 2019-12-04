@@ -709,7 +709,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 	if(mouse_pressed)
-		my_cam.processMouseMovement(xoffset, yoffset);
+		my_cam.processMouseMovement(-xoffset, -yoffset);
 }
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods){
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
