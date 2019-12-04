@@ -97,7 +97,7 @@ int main()
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	Shader ourShader("./shaders/shader.vert", "./shaders/shader.frag");
 	Shader stensilShader("./shaders/shader.vert", "./shaders/stencil.frag");
