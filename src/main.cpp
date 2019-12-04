@@ -17,8 +17,6 @@
 #include <iostream>
 #include <math.h>
 
-#include "gui.h"
-
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
@@ -28,6 +26,7 @@
 
 #include "manipulator.h"
 #include "remote_manipulator.h"
+#include "GUI_Manipulator.h"
 #include "ConstructionContainer.h"
 
 void do_movement();
@@ -41,12 +40,33 @@ bool keys[1024] = {false};
 
 int main()
 {
+
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
+
+
+
+
+
+	// std::thread thr1([](float & float_var){	
+	// 	nanogui::init();
+	// 	nanogui::ref<ExampleApplication> app = new ExampleApplication(float_var);
+	// 	app->drawAll();
+	// 	app->setVisible(true);
+	// 	nanogui::mainloop();
+	// //	nanogui::shutdown();
+	// 	}, std::ref(some_gui_var1));
+	// thr1.detach();
+
+
+//	nanogui::ref<ExampleApplication> gm = new ExampleApplication(std::ref(some_gui_var1));
+
+
 
 #ifdef FULL_SCREEN
 	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
@@ -387,23 +407,31 @@ int main()
 		r_m.bond_list.push_back(bl);
 	}
 
+
 	float some_gui_var = 0;
-	
-	std::thread thr([](float & float_var){	
-		nanogui::ref<ExampleApplication> app = new ExampleApplication(float_var);
+	float some_gui_var1 = 0;
+	guiManipulator gui_man = guiManipulator();
+//	nanogui::init();
+
+//		nanogui::mainloop();
+//	guiManipulator gui_man = guiManipulator();
+//	ExampleApplication * exap = new ExampleApplication(std::ref(some_gui_var));
+	std::thread thr([](guiManipulator & man_ref){	
+		nanogui::ref<ExampleApplication> app = new ExampleApplication(man_ref);
 		app->drawAll();
 		app->setVisible(true);
-		nanogui::mainloop();
-		}, std::ref(some_gui_var));
+		 nanogui::mainloop();
+	//	nanogui::shutdown();
+		}, std::ref(gui_man));
 	thr.detach();
-
 
 	RemoteManipulator remote_man = RemoteManipulator(1);
 	RemoteManipulator remote_man1 = RemoteManipulator(2);
 	RemoteManipulator remote_man2 = RemoteManipulator(3);
-	guiManipulator gui_man = guiManipulator(&some_gui_var);
 
-	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &gui_man};
+	Manipulator *m_mat[3] = {&remote_man, &gui_man, &remote_man1};
+	m_mat[0]->config.rail = 3000.0;
+	m_mat[2]->config.rail = 6000.0;
 
 	ConstructionContainer constr_container = ConstructionContainer();
 
@@ -449,12 +477,12 @@ int main()
 		if (keys[GLFW_KEY_T])
 			trig = true;
 
-		if (trig)
-			for (int i = 0; i < 2; i++)
-			{
-				m_mat[i]->doStep();
-			}
-		m_mat[2]->doStep();
+		// if (trig)
+			// for (int i = 0; i < 2; i++)
+			// {
+			// 	m_mat[i]->doStep();
+			// }
+		m_mat[1]->doStep();
 		// m_mat[0]->driverSM(glfwGetTime()/10.0);
 		// m_mat[0]->updateManipConfig();
 

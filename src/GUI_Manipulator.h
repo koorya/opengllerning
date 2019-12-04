@@ -1,15 +1,10 @@
-/*
-    src/example1.cpp -- C++ version of an example application that shows
-    how to use the various widget classes. For a Python implementation, see
-    '../python/example1.py'.
+#ifndef GUI_MANIPULATOR_H
+#define GUI_MANIPULATOR_H
 
-    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
-    The widget drawing code is based on the NanoVG demo application
-    by Mikko Mononen.
+#include "manipulator.h"
+#include <mutex>
+#include <thread>
 
-    All rights reserved. Use of this source code is governed by a
-    BSD-style license that can be found in the LICENSE.txt file.
-*/
 
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
@@ -17,6 +12,7 @@
 #include <nanogui/window.h>
 #include <nanogui/layout.h>
 #include <nanogui/label.h>
+
 #include <nanogui/checkbox.h>
 #include <nanogui/button.h>
 #include <nanogui/toolbutton.h>
@@ -25,8 +21,11 @@
 #include <nanogui/progressbar.h>
 #include <nanogui/entypo.h>
 #include <nanogui/messagedialog.h>
+
 #include <nanogui/textbox.h>
 #include <nanogui/slider.h>
+
+
 #include <nanogui/imagepanel.h>
 #include <nanogui/imageview.h>
 #include <nanogui/vscrollpanel.h>
@@ -37,45 +36,28 @@
 #include <iostream>
 #include <string>
 
-// Includes for the GLTexture class.
-#include <cstdint>
-#include <memory>
-#include <utility>
+class guiManipulator : public Manipulator{
+public:
+	float gui_config[8] = {0};
+	void doStep(){
+		int i=0;
+		config.tower = 360.0 * gui_config[i++];
+		config.bpant = 3000 * gui_config[i++];
+		config.bcar = 1550 * gui_config[i++];
+		config.wrist = 80.0 * (-1 + 2*gui_config[i++]);
+		config.brot = 360.0 * gui_config[i++];
+		config.cpant = 800 * gui_config[i++];
+		config.ccar = 450 * gui_config[i++];
+		config.rail = 1000 + 0.86 * 3000 * 6 * gui_config[i++];
 
-#if defined(__GNUC__)
-#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
-#if defined(_WIN32)
-#  pragma warning(push)
-#  pragma warning(disable: 4457 4456 4005 4312)
-#endif
 
-#define STB_IMAGE_STATIC
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#if defined(_WIN32)
-#  pragma warning(pop)
-#endif
-#if defined(_WIN32)
-#  if defined(APIENTRY)
-#    undef APIENTRY
-#  endif
-#  include <windows.h>
-#endif
-
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::string;
-using std::vector;
-using std::pair;
-using std::to_string;
+	};
+};
 
 
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication(float & float_var) : nanogui::Screen(Eigen::Vector2i(300, 500), "NanoGUI Test") {
+    ExampleApplication(guiManipulator & manip_ref) : nanogui::Screen(Eigen::Vector2i(300, 500), "NanoGUI Test") {
         using namespace nanogui;
 
         // Window *window = new Window(this, "Button demo");
@@ -91,12 +73,16 @@ public:
         TextBox *textBox;
 
 
-        for(int i=0; i<7; i++){
+        for(int i=0; i<8; i++){
             panel = new Widget(window);
             panel->setLayout(new BoxLayout(Orientation::Horizontal,
                                         Alignment::Middle, 0, 5));
             slider = new Slider(panel);
-            slider->setValue(0.5f);
+            slider->setValue(0.0f);
+			if(i == 3){
+				slider->setValue(0.5f);
+				manip_ref.gui_config[i] = 0.5;
+			}
             slider->setFixedWidth(150);
 
             textBox = new TextBox(panel);
@@ -107,15 +93,16 @@ public:
             textBox->setFormat("[-]?[0-9]*\\.?[0-9]+");
 
             textBox->setFixedSize(Vector2i(60, 25));
-            textBox->setValue("50");
+            textBox->setValue("0");
             textBox->setUnits("%");
-            textBox->setCallback([slider, &float_var](const std::string& value_str){
-                float_var = std::stof(value_str)/ 100.0;
-                slider->setValue((float_var)); 
+            textBox->setCallback([slider, &manip_ref, i](const std::string& value_str){
+                float val = std::stof(value_str)/ 100.0;
+				manip_ref.gui_config[i] = val;
+                slider->setValue((val)); 
                 return true;           
             });
-            slider->setCallback([textBox, &float_var](float value) {
-                float_var = value;
+            slider->setCallback([textBox, &manip_ref, i](float value) {
+                manip_ref.gui_config[i] = value;
                 textBox->setValue(std::to_string((int) (value * 100)));
             });
             // slider->setFinalCallback([&](float value) {
@@ -134,6 +121,9 @@ public:
            buffer object management.
         */
 
+
+
+//		nanogui::mainloop();
     }
 
     ~ExampleApplication() {
@@ -168,3 +158,7 @@ private:
 //    nanogui::ProgressBar *mProgress;
 };
 
+
+
+
+#endif
