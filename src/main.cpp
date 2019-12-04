@@ -75,7 +75,7 @@ int main()
 	GLFWwindow *window = glfwCreateWindow(mode->width, mode->height, "OpenGL Learning", monitor, nullptr);
 	glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 #else
-	GLFWwindow *window = glfwCreateWindow(800, 600, "OpenGL Learning", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(800, 600, "Демо манипулятора с ручным управлением", nullptr, nullptr);
 #endif
 
 	if (window == nullptr)
@@ -456,8 +456,10 @@ int main()
 
 	bool trig = false;
 
+	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
+	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
 
-
+	
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -739,7 +741,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		keys[key] = false;
 		if (key == GLFW_KEY_B)
 		{
-			std::cout << glm::to_string(my_cam.Position) << std::endl;
+			std::cout << "pos " << glm::to_string(my_cam.Position) << std::endl;
+			std::cout << "dir " << glm::to_string(my_cam.Direction) << std::endl;
 		}
 	}
 }

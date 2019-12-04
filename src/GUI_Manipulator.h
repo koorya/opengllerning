@@ -36,6 +36,8 @@
 #include <iostream>
 #include <string>
 
+
+
 class guiManipulator : public Manipulator{
 public:
 	float gui_config[8] = {0};
@@ -57,32 +59,38 @@ public:
 
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication(guiManipulator & manip_ref) : nanogui::Screen(Eigen::Vector2i(300, 500), "NanoGUI Test") {
+    ExampleApplication(guiManipulator & manip_ref) : nanogui::Screen(Eigen::Vector2i(300, 550), "Управление манипулятором") {
         using namespace nanogui;
 
         // Window *window = new Window(this, "Button demo");
         Window *window = (Window*)this;
-//        window->setPosition(Vector2i(15, 15));
+        window->setPosition(Vector2i(15, 15));
         window->setLayout(new GroupLayout());
 
 
-        new Label(window, "Slider and text box", "sans-bold");
+        
 
         Widget *panel;
         Slider *slider;
         TextBox *textBox;
 
-
+		std::string handle_names[] = {
+							"Поворот башни",
+							"Пантограф связи",
+							"Каретка связи", 
+							"Вращение связи 1",
+							"Вращение связи 2", 
+							"Пантограф колонны",
+							"Каретка колонны", 
+							"Перемещение вдоль рамы" };  
         for(int i=0; i<8; i++){
+			new Label(window, handle_names[i], "sans-bold");
             panel = new Widget(window);
             panel->setLayout(new BoxLayout(Orientation::Horizontal,
                                         Alignment::Middle, 0, 5));
             slider = new Slider(panel);
             slider->setValue(0.0f);
-			if(i == 3){
-				slider->setValue(0.5f);
-				manip_ref.gui_config[i] = 0.5;
-			}
+
             slider->setFixedWidth(150);
 
             textBox = new TextBox(panel);
@@ -110,6 +118,12 @@ public:
             // });
             textBox->setFontSize(20);
             textBox->setAlignment(TextBox::Alignment::Right);
+
+			if(i == 3){
+				slider->setValue(0.5f);
+				manip_ref.gui_config[i] = 0.5;
+				textBox->setValue(std::to_string((int) (0.5 * 100)));
+			}
         }
         performLayout();
 
