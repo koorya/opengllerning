@@ -497,11 +497,10 @@ int main()
 		m_mat[2]->calculateMatrices();
 
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
-		if (keys[GLFW_KEY_B])
-		{
-			ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
-			ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
-		}
+
+		ourShader.setVec4(glm::vec4(my_cam.Position + glm::vec3(1.0, 0.0, 1.0), 1.0f), "spotLight.position");
+		ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
+
 		view = my_cam.getMatrix();
 		//ourShader.setMat4(m_mat[0]->I, "view");
 		ourShader.setMat4(view, "view");
