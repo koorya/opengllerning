@@ -44,30 +44,14 @@ int main()
 
 
 	glfwInit();
+
+
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
-
-
-
-
-
-	// std::thread thr1([](float & float_var){	
-	// 	nanogui::init();
-	// 	nanogui::ref<ExampleApplication> app = new ExampleApplication(float_var);
-	// 	app->drawAll();
-	// 	app->setVisible(true);
-	// 	nanogui::mainloop();
-	// //	nanogui::shutdown();
-	// 	}, std::ref(some_gui_var1));
-	// thr1.detach();
-
-
-//	nanogui::ref<ExampleApplication> gm = new ExampleApplication(std::ref(some_gui_var1));
-
-
 
 #ifdef FULL_SCREEN
 	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
@@ -77,6 +61,8 @@ int main()
 #else
 	GLFWwindow *window = glfwCreateWindow(800, 600, "Демо манипулятора с ручным управлением", nullptr, nullptr);
 #endif
+	glfwShowWindow(window);
+
 
 	if (window == nullptr)
 	{
@@ -84,6 +70,8 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+
+
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -300,6 +288,9 @@ int main()
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
 	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
 
+
+	glfwMakeContextCurrent(window);
+	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
 	Model tower_frame("./3D_models/manipulator/Component18.stl", 3);				 //tower frame
 	Model tower_box("./3D_models/manipulator/Component31.stl", 3);					 //tower box
 	Model carrige("./3D_models/manipulator/Component1_reduce.stl", 3);				 // carrige
@@ -411,33 +402,24 @@ int main()
 	}
 
 
-	float some_gui_var = 0;
-	float some_gui_var1 = 0;
-	guiManipulator gui_man = guiManipulator();
-//	nanogui::init();
-
-//		nanogui::mainloop();
-//	guiManipulator gui_man = guiManipulator();
-//	ExampleApplication * exap = new ExampleApplication(std::ref(some_gui_var));
-	std::thread thr([](guiManipulator & man_ref){	
-		nanogui::ref<ExampleApplication> app = new ExampleApplication(man_ref);
-		app->drawAll();
-		app->setVisible(true);
-
-		nanogui::ref<ExampleApplication> app1 = new ExampleApplication(man_ref);
-		app1->drawAll();
-		app1->setVisible(true);
-
-		 nanogui::mainloop();
-	//	nanogui::shutdown();
-		}, std::ref(gui_man));
-	thr.detach();
 
 	// RemoteManipulator remote_man = RemoteManipulator(1);
 	// RemoteManipulator remote_man1 = RemoteManipulator(2);
 	// RemoteManipulator remote_man2 = RemoteManipulator(3);
 
-	Manipulator *m_mat[3] = {&l_m, &gui_man, &r_m};
+
+	guiManipulator gui_man = guiManipulator();
+	guiManipulator gui_man1 = guiManipulator();
+	guiManipulator gui_man2 = guiManipulator();
+
+
+	glfwSetWindowPos(window, 50, 100);
+
+	glfwSetWindowPos(gui_man.glfwWindow(), 900, 50);
+	glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
+	glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
+
+	Manipulator *m_mat[3] = {&gui_man1, &gui_man, &gui_man2};
 	m_mat[0]->config.rail = 3000.0;
 	m_mat[2]->config.rail = 6000.0;
 
@@ -457,7 +439,7 @@ int main()
 	m_mat[1]->B = glm::translate(f_mat.A, glm::vec3(350.0, -245.0, -400.0));
 	m_mat[2]->B = glm::translate(f_mat.A, glm::vec3(350.0, -7250.0, -400.0));
 
-	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
+
 
 	bool trig = false;
 
@@ -465,9 +447,36 @@ int main()
 	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
 
 	
+		// ExampleApplication app = ExampleApplication(std::ref(gui_man));
+		
+		// ExampleApplication app1 = ExampleApplication(std::ref(gui_man));
+
+
+
+
+
+	// std::thread thr1([&app](guiManipulator & man_ref){	
+	// 	ExampleApplication * arg_ = (ExampleApplication*)app;
+	// 	arg_->setVisible(true);
+	// 	glfwMakeContextCurrent(arg_->glfwWindow());
+	// 	arg_->drawAll();
+	// 	while(!glfwWindowShouldClose(arg_->glfwWindow())){
+	// 		arg_->drawAll();
+	// 	}
+	// 	arg_->setVisible(false);
+
+	// }, std::ref(gui_man));
+
+	// thr1.detach();
+
+
 
 	while (!glfwWindowShouldClose(window))
 	{
+
+
+		glfwMakeContextCurrent(window);
+
 //		std::cout<<some_gui_var<<std::endl;
 		time_cnt++;
 		if (time_cnt % 1000 == 0)
@@ -488,11 +497,11 @@ int main()
 			trig = true;
 
 		// if (trig)
-			// for (int i = 0; i < 2; i++)
-			// {
-			// 	m_mat[i]->doStep();
-			// }
-		m_mat[1]->doStep();
+		for (int i = 0; i < 3; i++)
+		{
+			m_mat[i]->doStep();
+		}
+		//m_mat[1]->doStep();
 		// m_mat[0]->driverSM(glfwGetTime()/10.0);
 		// m_mat[0]->updateManipConfig();
 

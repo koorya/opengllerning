@@ -38,30 +38,18 @@
 
 
 
-class guiManipulator : public Manipulator{
+// class guiManipulator : public Manipulator{
+// public:
+
+// 	};
+// };
+
+
+class guiManipulator : public nanogui::Screen, public Manipulator {
 public:
-	float gui_config[8] = {0};
-	void doStep(){
-		int i=0;
-		config.tower = 360.0 * gui_config[i++];
-		config.bpant = 3000 * gui_config[i++];
-		config.bcar = 1550 * gui_config[i++];
-		config.wrist = 80.0 * (-1 + 2*gui_config[i++]);
-		config.brot = 360.0 * gui_config[i++];
-		config.cpant = 800 * gui_config[i++];
-		config.ccar = 450 * gui_config[i++];
-		config.rail = 1000 + 0.86 * 3000 * 6 * gui_config[i++];
-
-
-	};
-};
-
-
-class ExampleApplication : public nanogui::Screen {
-public:
-    ExampleApplication(guiManipulator & manip_ref) : nanogui::Screen(Eigen::Vector2i(300, 550), "Управление манипулятором") {
+    guiManipulator() : nanogui::Screen(Eigen::Vector2i(300, 550), "Управление манипулятором") {
         using namespace nanogui;
-
+		
         // Window *window = new Window(this, "Button demo");
         Window *window = (Window*)this;
         window->setPosition(Vector2i(15, 15));
@@ -103,14 +91,18 @@ public:
             textBox->setFixedSize(Vector2i(60, 25));
             textBox->setValue("0");
             textBox->setUnits("%");
-            textBox->setCallback([slider, &manip_ref, i](const std::string& value_str){
+            textBox->setCallback([&, slider, i](const std::string& value_str){
                 float val = std::stof(value_str)/ 100.0;
-				manip_ref.gui_config[i] = val;
+				//config_mutex->lock();
+				this->gui_config[i] = val;
+				//config_mutex->unlock();
                 slider->setValue((val)); 
                 return true;           
             });
-            slider->setCallback([textBox, &manip_ref, i](float value) {
-                manip_ref.gui_config[i] = value;
+            slider->setCallback([&, textBox, i](float value) {
+				//config_mutex->lock();
+                this->gui_config[i] = value;
+				//config_mutex->unlock();
                 textBox->setValue(std::to_string((int) (value * 100)));
             });
             // slider->setFinalCallback([&](float value) {
@@ -121,9 +113,12 @@ public:
 
 			if(i == 3){
 				slider->setValue(0.5f);
-				manip_ref.gui_config[i] = 0.5;
+				this->gui_config[i] = 0.5;
 				textBox->setValue(std::to_string((int) (0.5 * 100)));
 			}
+
+			
+
         }
         performLayout();
 
@@ -135,12 +130,17 @@ public:
            buffer object management.
         */
 
+		//config_mutex = new std::mutex();
 
+		std::thread thr(updateThread, this);
+		thr.detach();
 
 //		nanogui::mainloop();
     }
 
-    ~ExampleApplication() {
+
+
+    ~guiManipulator() {
 
     }
 
@@ -168,8 +168,42 @@ public:
         /* Draw the window contents using OpenGL */
 
     }
+	void doStep(){
+		int i=0;
+		//config_mutex->lock();
+		config.tower = 360.0 * gui_config[i++];
+		config.bpant = 3000 * gui_config[i++];
+		config.bcar = 1550 * gui_config[i++];
+		config.wrist = 80.0 * (-1 + 2*gui_config[i++]);
+		config.brot = 360.0 * gui_config[i++];
+		config.cpant = 800 * gui_config[i++];
+		config.ccar = 450 * gui_config[i++];
+		config.rail = 1000 + 0.86 * 3000 * 6 * gui_config[i++];
+		//config_mutex->unlock();
+	}
+
 private:
 //    nanogui::ProgressBar *mProgress;
+
+	static void updateThread(void * arg){
+		guiManipulator * arg_ = (guiManipulator*)arg;
+		arg_->setVisible(true);
+		glfwMakeContextCurrent(arg_->glfwWindow());
+		arg_->drawAll();
+		std::chrono::milliseconds time(50);
+		while(!glfwWindowShouldClose(arg_->glfwWindow())){
+			std::this_thread::sleep_for(time);
+			arg_->drawAll();
+		}
+		arg_->setVisible(false);
+
+		return;
+	};
+
+	float gui_config[8] = {0};
+	std::mutex * config_mutex;/// < блокирует обновление данных, пока происходит пересчет матриц
+
+
 };
 
 
