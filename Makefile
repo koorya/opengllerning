@@ -13,7 +13,7 @@ run: aplication.exe
 	aplication.exe
 
 
-aplication.exe: obj/main.o obj/glad.o obj/shader.o obj/camera.o obj/mesh.o obj/model.o obj/load_tex.o obj/movement_program.o obj/manipulator.o obj/remote_manipulator.o obj/ConstructionContainer.o
+aplication.exe: obj/main.o obj/glad.o obj/shader.o obj/camera.o obj/mesh.o obj/model.o obj/load_tex.o obj/movement_program.o obj/manipulator.o obj/remote_manipulator.o obj/GUI_Manipulator.o obj/ConstructionContainer.o
 	g++ -Wall -o aplication.exe -L.\ -Lc:/opengl/lib -L"C:\mysql-connector-c-6.0.2-mingw32\lib" obj/*.o -lnanogui.dll -lassimp.dll -lSOIL -llibglfw3 -lopengl32 -lgdi32 -lmysqlclient -lws2_32 
 
 obj/main.o: src/main.cpp 
@@ -47,6 +47,9 @@ obj/manipulator.o: src/manipulator.cpp src/manipulator.h
 
 obj/remote_manipulator.o: src/remote_manipulator.cpp src/remote_manipulator.h
 	g++ $(CXX_DEFINES) $(CFLAGS) $(CXX_INCLUDES) -I"C:\mysql-connector-c-6.0.2-mingw32\include" src/remote_manipulator.cpp -o obj/remote_manipulator.o
+
+obj/GUI_Manipulator.o: src/GUI_Manipulator.cpp src/GUI_Manipulator.h
+	g++ $(CXX_DEFINES) $(CFLAGS) $(CXX_INCLUDES) src/GUI_Manipulator.cpp -o obj/GUI_Manipulator.o
 
 
 obj/ConstructionContainer.o: src/ConstructionContainer.cpp src/ConstructionContainer.h
