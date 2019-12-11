@@ -36,6 +36,10 @@
 #include <iostream>
 #include <string>
 
+class GUIField{
+public:
+	virtual void updateState()=0;
+};
 
 class guiManipulator : public nanogui::Screen, public Manipulator {
 public:
@@ -55,6 +59,7 @@ private:
 	float gui_config[8] = {0};
 	std::mutex * config_mutex;/// < блокирует обновление данных, пока происходит пересчет матриц
 
+	std::vector<GUIField*> gui_inputs;
 
 };
 
