@@ -19,9 +19,7 @@ struct ManipulatorConfig{
 	float brot;
 };
 
-struct FrameMatrices{
-	glm::mat4 World, A;
-};
+
 
 enum ManStates{
 	vacant = 0,
@@ -77,7 +75,7 @@ private:
 // };
 
 
-extern struct FrameMatrices f_mat;
+
 
 
 #endif

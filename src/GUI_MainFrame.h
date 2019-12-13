@@ -1,7 +1,7 @@
-#ifndef GUI_MANIPULATOR_H
-#define GUI_MANIPULATOR_H
+#ifndef GUI_MAINFRAME_H
+#define GUI_MAINFRAME_H
 
-#include "manipulator.h"
+#include "main_frame.h"
 
 #include "gui.h"
 #include <mutex>
@@ -40,21 +40,17 @@
 
 
 
-
-
-class guiManipulator : public GUIWindow, public Manipulator {
+class guiMainFrame : public GUIWindow, public MainFrame {
 public:
-    guiManipulator();
+    guiMainFrame();
 
-    ~guiManipulator();
+    ~guiMainFrame();
 
-	void doStep();
+    void doStep();
+
 private:
 
-
 };
-
-
 
 
 

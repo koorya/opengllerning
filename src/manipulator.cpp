@@ -6,7 +6,6 @@
 #define EPSILON 0.01
 
 
-struct FrameMatrices f_mat;
 float section_length = 3500.0;
 
 Manipulator::Manipulator(){
@@ -418,7 +417,7 @@ void Manipulator::calculateMatrices(){
 	float max_ccar_level = 0.0;
 
 
-	this->C = glm::translate(this->B, glm::vec3(this->config.rail, 0.0, -400.0));
+	this->C = glm::translate(this->B, glm::vec3(this->config.rail, 0.0, -400.0)); // 
 	this->D = glm::rotate(this->C, glm::radians(this->config.tower), glm::vec3(0.0, 0.0, 1.0));
 	this->E1 = glm::translate(glm::rotate(this->D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
 										glm::vec3(this->config.bpant, 0.0f, 0.0f));
