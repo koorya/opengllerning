@@ -424,6 +424,7 @@ int main()
 	m_mat[0]->config.rail = 3000.0;
 	m_mat[2]->config.rail = 6000.0;
 
+	glfwMakeContextCurrent(window);
 	ConstructionContainer constr_container = ConstructionContainer();
 
 	m_mat[0]->container = &constr_container;
@@ -436,29 +437,6 @@ int main()
 
 	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
 	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
-
-	
-		// ExampleApplication app = ExampleApplication(std::ref(gui_man));
-		
-		// ExampleApplication app1 = ExampleApplication(std::ref(gui_man));
-
-
-
-
-
-	// std::thread thr1([&app](guiManipulator & man_ref){	
-	// 	ExampleApplication * arg_ = (ExampleApplication*)app;
-	// 	arg_->setVisible(true);
-	// 	glfwMakeContextCurrent(arg_->glfwWindow());
-	// 	arg_->drawAll();
-	// 	while(!glfwWindowShouldClose(arg_->glfwWindow())){
-	// 		arg_->drawAll();
-	// 	}
-	// 	arg_->setVisible(false);
-
-	// }, std::ref(gui_man));
-
-	// thr1.detach();
 
 
 
