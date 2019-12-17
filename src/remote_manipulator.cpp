@@ -55,14 +55,14 @@ void RemoteManipulator::updateManipConfig(){
 		while (row = mysql_fetch_row(res))
 		{
 			recieve_data->lock();
-			config_rec.rail = -atof(row[0]);
-			config_rec.tower = atof(row[1]);
-			config_rec.bpant = atof(row[2]);
-			config_rec.cpant = atof(row[3]);
-			config_rec.bcar = atof(row[4]);
-			config_rec.ccar = atof(row[5]);
-			config_rec.wrist = atof(row[6]);
-			config_rec.brot = atof(row[7]);
+			config_rec.rail.value = -atof(row[0]);
+			config_rec.tower.value = atof(row[1]);
+			config_rec.bpant.value = atof(row[2]);
+			config_rec.cpant.value = atof(row[3]);
+			config_rec.bcar.value = atof(row[4]);
+			config_rec.ccar.value = atof(row[5]);
+			config_rec.wrist.value = atof(row[6]);
+			config_rec.brot.value = atof(row[7]);
 			recieve_data->unlock();
 			// for (int i = 0; i < mysql_num_fields(res); i++)
 			// {
@@ -80,14 +80,14 @@ void RemoteManipulator::updateManipConfig(){
 }
 
 void RemoteManipulator::resetConfiguration(){
-	config.rail = 0.0;
-	config.tower = 0.0;
-	config.bpant = 0.0;
-	config.cpant = 0.0;
-	config.bcar = 0.0;
-	config.ccar = 0.0;
-	config.wrist = 0.0;
-	config.brot = 0.0;
+	config.rail.value = 0.0;
+	config.tower.value = 0.0;
+	config.bpant.value = 0.0;
+	config.cpant.value = 0.0;
+	config.bcar.value = 0.0;
+	config.ccar.value = 0.0;
+	config.wrist.value = 0.0;
+	config.brot.value = 0.0;
 
 }
 

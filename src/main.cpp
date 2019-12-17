@@ -421,8 +421,8 @@ int main()
 	glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
 	Manipulator *m_mat[3] = {&gui_man1, &gui_man, &gui_man2};
-	m_mat[0]->config.rail = 3000.0;
-	m_mat[2]->config.rail = 6000.0;
+	m_mat[0]->config.rail.value = 3000.0;
+	m_mat[2]->config.rail.value = 6000.0;
 
 	glfwMakeContextCurrent(window);
 	ConstructionContainer constr_container = ConstructionContainer();

@@ -8,15 +8,20 @@
 #include "ConstructionContainer.h"
 #include <vector>
 
+struct ManipulatorDrive{
+	float value;
+	std::pair<float, float> limits;
+};
+
 struct ManipulatorConfig{
-	float rail;
-	float tower;
-	float bpant;
-	float cpant;
-	float bcar;
-	float ccar;
-	float wrist;
-	float brot;
+	struct ManipulatorDrive rail;
+	struct ManipulatorDrive tower;
+	struct ManipulatorDrive bpant;
+	struct ManipulatorDrive cpant;
+	struct ManipulatorDrive bcar;
+	struct ManipulatorDrive ccar;
+	struct ManipulatorDrive wrist;
+	struct ManipulatorDrive brot;
 };
 
 
@@ -41,6 +46,7 @@ public:
 //	~Manipulator();
 	void calculateMatrices();
 	virtual void doStep() = 0;
+//	bool checkConfig();
 };
 
 class BotManipulator : public Manipulator{

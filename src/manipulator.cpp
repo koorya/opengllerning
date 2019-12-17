@@ -9,14 +9,27 @@
 float section_length = 3500.0;
 
 Manipulator::Manipulator(){
-	config.rail = 0.0;
-	config.tower= 0.0;
-	config.bpant= 0.0;
-	config.cpant= 0.0;
-	config.bcar = 0.0;
-	config.ccar = 0.0;
-	config.wrist= 0.0;
-	config.brot = 0.0;
+	config.rail.value = 0.0;
+	config.tower.value = 0.0;
+	config.bpant.value = 0.0;
+	config.cpant.value = 0.0;
+	config.bcar.value = 0.0;
+	config.ccar.value = 0.0;
+	config.wrist.value = 0.0;
+	config.brot.value = 0.0;
+
+
+	config.rail.limits = std::pair<float, float> (0.0, 1000 + 0.86 * 3000 * 6 );
+	config.tower.limits = std::pair<float, float> (-110.0, 210.0);
+	config.bpant.limits = std::pair<float, float> (0.0, 2920.0);
+	config.bcar.limits = std::pair<float, float> (0.0, 1645.0);
+	config.wrist.limits = std::pair<float, float> (-95.0, 95.0);
+	config.brot.limits = std::pair<float, float> (-180.0, 20.0);
+	config.cpant.limits = std::pair<float, float> (0.0, 680.0);
+	config.ccar.limits = std::pair<float, float> (0.0, 765.0);
+
+
+
 }
 
 
@@ -44,14 +57,14 @@ BotManipulator::BotManipulator(double (*time_funct)(void)) : Manipulator(){
 	// add_config.wrist = 20.0;
 	// add_config.brot = 60.0;
 
-	add_config.rail = 0.0;
-	add_config.tower = 0.0;
-	add_config.bpant = 0.0;
-	add_config.cpant = 0.0;
-	add_config.bcar = 0.0;
-	add_config.ccar = 0.0;
-	add_config.wrist = 0.0;
-	add_config.brot = 0.0;
+	add_config.rail.value = 0.0;
+	add_config.tower.value = 0.0;
+	add_config.bpant.value = 0.0;
+	add_config.cpant.value = 0.0;
+	add_config.bcar.value = 0.0;
+	add_config.ccar.value = 0.0;
+	add_config.wrist.value = 0.0;
+	add_config.brot.value = 0.0;
 
 
 	struct AxisDriver * axes 			= 	axes_array;
@@ -62,14 +75,14 @@ BotManipulator::BotManipulator(double (*time_funct)(void)) : Manipulator(){
 	axes[AxisName::tower].cur_pos 		= 	0.0;
 	axes[AxisName::turn].cur_pos 		= 	0.0;
 
-	config.rail =  add_config.rail + axes[AxisName::CAR].cur_pos; 
-	config.tower = add_config.tower + axes[AxisName::tower].cur_pos;
-	config.bpant = add_config.bpant + axes[AxisName::pantograph].cur_pos;
-	config.cpant = add_config.cpant;
-	config.bcar =  add_config.bcar + axes[AxisName::carrige].cur_pos; 
-	config.ccar =  add_config.ccar; 
-	config.wrist = add_config.wrist + axes[AxisName::turn].cur_pos;
-	config.brot =  add_config.brot + axes[AxisName::rotate].cur_pos; 
+	config.rail.value =  add_config.rail.value + axes[AxisName::CAR].cur_pos; 
+	config.tower.value = add_config.tower.value + axes[AxisName::tower].cur_pos;
+	config.bpant.value = add_config.bpant.value + axes[AxisName::pantograph].cur_pos;
+	config.cpant.value = add_config.cpant.value;
+	config.bcar.value =  add_config.bcar.value + axes[AxisName::carrige].cur_pos; 
+	config.ccar.value =  add_config.ccar.value; 
+	config.wrist.value = add_config.wrist.value + axes[AxisName::turn].cur_pos;
+	config.brot.value =  add_config.brot.value + axes[AxisName::rotate].cur_pos; 
 }
 
 int BotManipulator::sequenceSM(float time){
@@ -215,34 +228,34 @@ void BotManipulator::setProgram(MovementStep * prg){
 
 	struct AxisDriver * axes 	= 	axes_array;
 
-	axes[AxisName::CAR].cur_pos =  config.rail - cur_section*section_length;
-	axes[AxisName::tower].cur_pos = config.tower;
-	axes[AxisName::pantograph].cur_pos = config.bpant;
+	axes[AxisName::CAR].cur_pos =  config.rail.value - cur_section*section_length;
+	axes[AxisName::tower].cur_pos = config.tower.value;
+	axes[AxisName::pantograph].cur_pos = config.bpant.value;
 
-	axes[AxisName::carrige].cur_pos =  config.bcar;
+	axes[AxisName::carrige].cur_pos =  config.bcar.value;
 
-	axes[AxisName::turn].cur_pos = config.wrist;
-	axes[AxisName::rotate].cur_pos =  config.brot ;
+	axes[AxisName::turn].cur_pos = config.wrist.value;
+	axes[AxisName::rotate].cur_pos =  config.brot.value ;
 }
 
 void BotManipulator::resetConfiguration(){
-	config.rail = 0.0;
-	config.tower = 0.0;
-	config.bpant = 0.0;
-	config.cpant = 0.0;
-	config.bcar = 0.0;
-	config.ccar = 0.0;
-	config.wrist = 0.0;
-	config.brot = 0.0;
+	config.rail.value = 0.0;
+	config.tower.value = 0.0;
+	config.bpant.value = 0.0;
+	config.cpant.value = 0.0;
+	config.bcar.value = 0.0;
+	config.ccar.value = 0.0;
+	config.wrist.value = 0.0;
+	config.brot.value = 0.0;
 
-	add_config.rail = 0.0;
-	add_config.tower = 0.0;
-	add_config.bpant = 0.0;
-	add_config.cpant = 0.0;
-	add_config.bcar = 0.0;
-	add_config.ccar = 0.0;
-	add_config.wrist = 0.0;
-	add_config.brot = 0.0;
+	add_config.rail.value = 0.0;
+	add_config.tower.value = 0.0;
+	add_config.bpant.value = 0.0;
+	add_config.cpant.value = 0.0;
+	add_config.bcar.value = 0.0;
+	add_config.ccar.value = 0.0;
+	add_config.wrist.value = 0.0;
+	add_config.brot.value = 0.0;
 }
 /**
  * \brief сбрасывает параметры осей для записи в них программы
@@ -397,14 +410,14 @@ void BotManipulator::doStep(){
 void BotManipulator::updateManipConfig(){
 	struct AxisDriver * axes = axes_array;
 
-	config.rail =  add_config.rail + axes[AxisName::CAR].cur_pos + cur_section*section_length; 
-	config.tower = add_config.tower + axes[AxisName::tower].cur_pos;
-	config.bpant = add_config.bpant + axes[AxisName::pantograph].cur_pos;
-	config.cpant = add_config.cpant;
-	config.bcar =  add_config.bcar + axes[AxisName::carrige].cur_pos; 
-	config.ccar =  add_config.ccar; 
-	config.wrist = add_config.wrist + axes[AxisName::turn].cur_pos;
-	config.brot =  add_config.brot + axes[AxisName::rotate].cur_pos; 
+	config.rail.value =  add_config.rail.value + axes[AxisName::CAR].cur_pos+ cur_section*section_length; 
+	config.tower.value = add_config.tower.value + axes[AxisName::tower].cur_pos;
+	config.bpant.value = add_config.bpant.value + axes[AxisName::pantograph].cur_pos;
+	config.cpant.value = add_config.cpant.value;
+	config.bcar.value =  add_config.bcar.value + axes[AxisName::carrige].cur_pos; 
+	config.ccar.value =  add_config.ccar.value; 
+	config.wrist.value = add_config.wrist.value + axes[AxisName::turn].cur_pos;
+	config.brot.value =  add_config.brot.value + axes[AxisName::rotate].cur_pos; 
 
 
 }
@@ -417,20 +430,20 @@ void Manipulator::calculateMatrices(){
 	float max_ccar_level = 0.0;
 
 
-	this->C = glm::translate(this->B, glm::vec3(this->config.rail, 0.0, -400.0)); // 
-	this->D = glm::rotate(this->C, glm::radians(this->config.tower), glm::vec3(0.0, 0.0, 1.0));
+	this->C = glm::translate(this->B, glm::vec3(this->config.rail.value, 0.0, -400.0)); // 
+	this->D = glm::rotate(this->C, glm::radians(this->config.tower.value), glm::vec3(0.0, 0.0, 1.0));
 	this->E1 = glm::translate(glm::rotate(this->D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
-										glm::vec3(this->config.bpant, 0.0f, 0.0f));
-	this->E2 = glm::translate(this->D, glm::vec3(this->config.cpant, 0.0f, 0.0f));
-	this->F1 = glm::translate(this->E1, glm::vec3(627.0, 0.0, -max_bcar_level + this->config.bcar));
-	this->F2 = glm::translate(this->E2, glm::vec3(0.0, 0.0, -max_ccar_level + this->config.ccar));
-	this->G1 = glm::rotate(this->F1, glm::radians(this->config.wrist), glm::vec3(0.0, 0.0, 1.0));
+										glm::vec3(this->config.bpant.value, 0.0f, 0.0f));
+	this->E2 = glm::translate(this->D, glm::vec3(this->config.cpant.value, 0.0f, 0.0f));
+	this->F1 = glm::translate(this->E1, glm::vec3(627.0, 0.0, -max_bcar_level + this->config.bcar.value));
+	this->F2 = glm::translate(this->E2, glm::vec3(0.0, 0.0, -max_ccar_level + this->config.ccar.value));
+	this->G1 = glm::rotate(this->F1, glm::radians(this->config.wrist.value), glm::vec3(0.0, 0.0, 1.0));
 	this->G2 = glm::rotate(glm::translate(this->F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-	this->H = glm::rotate(this->G1, glm::radians(180.0f-this->config.brot), glm::vec3(1.0, 0.0, 0.0));
+	this->H = glm::rotate(this->G1, glm::radians(180.0f-this->config.brot.value), glm::vec3(1.0, 0.0, 0.0));
 	this->I = glm::rotate(glm::translate(this->H, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 
 
-	float bpant_length = this->config.bpant+334.2;
+	float bpant_length = this->config.bpant.value+334.2;
 	float bangle = -asinf((bpant_length)/4450);
 	glm::mat4 bpant_origin = glm::rotate(this->D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 
@@ -446,7 +459,7 @@ void Manipulator::calculateMatrices(){
 
 
 
-	float cpant_length = this->config.cpant + 148.0;
+	float cpant_length = this->config.cpant.value + 148.0;
 	float cangle = -asinf((cpant_length)/1420);
 	glm::mat4 cpant_origin = this->D;
 
