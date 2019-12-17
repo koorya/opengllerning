@@ -32,6 +32,21 @@ Manipulator::Manipulator(){
 
 }
 
+bool inLimits(const float val, const std::pair<float, float> &lim){
+	return ( lim.first <= val ) && ( lim.second >= val);
+}
+
+bool Manipulator::checkConfig(){
+	return 	inLimits(config.rail.value, config.rail.limits) &&
+			inLimits(config.tower.value, config.tower.limits) &&
+			inLimits(config.bpant.value, config.bpant.limits) &&
+			inLimits(config.bcar.value, config.bcar.limits) &&
+			inLimits(config.wrist.value, config.wrist.limits) &&
+			inLimits(config.brot.value, config.brot.limits) &&
+			inLimits(config.cpant.value, config.cpant.limits) &&
+			inLimits(config.ccar.value, config.ccar.limits);
+}
+
 
 BotManipulator::BotManipulator(double (*time_funct)(void)) : Manipulator(){
 

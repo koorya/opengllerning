@@ -46,7 +46,7 @@ public:
 //	~Manipulator();
 	void calculateMatrices();
 	virtual void doStep() = 0;
-//	bool checkConfig();
+	bool checkConfig();
 };
 
 class BotManipulator : public Manipulator{
