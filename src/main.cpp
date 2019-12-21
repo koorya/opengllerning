@@ -291,6 +291,12 @@ int main()
 
 
 	glfwMakeContextCurrent(window);
+
+	Model girl =Model("3d_models/slim girl/slim girl.obj", 1);
+	Model nanosuit = Model("./3d_models/nanosuit/nanosuit.obj", 1);
+	
+	
+
 	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
 	Model tower_frame("./3D_models/manipulator/Component18.stl", 3);				 //tower frame
 	Model tower_box("./3D_models/manipulator/Component31.stl", 3);					 //tower box
@@ -537,7 +543,7 @@ int main()
 		// rail.Draw(ourShader);
 		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B3));
 		// rail.Draw(ourShader);
-
+/////
 		ourShader.setMaterial(Material::green_plastic);
 		carrige.setMatrixByID(0, m_mat[0]->C);
 		carrige.setMatrixByID(1, m_mat[1]->C);
@@ -641,6 +647,21 @@ int main()
 		column_carrige.setMatrixByID(1, m_mat[1]->F2);
 		column_carrige.setMatrixByID(2, m_mat[2]->F2);
 		column_carrige.Draw(ourShader, 3);
+
+
+
+
+
+	//	model = glm::scale(model, glm::vec3(0.5f));
+		glm::mat4 _model = glm::mat4(1.0f);
+		_model = glm::scale(_model, glm::vec3(100.0f));
+		_model = glm::rotate(_model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(_model)); //model to identity
+		nanosuit.setMatrixByID(0, m_mat[0]->H);
+		nanosuit.Draw(ourShader, 1);
+	
+
 
 		skyboxShader.use();
 		skyboxShader.setMat4(proj, "proj");
