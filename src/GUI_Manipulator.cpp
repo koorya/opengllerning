@@ -1,4 +1,19 @@
 #include "GUI_Manipulator.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/ext.hpp>
+
+class MethodButton : public GUIField{
+public:
+	MethodButton(nanogui::Window *window, const std::function<void ()> &callback){
+	}
+	virtual void updateState();
+private:
+	float * value_var_ptr;
+	nanogui::Widget *panel;
+	nanogui::Slider *slider;
+	nanogui::TextBox *textBox;
+};
+
 
 guiManipulator::guiManipulator() : GUIWindow() {
 
@@ -20,6 +35,12 @@ guiManipulator::guiManipulator() : GUIWindow() {
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Пантограф колонны", std::ref(this->config.cpant.limits), "mm", std::ref(this->config.cpant.value)));
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Каретка колонны", std::ref(this->config.ccar.limits), "mm", std::ref(this->config.ccar.value)));
 
+	nanogui::Button * button = new nanogui::Button((nanogui::Window*)this);
+	button->setCallback([&]{
+		std::cout<<glm::to_string(this->getTarget())<<std::endl;
+		this->syncmove();
+	});
+	
 
 	performLayout();
 
