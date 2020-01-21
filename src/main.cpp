@@ -410,10 +410,9 @@ int main()
 
 
 
-	// RemoteManipulator remote_man = RemoteManipulator(1);
+	 RemoteManipulator remote_man = RemoteManipulator(1);
 	// RemoteManipulator remote_man1 = RemoteManipulator(2);
 	// RemoteManipulator remote_man2 = RemoteManipulator(3);
-
 
 	guiManipulator gui_man = guiManipulator();
 	guiManipulator gui_man1 = guiManipulator();
@@ -426,7 +425,7 @@ int main()
 	glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
 	glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
-	Manipulator *m_mat[3] = {&gui_man1, &gui_man, &gui_man2};
+	Manipulator *m_mat[3] = {&remote_man, &gui_man, &gui_man2};
 	m_mat[0]->config.rail.value = 3000.0;
 	m_mat[2]->config.rail.value = 6000.0;
 

@@ -16,7 +16,7 @@ RemoteManipulator::RemoteManipulator(unsigned int manip_id){
 		//exit(1); //Если используется оконное приложение
 	}
 	// Подключаемся к серверу MySQLdb.connect('172.16.0.77', 'user1', 'vbtqjpxe', DATABASE_NAME)
-	if (!mysql_real_connect(conn, "172.16.0.77", "user1", "vbtqjpxe", "MM_dev", NULL, NULL, 0))
+	if (!mysql_real_connect(conn, "172.16.0.77", "user1", "vbtqjpxe", "MM", NULL, NULL, 0))
 	{
 		// Если нет возможности установить соединение с сервером
 		// базы данных выводим сообщение об ошибке
