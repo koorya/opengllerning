@@ -2,7 +2,7 @@ CFLAGS=-c -Wall #-g -O0
 CXX_INCLUDES = -Ic:/opengl/include -IC:/opengl/lerning/nanoGUI/nanogui/ext/glad/include/ -IC:/opengl/lerning/nanoGUI/nanogui/ext/eigen -IC:/opengl/lerning/nanoGUI/nanogui/ext/nanovg/src -IC:/opengl/lerning/nanoGUI/nanogui/include -IC:/opengl/nanogui 
 CXX_DEFINES = -DNANOGUI_GLAD -DNANOGUI_SHARED -DNVG_SHARED #-DGLAD_GLAPI_EXPORT
 
-
+#coment for git test
 all: run
 
 rebuild: 
