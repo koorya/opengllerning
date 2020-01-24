@@ -1,7 +1,1 @@
-*
-!.gitignore
-!/src
-!/src/*
-!/shaders
-!/shaders/*
-!Makefile
+/build
