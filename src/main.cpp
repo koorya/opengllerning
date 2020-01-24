@@ -1,4 +1,4 @@
-
+#define GLM_ENABLE_EXPERIMENTAL
 //#include <GL/glew.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -292,12 +292,12 @@ int main()
 
 	glfwMakeContextCurrent(window);
 
-	Model girl =Model("3d_models/slim girl/slim girl.obj", 1);
-	Model nanosuit = Model("./3d_models/nanosuit/nanosuit.obj", 1);
+	Model girl =Model("3D_models/slim girl/slim girl.obj", 1);
+	Model nanosuit = Model("./3D_models/nanosuit/nanosuit.obj", 1);
 	
 	
 
-	Model main_frame("./3d_models/stl_components/main_frame.stl", 1);
+	Model main_frame("./3D_models/stl_components/main_frame.stl", 1);
 	Model tower_frame("./3D_models/manipulator/Component18.stl", 3);				 //tower frame
 	Model tower_box("./3D_models/manipulator/Component31.stl", 3);					 //tower box
 	Model carrige("./3D_models/manipulator/Component1_reduce.stl", 3);				 // carrige
