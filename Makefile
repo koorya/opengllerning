@@ -3,6 +3,7 @@ CXX_INCLUDES = -Ic:/opengl/include -IC:/opengl/lerning/nanoGUI/nanogui/ext/glad/
 CXX_DEFINES = -DNANOGUI_GLAD -DNANOGUI_SHARED -DNVG_SHARED #-DGLAD_GLAPI_EXPORT
 
 #coment for git test
+#linux comment
 all: run
 
 rebuild: 
