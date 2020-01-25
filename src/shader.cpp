@@ -74,6 +74,7 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath){
 	if(!success){
 		glGetShaderInfoLog(fragment_shader, sizeof(infoLog), NULL, infoLog);
 		std::cout << "FRAGMENT SHADER COMPILE FAILED\n" << infoLog << std::endl;
+		std::cout << fragmentPath << std::endl;
 	}
 	GLuint shader_program = glCreateProgram();
 	glAttachShader(shader_program, vertex_shader);

@@ -1,4 +1,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
+//#define FULL_SCREEN
+
 //#include <GL/glew.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -53,7 +55,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
-
+	
 #ifdef FULL_SCREEN
 	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode *mode = glfwGetVideoMode(monitor);
@@ -93,7 +95,7 @@ int main()
 
 	Shader ourShader("./shaders/shader.vert", "./shaders/shader.frag");
 	Shader stensilShader("./shaders/shader.vert", "./shaders/stencil.frag");
-	Shader screenShader("./shaders/screen.vert", "./shaders/screen.frag");
+//	Shader screenShader("./shaders/screen.vert", "./shaders/screen.frag");
 	Shader skyboxShader("./shaders/skybox.vert", "./shaders/skybox.frag");
 	Shader reflectShader("./shaders/reflect.vert", "./shaders/reflect.frag");
 	Shader refractShader("./shaders/refract.vert", "./shaders/refract.frag");
@@ -411,21 +413,21 @@ int main()
 
 
 	 RemoteManipulator remote_man = RemoteManipulator(1);
-	// RemoteManipulator remote_man1 = RemoteManipulator(2);
-	// RemoteManipulator remote_man2 = RemoteManipulator(3);
+	 RemoteManipulator remote_man1 = RemoteManipulator(2);
+	 RemoteManipulator remote_man2 = RemoteManipulator(3);
 
-	guiManipulator gui_man = guiManipulator();
-	guiManipulator gui_man1 = guiManipulator();
-	guiManipulator gui_man2 = guiManipulator();
+	 guiManipulator gui_man = guiManipulator();
+//	 guiManipulator gui_man1 = guiManipulator();
+	// guiManipulator gui_man2 = guiManipulator();
 
 
 	glfwSetWindowPos(window, 50, 100);
 
-	glfwSetWindowPos(gui_man.glfwWindow(), 900, 50);
-	glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
-	glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
+//	 glfwSetWindowPos(gui_man.glfwWindow(), 900, 50);
+	// glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
+	// glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
-	Manipulator *m_mat[3] = {&remote_man, &gui_man, &gui_man2};
+	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
 	m_mat[0]->config.rail.value = 3000.0;
 	m_mat[2]->config.rail.value = 6000.0;
 
@@ -436,26 +438,31 @@ int main()
 	m_mat[1]->container = &constr_container;
 	m_mat[2]->container = &constr_container;
 
-	guiMainFrame f_mat;
+//	guiMainFrame f_mat;
 
+	MainFrame f_mat;
+
+	
 	bool trig = false;
 
 	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
 	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
 
 
+	std::chrono::seconds time(1);
 
 	while (!glfwWindowShouldClose(window))
 	{
 
+		std::this_thread::sleep_for(time);
 
 		glfwMakeContextCurrent(window);
 
 //		std::cout<<some_gui_var<<std::endl;
 		time_cnt++;
-		if (time_cnt % 1000 == 0)
+		if (time_cnt % 500 == 0)
 		{
-			std::cout << "FPS: " << 1000.0 / (glfwGetTime() - timestamp) << std::endl;
+			std::cout << "FPS: " << 500.0 / (glfwGetTime() - timestamp) << std::endl;
 			timestamp = glfwGetTime();
 			time_cnt = 0;
 		}
@@ -471,7 +478,7 @@ int main()
 			trig = true;
 
 		// if (trig)
-		f_mat.doStep();
+//		f_mat.doStep();
 		m_mat[0]->B = f_mat.rail1;
 		m_mat[1]->B = f_mat.rail2;
 		m_mat[2]->B = f_mat.rail3;

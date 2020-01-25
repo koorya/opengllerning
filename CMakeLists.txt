@@ -7,6 +7,7 @@ project(BuildingMachines VERSION 0.0.1 LANGUAGES CXX)
 # Добавить в сборку исполняемый файл "MyProgram":
 add_executable(MyProgram src/main.cpp)
 
+
 add_subdirectory(ext/glad)
 target_link_libraries(MyProgram glad)
 target_include_directories(MyProgram PUBLIC glad/build/include)
