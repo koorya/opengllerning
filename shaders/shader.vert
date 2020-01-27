@@ -23,11 +23,9 @@ void main(){
 	
 	texPos = texture;
 	float phase;
-	if(orbit_radius != 0.0)
-		phase = (time+1000.0) * 200 / pow(orbit_radius, 3.0/2.0);
 	mat4 instance_mat_ = mat4(1.0);
 	mat4 model_ = instance_mat * model;
-	vec4 pos = model_ * vec4(position + orbit_radius*vec3(sin(phase), gl_InstanceID/10000.0, cos(phase)) + scale*normal, 1.0f) ;
+	vec4 pos = model_ * vec4(position, 1.0f) ;
 
 	fragPos = pos.xyz;
 	gl_Position =  proj * view * pos;

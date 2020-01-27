@@ -416,7 +416,7 @@ int main()
 	 RemoteManipulator remote_man1 = RemoteManipulator(2);
 	 RemoteManipulator remote_man2 = RemoteManipulator(3);
 
-	 guiManipulator gui_man = guiManipulator();
+//	 guiManipulator gui_man = guiManipulator();
 //	 guiManipulator gui_man1 = guiManipulator();
 	// guiManipulator gui_man2 = guiManipulator();
 
@@ -454,7 +454,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 
-		std::this_thread::sleep_for(time);
+//		std::this_thread::sleep_for(time);
 
 		glfwMakeContextCurrent(window);
 
