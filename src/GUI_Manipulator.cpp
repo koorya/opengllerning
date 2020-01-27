@@ -26,6 +26,12 @@ guiManipulator::guiManipulator() : GUIWindow() {
 	// gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Пантограф колонны", std::pair<float, float> (0.0, 680.0), "mm", std::ref(this->config.cpant)));
 	// gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Каретка колонны", std::pair<float, float> (0.0, 765.0), "mm", std::ref(this->config.ccar)));
 
+	// Window *window = new Window(this, "Button demo");
+	nanogui::Window *window = (nanogui::Window*)this;
+	window->setPosition(nanogui::Vector2i(15, 15));
+	window->setLayout(new nanogui::GroupLayout());
+
+
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Перемещение вдоль рамы", std::ref(this->config.rail.limits), "mm", std::ref(this->config.rail.value)));
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Поворот башни", std::ref(this->config.tower.limits), "°", std::ref(this->config.tower.value)));
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)this, "Пантограф связи", std::ref(this->config.bpant.limits), "mm", std::ref(this->config.bpant.value)));
