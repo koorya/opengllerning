@@ -54,27 +54,98 @@ void SliderWithText::updateState(){
 }
 
 
-GUIWindow::GUIWindow() : nanogui::Screen(Eigen::Vector2i(300, 550), "Управление манипулятором") {
+GUIWindow::GUIWindow() : nanogui::Screen() {
+	GLFWwindow * prew_window = glfwGetCurrentContext();
+
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    glfwWindowHint(GLFW_SAMPLES, 0);
+    glfwWindowHint(GLFW_RED_BITS, 8);
+    glfwWindowHint(GLFW_GREEN_BITS, 8);
+    glfwWindowHint(GLFW_BLUE_BITS, 8);
+    glfwWindowHint(GLFW_ALPHA_BITS, 8);
+    glfwWindowHint(GLFW_STENCIL_BITS, 8);
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+
+    // Create a GLFWwindow object
+    GLFWwindow* window = glfwCreateWindow(300, 550, "example3", nullptr, nullptr);
+    if (window == nullptr) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        exit(-1);
+    }
+    glfwMakeContextCurrent(window);
+
+    this->initialize(window, false);
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
+    glfwSwapInterval(0);
+    glfwSwapBuffers(window);
+
+
+    this->setVisible(true);
+    this->performLayout();
+	glfwSetWindowUserPointer(window, (void*)this);
+	
 	using namespace nanogui;
+    glfwSetCursorPosCallback(window,
+            [](GLFWwindow * window, double x, double y) {
+				Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+            	screen->cursorPosCallbackEvent(x, y);
+        }
+    );
 
-	// Window *window = new Window(this, "Button demo");
-	Window *window = (Window*)this;
-	window->setPosition(Vector2i(15, 15));
-	window->setLayout(new GroupLayout());
+    glfwSetMouseButtonCallback(window,
+        [](GLFWwindow * window, int button, int action, int modifiers) {
+            Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+			screen->mouseButtonCallbackEvent(button, action, modifiers);
+        }
+    );
 
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Перемещение вдоль рамы", std::pair<float, float> (0.0, 1000 + 0.86 * 3000 * 6 ), "mm", std::ref(this->config.rail)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Поворот башни", std::pair<float, float> (-110.0, 210.0), "°", std::ref(this->config.tower)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Пантограф связи", std::pair<float, float> (0.0, 2920.0), "mm", std::ref(this->config.bpant)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Каретка связи", std::pair<float, float> (0.0, 1645.0), "mm", std::ref(this->config.bcar)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Вращение связи 1", std::pair<float, float> (-95.0, 95.0), "°", std::ref(this->config.wrist)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Вращение связи 2", std::pair<float, float> (-180.0, 20.0), "°", std::ref(this->config.brot)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Пантограф колонны", std::pair<float, float> (0.0, 680.0), "mm", std::ref(this->config.cpant)));
-	// gui_inputs.push_back((GUIField*) new SliderWithText(window, "Каретка колонны", std::pair<float, float> (0.0, 765.0), "mm", std::ref(this->config.ccar)));
+    glfwSetKeyCallback(window,
+        [] (GLFWwindow * window, int key, int scancode, int action, int mods) {
+            Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+			screen->keyCallbackEvent(key, scancode, action, mods);
+        }
+    );
 
-	performLayout();
+    glfwSetCharCallback(window,
+        [](GLFWwindow * window, unsigned int codepoint) {
+            Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+			screen->charCallbackEvent(codepoint);
+        }
+    );
 
-	std::thread thr(updateThread, this);
-	thr.detach();
+    glfwSetDropCallback(window,
+        [](GLFWwindow * window, int count, const char **filenames) {
+            Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+			screen->dropCallbackEvent(count, filenames);
+        }
+    );
+
+    glfwSetScrollCallback(window,
+        [](GLFWwindow * window, double x, double y) {
+            Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+			screen->scrollCallbackEvent(x, y);
+       }
+    );
+
+    glfwSetFramebufferSizeCallback(window,
+        [](GLFWwindow * window, int width, int height) {
+            Screen * screen = (Screen *)glfwGetWindowUserPointer(window);
+			screen->resizeCallbackEvent(width, height);
+        }
+    );
+
+
+
+	glfwMakeContextCurrent(prew_window);
 }
 
 
@@ -111,6 +182,21 @@ void GUIWindow::syncValues(){
 	for(int i = 0; i < gui_inputs.size(); i++)
 		gui_inputs[i]->updateState();
 	int i=0;
+
+	GLFWwindow * prew_window = glfwGetCurrentContext();
+
+	glfwMakeContextCurrent(glfwWindow());
+	glfwPollEvents();
+
+	glClearColor(0.2f, 0.25f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Draw nanogui
+	this->drawContents();
+	this->drawWidgets();
+
+	glfwSwapBuffers(glfwWindow());
+	glfwMakeContextCurrent(prew_window);
 }
 
 void GUIWindow::updateThread(void * arg){

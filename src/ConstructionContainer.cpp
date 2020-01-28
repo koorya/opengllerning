@@ -1,10 +1,11 @@
 #include "ConstructionContainer.h"
 
+#define FLOOR_CNT 10
 
 ConstructionContainer::ConstructionContainer(){
-	tilted_bond_cnt = 48 * 19;
-	horizontal_bond_cnt = 24*19;
-	column_cnt = 16*20;
+	tilted_bond_cnt = 48 * (FLOOR_CNT-1);
+	horizontal_bond_cnt = 24* (FLOOR_CNT - 1);
+	column_cnt = 16*FLOOR_CNT;
 
 	float stride = 3500.0;;
 	glm::vec3 column_offset = glm::vec3(-5.600e+03, 507.50f, 5.005e+03); 
@@ -17,7 +18,7 @@ ConstructionContainer::ConstructionContainer(){
 	std::vector<glm::mat4> tilt_bond_matrices;
 	glm::mat4 model;
 
-	for(int floor = 0; floor < 26; floor++){
+	for(int floor = 0; floor < FLOOR_CNT; floor++){
 		for(int x = 0; x < 4; x++){
 			for(int y = 0; y< 4; y++){
 
