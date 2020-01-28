@@ -50,8 +50,8 @@ int main()
 
 
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -412,13 +412,14 @@ int main()
 
 
 
-	 RemoteManipulator remote_man = RemoteManipulator(1);
-	 RemoteManipulator remote_man1 = RemoteManipulator(2);
-	 RemoteManipulator remote_man2 = RemoteManipulator(3);
+//	 RemoteManipulator remote_man = RemoteManipulator(1);
+//	 RemoteManipulator remote_man1 = RemoteManipulator(2);
+//	 RemoteManipulator remote_man2 = RemoteManipulator(3);
 
-//	 guiManipulator gui_man = guiManipulator();
-//	 guiManipulator gui_man1 = guiManipulator();
-	// guiManipulator gui_man2 = guiManipulator();
+
+	guiManipulator gui_man = guiManipulator();
+	guiManipulator gui_man1 = guiManipulator();
+	guiManipulator gui_man2 = guiManipulator();
 
 
 	glfwSetWindowPos(window, 50, 100);
@@ -427,7 +428,7 @@ int main()
 	// glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
 	// glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
-	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
+	Manipulator *m_mat[3] = {&gui_man, &gui_man1, &gui_man2};
 	m_mat[0]->config.rail.value = 3000.0;
 	m_mat[2]->config.rail.value = 6000.0;
 
@@ -488,6 +489,8 @@ int main()
 		{
 			m_mat[i]->doStep();
 		}
+		glfwMakeContextCurrent(window);
+
 		//m_mat[1]->doStep();
 		// m_mat[0]->driverSM(glfwGetTime()/10.0);
 		// m_mat[0]->updateManipConfig();
@@ -688,6 +691,12 @@ int main()
 		// glDrawArrays(GL_TRIANGLES, 0, 6);
 		// glBindVertexArray(0);
 
+
+		// check OpenGL error
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			std::cout << "OpenGL error: " << err << std::endl;
+		}
 		glfwSwapBuffers(window);
 	}
 	glfwTerminate();
