@@ -93,12 +93,12 @@ int main()
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-	Shader ourShader("./shaders/shader.vert", "./shaders/shader.frag");
-	Shader stensilShader("./shaders/shader.vert", "./shaders/stencil.frag");
-//	Shader screenShader("./shaders/screen.vert", "./shaders/screen.frag");
-	Shader skyboxShader("./shaders/skybox.vert", "./shaders/skybox.frag");
-	Shader reflectShader("./shaders/reflect.vert", "./shaders/reflect.frag");
-	Shader refractShader("./shaders/refract.vert", "./shaders/refract.frag");
+	Shader ourShader("../shaders/shader.vert", "../shaders/shader.frag");
+	Shader stensilShader("../shaders/shader.vert", "../shaders/stencil.frag");
+//	Shader screenShader("../shaders/screen.vert", "../shaders/screen.frag");
+	Shader skyboxShader("../shaders/skybox.vert", "../shaders/skybox.frag");
+	Shader reflectShader("../shaders/reflect.vert", "../shaders/reflect.frag");
+	Shader refractShader("../shaders/refract.vert", "../shaders/refract.frag");
 
 	GLuint uboTransform;
 	glGenBuffers(1, &uboTransform);
@@ -167,19 +167,19 @@ int main()
 		-1.0f, -1.0f, 1.0f,
 		1.0f, -1.0f, 1.0f};
 
-	std::vector<std::string> faces({"./textures/skybox/right.jpg",
-									"./textures/skybox/left.jpg",
-									"./textures/skybox/top.jpg",
-									"./textures/skybox/bottom.jpg",
-									"./textures/skybox/front.jpg",
-									"./textures/skybox/back.jpg"});
+	std::vector<std::string> faces({"../textures/skybox/right.jpg",
+									"../textures/skybox/left.jpg",
+									"../textures/skybox/top.jpg",
+									"../textures/skybox/bottom.jpg",
+									"../textures/skybox/front.jpg",
+									"../textures/skybox/back.jpg"});
 	// std::vector<std::string> faces({
-	// 	"./textures/Yokohama3/posx.jpg",
-	// 	"./textures/Yokohama3/negx.jpg",
-	// 	"./textures/Yokohama3/posy.jpg",
-	// 	"./textures/Yokohama3/negy.jpg",
-	// 	"./textures/Yokohama3/posz.jpg",
-	// 	"./textures/Yokohama3/negz.jpg"
+	// 	"../textures/Yokohama3/posx.jpg",
+	// 	"../textures/Yokohama3/negx.jpg",
+	// 	"../textures/Yokohama3/posy.jpg",
+	// 	"../textures/Yokohama3/negy.jpg",
+	// 	"../textures/Yokohama3/posz.jpg",
+	// 	"../textures/Yokohama3/negz.jpg"
 	// });
 
 	unsigned int cubemapTexture = loadCubeMap(faces);
@@ -211,7 +211,7 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	GLuint textureColorBuffer;
-	//	textureColorBuffer = loadTexture("./textures/container.jpg");
+	//	textureColorBuffer = loadTexture("../textures/container.jpg");
 	glGenTextures(1, &textureColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -294,32 +294,32 @@ int main()
 
 	glfwMakeContextCurrent(window);
 
-	Model girl =Model("3D_models/slim girl/slim girl.obj", 1);
-	Model nanosuit = Model("./3D_models/nanosuit/nanosuit.obj", 1);
+	Model girl =Model("../3D_models/slim girl/slim girl.obj", 1);
+	Model nanosuit = Model("../3D_models/nanosuit/nanosuit.obj", 1);
 	
 	
 
-	Model main_frame("./3D_models/stl_components/main_frame.stl", 1);
-	Model tower_frame("./3D_models/manipulator/Component18.stl", 3);				 //tower frame
-	Model tower_box("./3D_models/manipulator/Component31.stl", 3);					 //tower box
-	Model carrige("./3D_models/manipulator/Component1_reduce.stl", 3);				 // carrige
-	Model rail("./3D_models/manipulator/Component129.stl", 3);						 //rail
-	Model bond_wrist("./3D_models/manipulator/wrist.stl", 3);						 //bond wrist
-	Model bond_carrige("./3D_models/manipulator/bcar.stl", 3);						 //bond carrige
-	Model bond_rail("./3D_models/manipulator/Component21_orient.stl", 3);			 //bond rail
-	Model column_rail("./3D_models/manipulator/Component20.stl", 3);				 //column rail
-	Model column_carrige("./3D_models/manipulator/Component40.stl", 3);				 //column carrige
-	Model bond_handler_middle("./3D_models/manipulator/bond_handler_middle.stl", 3); //bond handler middle
-	Model bond_handler_left("./3D_models/manipulator/bond_handler_left.stl", 3);	 //bond handlre left
-	Model bond_handler_right("./3D_models/manipulator/bond_handler_right.stl", 3);   //bond handler right
+	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
+	Model tower_frame("../3D_models/manipulator/Component18.stl", 3);				 //tower frame
+	Model tower_box("../3D_models/manipulator/Component31.stl", 3);					 //tower box
+	Model carrige("../3D_models/manipulator/Component1_reduce.stl", 3);				 // carrige
+	Model rail("../3D_models/manipulator/Component129.stl", 3);						 //rail
+	Model bond_wrist("../3D_models/manipulator/wrist.stl", 3);						 //bond wrist
+	Model bond_carrige("../3D_models/manipulator/bcar.stl", 3);						 //bond carrige
+	Model bond_rail("../3D_models/manipulator/Component21_orient.stl", 3);			 //bond rail
+	Model column_rail("../3D_models/manipulator/Component20.stl", 3);				 //column rail
+	Model column_carrige("../3D_models/manipulator/Component40.stl", 3);				 //column carrige
+	Model bond_handler_middle("../3D_models/manipulator/bond_handler_middle.stl", 3); //bond handler middle
+	Model bond_handler_left("../3D_models/manipulator/bond_handler_left.stl", 3);	 //bond handlre left
+	Model bond_handler_right("../3D_models/manipulator/bond_handler_right.stl", 3);   //bond handler right
 
-	Model pb1("./3D_models/stl_components/pb1.stl", 3); //bond pantograph section 1
-	Model pb2("./3D_models/stl_components/pb2.stl", 3); //bond pantograph section 2
-	Model pb3("./3D_models/stl_components/pb3.stl", 3); //bond pantograph section 3
-	Model pb4("./3D_models/stl_components/pb4.stl", 3); //bond pantograph section 4
+	Model pb1("../3D_models/stl_components/pb1.stl", 3); //bond pantograph section 1
+	Model pb2("../3D_models/stl_components/pb2.stl", 3); //bond pantograph section 2
+	Model pb3("../3D_models/stl_components/pb3.stl", 3); //bond pantograph section 3
+	Model pb4("../3D_models/stl_components/pb4.stl", 3); //bond pantograph section 4
 
-	Model pc1("./3D_models/stl_components/pc1.stl", 3); //column pantograph section 1
-	Model pc2("./3D_models/stl_components/pc2.stl", 3); //column pantograph section 2
+	Model pc1("../3D_models/stl_components/pc1.stl", 3); //column pantograph section 1
+	Model pc2("../3D_models/stl_components/pc2.stl", 3); //column pantograph section 2
 
 	glEnable(GL_MULTISAMPLE);
 
