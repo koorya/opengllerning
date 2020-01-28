@@ -7,7 +7,11 @@ project(BuildingMachines VERSION 0.0.1 LANGUAGES CXX)
 # Добавить в сборку исполняемый файл "MyProgram":
 add_executable(MyProgram src/main.cpp)
 
+<<<<<<< HEAD
 #add_custom_target(run ALL cp ./MyProgram ../MyProgram && cd  ../ && optirun ./MyProgram )
+=======
+add_custom_target(run ALL cp ./MyProgram ../MyProgram && cd  ../ && optirun ./MyProgram )
+>>>>>>> 946d2862211c31da3494b369c711c01e074c1f09
 
 add_subdirectory(ext/glad)
 target_link_libraries(MyProgram glad)
@@ -18,7 +22,11 @@ target_include_directories(MyProgram PUBLIC /usr/include/mariadb)
 target_link_libraries(MyProgram dl)
 target_link_libraries(MyProgram pthread)
 
+<<<<<<< HEAD
 set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
+=======
+set(NANOGUI_BUILD_PYTHON OFF)
+>>>>>>> 946d2862211c31da3494b369c711c01e074c1f09
 add_subdirectory(ext/nanogui)
 target_include_directories(MyProgram PUBLIC ext/nanogui/include)
 target_include_directories(MyProgram PUBLIC ext/nanogui/ext/eigen)
