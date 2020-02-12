@@ -32,6 +32,9 @@
 #include "ConstructionContainer.h"
 #include "GUI_MainFrame.h"
 
+
+#include <nanogui/nanogui.h>
+
 void do_movement();
 void key_callback(GLFWwindow *, int, int, int, int);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -42,6 +45,10 @@ unsigned int loadCubeMap(std::vector<std::string> faces);
 Camera my_cam(glm::vec3(0.0, 0.0, 0.0));
 bool keys[1024] = {false};
 
+using namespace nanogui;
+
+Screen *screen = nullptr;
+
 int main()
 {
 
@@ -50,8 +57,9 @@ int main()
 
 
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -81,15 +89,89 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
+
+
+
+	std::cout<<"before new screen"<<std::endl;
+	screen = new Screen();
+	std::cout<<"before initialize screen"<<std::endl;
+	screen->initialize(window, true);
+
+	std::cout<<"before new Formhelper"<<std::endl;
+	FormHelper *gui = new FormHelper(screen);
+	ref<Window> nanoguiWindow = gui->addWindow(Eigen::Vector2i(10, 10), "Form helper example");
+	gui->addGroup("Other widgets");
+	gui->addButton("A button", []() { std::cout << "Button pressed." << std::endl; })->setTooltip("Testing a much longer tooltip, that will wrap around to new lines multiple times.");;
+
+	screen->setVisible(true);
+	screen->performLayout();
+	nanoguiWindow->center();
+
+//	glfwSetKeyCallback(window, key_callback);
+//	glfwSetCursorPosCallback(window, mouse_callback);
+//	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+
+//	glfwSetScrollCallback(window, scroll_callback);
+
+    glfwSetCursorPosCallback(window,
+            [](GLFWwindow *, double x, double y) {
+            screen->cursorPosCallbackEvent(x, y);
+			mouse_callback(NULL, x, y);
+        }
+    );
+
+    glfwSetMouseButtonCallback(window,
+        [](GLFWwindow *, int button, int action, int modifiers) {
+            if(!screen->mouseButtonCallbackEvent(button, action, modifiers) || 
+				(action == GLFW_RELEASE))
+				MouseButtonCallback(NULL, button, action, modifiers);
+			
+        }
+    );
+
+    glfwSetKeyCallback(window,
+        [](GLFWwindow *, int key, int scancode, int action, int mods) {
+            if(!screen->keyCallbackEvent(key, scancode, action, mods))
+				key_callback(NULL, key, scancode, action, mods);
+        }
+    );
+
+    glfwSetCharCallback(window,
+        [](GLFWwindow *, unsigned int codepoint) {
+            screen->charCallbackEvent(codepoint);
+        }
+    );
+
+    glfwSetDropCallback(window,
+        [](GLFWwindow *, int count, const char **filenames) {
+            screen->dropCallbackEvent(count, filenames);
+        }
+    );
+
+    glfwSetScrollCallback(window,
+        [](GLFWwindow *, double x, double y) {
+            screen->scrollCallbackEvent(x, y);
+			scroll_callback(NULL, x, y);
+       }
+    );
+
+    glfwSetFramebufferSizeCallback(window,
+        [](GLFWwindow *, int width, int height) {
+            screen->resizeCallbackEvent(width, height);
+        }
+    );
+
+
+
+
+
+
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetMouseButtonCallback(window, MouseButtonCallback);
 
-	glfwSetScrollCallback(window, scroll_callback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
@@ -412,9 +494,9 @@ int main()
 
 
 
-//	 RemoteManipulator remote_man = RemoteManipulator(1);
-//	 RemoteManipulator remote_man1 = RemoteManipulator(2);
-//	 RemoteManipulator remote_man2 = RemoteManipulator(3);
+	//  RemoteManipulator remote_man = RemoteManipulator(1);
+	//  RemoteManipulator remote_man1 = RemoteManipulator(2);
+	//  RemoteManipulator remote_man2 = RemoteManipulator(3);
 
 
 	guiManipulator gui_man = guiManipulator();
@@ -429,6 +511,7 @@ int main()
 	// glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
 	Manipulator *m_mat[3] = {&gui_man, &gui_man1, &gui_man2};
+//	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
 	m_mat[0]->config.rail.value = 3000.0;
 	m_mat[2]->config.rail.value = 6000.0;
 
@@ -449,8 +532,9 @@ int main()
 	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
 	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
 
-
 	std::chrono::seconds time(1);
+
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -690,6 +774,15 @@ int main()
 		// glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
 		// glDrawArrays(GL_TRIANGLES, 0, 6);
 		// glBindVertexArray(0);
+
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+//        screen->drawContents();
+        screen->drawWidgets();
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+		glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
+        glEnable(GL_DEPTH_TEST);
 
 
 		// check OpenGL error
