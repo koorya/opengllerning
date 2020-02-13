@@ -4,7 +4,7 @@
 #include <mutex>
 #include <thread>
 
-
+#include <nanogui/nanogui.h>
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 #include <nanogui/screen.h>
@@ -43,25 +43,24 @@ public:
 
 class SliderWithText : public GUIField{
 public:
-	SliderWithText(nanogui::Window *window, const std::string &name, const std::pair<float, float> &range, const std::string &units, float &value_var);
+	SliderWithText(nanogui::Widget *parent, const std::string &name, const std::pair<float, float> &range, const std::string &units, float &value_var);
 	virtual void updateState();
+	nanogui::Widget *panel;
+
 private:
 	float * value_var_ptr;
-	nanogui::Widget *panel;
 	nanogui::Slider *slider;
 	nanogui::TextBox *textBox;
 };
-
-class GUIWindow : public nanogui::Screen {
+using namespace nanogui;
+class GUIWindow {
 public:
     GUIWindow();
+    GUIWindow(nanogui::Screen * screen);
 
     ~GUIWindow();
 
-    virtual bool keyboardEvent(int key, int scancode, int action, int modifiers);
-    virtual void draw(NVGcontext *ctx);
 
-    virtual void drawContents();
 	void syncValues();
 private:
 
@@ -70,8 +69,10 @@ private:
 	float gui_config[8] = {0};
 	std::mutex * config_mutex;/// < блокирует обновление данных, пока происходит пересчет матриц
 protected:
-	std::vector<GUIField*> gui_inputs;
 
+	std::vector<GUIField*> gui_inputs;
+	nanogui::FormHelper *gui;
+	ref<Window> nanoguiWindow;
 };
 
 

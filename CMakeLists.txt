@@ -9,6 +9,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 #add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/example3.cpp)
 add_definitions(-DNANOGUI_GLAD)
 
+
 #add_custom_target(run ALL cp ./${CMAKE_PROJECT_NAME} ../${CMAKE_PROJECT_NAME} && cd  ../ && optirun ./${CMAKE_PROJECT_NAME} )
 
 
@@ -103,7 +104,6 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI_
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI_MainFrame.cpp)
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp)
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ConstructionContainer.cpp)
-
 
 # -L.\ 
 # -Lc:/opengl/lib 

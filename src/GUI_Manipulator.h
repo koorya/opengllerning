@@ -46,7 +46,7 @@
 class guiManipulator : public GUIWindow, public Manipulator {
 public:
 	guiManipulator();
-
+	guiManipulator(nanogui::Screen * screen);
 	~guiManipulator();
 
 	void doStep();

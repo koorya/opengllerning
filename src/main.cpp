@@ -49,7 +49,7 @@ using namespace nanogui;
 
 Screen *screen = nullptr;
 
-int main()
+int main(int argc, char * argv[])
 {
 
 
@@ -64,14 +64,27 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	
-#ifdef FULL_SCREEN
-	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-	GLFWwindow *window = glfwCreateWindow(mode->width, mode->height, "OpenGL Learning", monitor, nullptr);
-	glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-#else
-	GLFWwindow *window = glfwCreateWindow(800, 600, "Демо манипулятора с ручным управлением", nullptr, nullptr);
-#endif
+	bool FULL_SCREEN = false;
+	int mon_numb = 0;
+	if(argc>1){
+		if(std::string(argv[1])=="--fullscreen")
+			 FULL_SCREEN = true;
+		if(argc>2){
+			mon_numb = std::stoi(std::string(argv[2]));
+		}
+	}
+	GLFWwindow *window;
+	if(FULL_SCREEN){
+		int mon_cnt;
+		GLFWmonitor **monitor = glfwGetMonitors(&mon_cnt);
+		if(mon_cnt <= mon_numb)
+			mon_numb = 0;
+		const GLFWvidmode *mode = glfwGetVideoMode(monitor[mon_numb]);
+		window = glfwCreateWindow(mode->width, mode->height, "OpenGL Learning", monitor[mon_numb], nullptr);
+		glfwSetWindowMonitor(window, monitor[mon_numb], 0, 0, mode->width, mode->height, mode->refreshRate);
+	}else{
+		window = glfwCreateWindow(800, 600, "Демо манипулятора с ручным управлением", nullptr, nullptr);
+	}
 	glfwShowWindow(window);
 
 
@@ -93,20 +106,10 @@ int main()
 
 
 
-	std::cout<<"before new screen"<<std::endl;
 	screen = new Screen();
-	std::cout<<"before initialize screen"<<std::endl;
+
 	screen->initialize(window, true);
 
-	std::cout<<"before new Formhelper"<<std::endl;
-	FormHelper *gui = new FormHelper(screen);
-	ref<Window> nanoguiWindow = gui->addWindow(Eigen::Vector2i(10, 10), "Form helper example");
-	gui->addGroup("Other widgets");
-	gui->addButton("A button", []() { std::cout << "Button pressed." << std::endl; })->setTooltip("Testing a much longer tooltip, that will wrap around to new lines multiple times.");;
-
-	screen->setVisible(true);
-	screen->performLayout();
-	nanoguiWindow->center();
 
 //	glfwSetKeyCallback(window, key_callback);
 //	glfwSetCursorPosCallback(window, mouse_callback);
@@ -495,13 +498,15 @@ int main()
 
 
 	//  RemoteManipulator remote_man = RemoteManipulator(1);
-	//  RemoteManipulator remote_man1 = RemoteManipulator(2);
-	//  RemoteManipulator remote_man2 = RemoteManipulator(3);
+	  RemoteManipulator remote_man1 = RemoteManipulator(2);
+	  RemoteManipulator remote_man2 = RemoteManipulator(3);
 
 
-	guiManipulator gui_man = guiManipulator();
-	guiManipulator gui_man1 = guiManipulator();
-	guiManipulator gui_man2 = guiManipulator();
+
+
+	guiManipulator gui_man = guiManipulator(screen);
+//	guiManipulator gui_man1 = guiManipulator();
+//	guiManipulator gui_man2 = guiManipulator();
 
 
 	glfwSetWindowPos(window, 50, 100);
@@ -510,7 +515,7 @@ int main()
 	// glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
 	// glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
-	Manipulator *m_mat[3] = {&gui_man, &gui_man1, &gui_man2};
+	Manipulator *m_mat[3] = {&gui_man, &remote_man1, &remote_man2};
 //	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
 	m_mat[0]->config.rail.value = 3000.0;
 	m_mat[2]->config.rail.value = 6000.0;
