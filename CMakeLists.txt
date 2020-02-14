@@ -26,10 +26,10 @@ target_link_libraries(${CMAKE_PROJECT_NAME} pthread)
 # пока воспользуемся glfw из nanogui, это неправильно, но 
 # хочу запустить,чтоб хоть как-то собиралось
 #
-set(glfw3_DIR "C:\\Program Files (x86)\\GLFW\\lib\\cmake\\glfw3")
+#set(glfw3_DIR "C:\\Program Files (x86)\\GLFW\\lib\\cmake\\glfw3")
 #find_package(glfw3 REQUIRED)
 #find_package(glfw3 3.3 REQUIRED)
-message(STATUS "glfw include dir ${glfw3_INCLUDE_DIR}")
+#message(STATUS "glfw include dir ${glfw3_INCLUDE_DIR}")
 #target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
 
 
@@ -43,7 +43,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${NANOGUI_SRC_DIR}/incl
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${NANOGUI_SRC_DIR}/ext/eigen")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${NANOGUI_SRC_DIR}/ext/nanovg/src")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${NANOGUI_SRC_DIR}/ext/glad/include")
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${glfw3_DIR}/../../../include")
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${NANOGUI_SRC_DIR}/ext/glfw/include")
 target_link_libraries(${CMAKE_PROJECT_NAME} "${NANOGUI_BUILD_DIR}/libnanogui.dll.a")
 
 #target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
@@ -57,7 +57,11 @@ set(glm_DIR "C:/src/glm")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${glm_DIR}")
 
 add_definitions(-DKIRYA_WIN)
+option(WIN32_MYSQL "ON IF COMPILE WITH x32 mysql connector lib" OFF)
 set(mysql_DIR "C:/src/mysql-connector-c-6.1.11-winx64")
+if(WIN32_MYSQL)
+    set(mysql_DIR "C:/src/mysql-connector-c-6.1.11-win32")
+endif()
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${mysql_DIR}/include")
 target_link_libraries(${CMAKE_PROJECT_NAME} "${mysql_DIR}/lib/libmysql.lib")
 
