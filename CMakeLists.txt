@@ -28,7 +28,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} pthread)
 #
 set(glfw3_DIR "C:\\Program Files (x86)\\GLFW\\lib\\cmake\\glfw3")
 #find_package(glfw3 REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
+#find_package(glfw3 3.3 REQUIRED)
 message(STATUS "glfw include dir ${glfw3_INCLUDE_DIR}")
 #target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
 
