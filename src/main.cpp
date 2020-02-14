@@ -788,6 +788,7 @@ int main(int argc, char * argv[])
         glViewport(0, 0, width, height);
 		glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
 
 		// check OpenGL error
