@@ -86,9 +86,9 @@ ConstructionContainer::ConstructionContainer(){
 		}
 	}
 
-	tilted_bond = new Model("../3D_models/stl_components/tilted_bond.stl", tilt_bond_matrices);
-	horizontal_bond = new Model("../3D_models/stl_components/horizontal_bond.stl", hor_bond_matrices);
-	column = new Model("../3D_models/stl_components/column_light.stl", column_matrices);
+	tilted_bond = new Model("../3D_models/obj/tilted_bond.obj", tilt_bond_matrices);
+	horizontal_bond = new Model("../3D_models/obj/horizontal_bond.obj", hor_bond_matrices);
+	column = new Model("../3D_models/obj/column_light.obj", column_matrices);
 }
 
 
