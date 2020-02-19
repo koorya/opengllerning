@@ -137,7 +137,12 @@ Mesh::Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, 
 	//return;
 	this->textures = textures;
 
-
+	aiColor3D diffuse (0.f, 0.f, 0.f);
+	if(mesh->mMaterialIndex >= 0){
+		aiMaterial * material = scene->mMaterials[mesh->mMaterialIndex];
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+	}
+	diffuse_color = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -230,11 +235,15 @@ void Mesh::Draw(Shader shader){
 	}
 	glActiveTexture(GL_TEXTURE0);
 
-	if(textures.size() > 0)
+	if(textures.size() > 0){
 		shader.setInt(1, "material.textured");
-	else
+	}else{
 		shader.setInt(0, "material.textured");
-
+		shader.setVec3(diffuse_color/10.0f, "material.ambient");
+		shader.setVec3(diffuse_color, "material.diffuse");
+		shader.setVec3(diffuse_color/10.0f, "material.specular");
+		shader.setFloat(0.5, "material.shininess");
+	}
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -262,11 +271,15 @@ void Mesh::Draw(Shader shader, unsigned int count){
 	}
 	glActiveTexture(GL_TEXTURE0);
 
-	if(textures.size() > 0)
+	if(textures.size() > 0){
 		shader.setInt(1, "material.textured");
-	else
+	}else{
 		shader.setInt(0, "material.textured");
-
+		shader.setVec3(diffuse_color/10.0f, "material.ambient");
+		shader.setVec3(diffuse_color, "material.diffuse");
+		shader.setVec3(glm::vec3(0.60,	0.60,	0.60), "material.specular");
+		shader.setFloat(0.25f, "material.shininess");
+	}
 	glBindVertexArray(VAO);
 	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, count);
 	glBindVertexArray(0);

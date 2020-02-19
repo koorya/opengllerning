@@ -42,10 +42,10 @@ void Model::setMatrixByID(unsigned int id, glm::mat4 matrix){
 
 void Model::loadModel(std::string path){
 	Assimp::Importer import;
-	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs );//| aiProcess_SplitLargeMeshes);
-
+	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_SplitLargeMeshes);
+	this->path = path;
 	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
-		std::cout<<"ERROR::ASSIMP::"<< import.GetErrorString() << std::endl;
+		std::cout<<"ERROR::ASSIMP::"<< import.GetErrorString() << std::endl << path << std::endl;
 		return;
 	}
 	directory = path.substr(0, path.find_last_of('/'));
@@ -73,7 +73,22 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
 	std::vector<Texture> textures;
 
 	if(mesh->mMaterialIndex >= 0){
+
 		aiMaterial * material = scene->mMaterials[mesh->mMaterialIndex];
+		aiString mat_name;
+		if(AI_SUCCESS != material->Get(AI_MATKEY_NAME, mat_name)){
+			std::cout<<path<<" NO MATERIAL NAME"<<std::endl;
+		}else{
+			std::cout<<path<<" | MATERIAL NAME: "<<mat_name.C_Str()<<std::endl;
+			aiColor3D diffuse (0.f, 0.f, 0.f);
+			if(AI_SUCCESS != material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse)){
+				std::cout<<path<<" NO MATERIAL DIFFUSE COLOR"<<std::endl;
+			}else{
+				std::cout<<path<<" | DIFFUSE COLOR: "<<diffuse.r<<", "<<diffuse.g<<", "<<diffuse.b<<std::endl;
+			}
+
+		}
+
 		std::vector <Texture> diffuseMap = loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
 		textures.insert(textures.end(), diffuseMap.begin(), diffuseMap.end());
 		std::vector <Texture> specularMap = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::SPECULAR);

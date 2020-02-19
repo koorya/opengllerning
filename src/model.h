@@ -24,6 +24,7 @@ public:
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;
+	std::string path;
 	std::vector <Texture> loaded_textures;
 	std::vector<float> rad_vect;
 	std::vector<glm::mat4> mat4_vect;
