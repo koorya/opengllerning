@@ -385,26 +385,27 @@ int main(int argc, char * argv[])
 	
 
 	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
-	Model tower_frame("../3D_models/manipulator/Component18.stl", 3);				 //tower frame
-	Model tower_box("../3D_models/manipulator/Component31.stl", 3);					 //tower box
-	Model carrige("../3D_models/manipulator/Component1_reduce.stl", 3);				 // carrige
-	Model rail("../3D_models/manipulator/Component129.stl", 3);						 //rail
-	Model bond_wrist("../3D_models/manipulator/wrist.stl", 3);						 //bond wrist
-	Model bond_carrige("../3D_models/manipulator/bcar.stl", 3);						 //bond carrige
-	Model bond_rail("../3D_models/manipulator/Component21_orient.stl", 3);			 //bond rail
-	Model column_rail("../3D_models/manipulator/Component20.stl", 3);				 //column rail
-	Model column_carrige("../3D_models/manipulator/Component40.stl", 3);				 //column carrige
-	Model bond_handler_middle("../3D_models/manipulator/bond_handler_middle.stl", 3); //bond handler middle
-	Model bond_handler_left("../3D_models/manipulator/bond_handler_left.stl", 3);	 //bond handlre left
-	Model bond_handler_right("../3D_models/manipulator/bond_handler_right.stl", 3);   //bond handler right
+	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
+	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3);					 //tower box
+	Model carrige("../3D_models/obj/manipulator/Component1 reduce.obj", 3);				 // carrige
+	Model rail("../3D_models/obj/manipulator/Component129.obj", 3);						 //rail
+	Model bond_wrist("../3D_models/obj/manipulator/Wrist.obj", 3);						 //bond wrist
+	Model bond_carrige("../3D_models/obj/manipulator/bcar.obj", 3);						 //bond carrige
+	Model bond_rail("../3D_models/obj/manipulator/Component21 orient.obj", 3);			 //bond rail
+	Model column_rail("../3D_models/obj/manipulator/Component20.obj", 3);				 //column rail
+	Model column_carrige("../3D_models/obj/manipulator/Component40.obj", 3);				 //column carrige
+	Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
+	Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
+	Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
 
-	Model pb1("../3D_models/stl_components/pb1.stl", 3); //bond pantograph section 1
-	Model pb2("../3D_models/stl_components/pb2.stl", 3); //bond pantograph section 2
-	Model pb3("../3D_models/stl_components/pb3.stl", 3); //bond pantograph section 3
-	Model pb4("../3D_models/stl_components/pb4.stl", 3); //bond pantograph section 4
+	Model pb1("../3D_models/obj/manipulator/Pb1.obj", 3); //bond pantograph section 1
+	Model pb2("../3D_models/obj/manipulator/Pb2.obj", 3); //bond pantograph section 2
+	Model pb3("../3D_models/obj/manipulator/Pb3.obj", 3); //bond pantograph section 3
+	Model pb4("../3D_models/obj/manipulator/Pb4.obj", 3); //bond pantograph section 4
 
-	Model pc1("../3D_models/stl_components/pc1.stl", 3); //column pantograph section 1
-	Model pc2("../3D_models/stl_components/pc2.stl", 3); //column pantograph section 2
+	Model pc1("../3D_models/obj/manipulator/Pc1.obj", 3); //column pantograph section 1
+	Model pc2("../3D_models/obj/manipulator/Pc2.obj", 3); //column pantograph section 2
+
 
 	glEnable(GL_MULTISAMPLE);
 
