@@ -1,6 +1,6 @@
 #include "ConstructionContainer.h"
 
-#define FLOOR_CNT 10
+#define FLOOR_CNT 0
 
 ConstructionContainer::ConstructionContainer(){
 	tilted_bond_cnt = 48 * (FLOOR_CNT-1);
@@ -114,13 +114,16 @@ void ConstructionContainer::updateMatrices(){
 void ConstructionContainer::drawElements(Shader shader){
 
 	shader.setMaterial(Material::white_rubber);
-	column->Draw(shader, column_cnt);
+	if(column_cnt>0)
+		column->Draw(shader, column_cnt);
 
 	shader.setMaterial(Material::copper);
-	horizontal_bond->Draw(shader, horizontal_bond_cnt);
+	if(horizontal_bond_cnt>0)
+		horizontal_bond->Draw(shader, horizontal_bond_cnt);
 
 	shader.setMaterial(Material::green_plastic);
-	tilted_bond->Draw(shader, tilted_bond_cnt);
+	if(tilted_bond_cnt>0)
+		tilted_bond->Draw(shader, tilted_bond_cnt);
 
 }
 

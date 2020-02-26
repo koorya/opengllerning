@@ -37,6 +37,9 @@ class Mesh{
 		void setMatrixByID(unsigned int id, glm::mat4 matrix);
 	private:
 		glm::vec3 diffuse_color;
+		glm::vec3 specular_color;
+		glm::vec3 ambient_color;
+
 		unsigned int mat4_ptr_offset;
 		unsigned int VAO, VBO, EBO;
 

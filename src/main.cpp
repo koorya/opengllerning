@@ -384,19 +384,21 @@ int main(int argc, char * argv[])
 	
 	
 
-	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
+//	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
+	Model main_frame("../3D_models/stend_mm_inventor_blender.obj", 1);
 	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
 	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3);					 //tower box
-	Model carrige("../3D_models/obj/manipulator/Component1 reduce.obj", 3);				 // carrige
+	Model carrige("../3D_models/obj/manipulator/carrige.obj", 3);				 // carrige
 	Model rail("../3D_models/obj/manipulator/Component129.obj", 3);						 //rail
 	Model bond_wrist("../3D_models/obj/manipulator/Wrist.obj", 3);						 //bond wrist
 	Model bond_carrige("../3D_models/obj/manipulator/bcar.obj", 3);						 //bond carrige
 	Model bond_rail("../3D_models/obj/manipulator/Component21 orient.obj", 3);			 //bond rail
 	Model column_rail("../3D_models/obj/manipulator/Component20.obj", 3);				 //column rail
 	Model column_carrige("../3D_models/obj/manipulator/Component40.obj", 3);				 //column carrige
-	Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
-	Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
-	Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
+	// Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
+	// Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
+	// Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
+	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik.obj", 3);   //bond handler right
 
 	Model pb1("../3D_models/obj/manipulator/Pb1.obj", 3); //bond pantograph section 1
 	Model pb2("../3D_models/obj/manipulator/Pb2.obj", 3); //bond pantograph section 2
@@ -570,9 +572,9 @@ int main(int argc, char * argv[])
 
 		// if (trig)
 //		f_mat.doStep();
-		m_mat[0]->B = f_mat.rail1;
+		m_mat[0]->B = f_mat.rail2;
 		m_mat[1]->B = f_mat.rail2;
-		m_mat[2]->B = f_mat.rail3;
+		m_mat[2]->B = f_mat.rail2;
 
 
 		for (int i = 0; i < 3; i++)
@@ -647,119 +649,109 @@ int main(int argc, char * argv[])
 		carrige.setMatrixByID(0, m_mat[0]->C);
 		carrige.setMatrixByID(1, m_mat[1]->C);
 		carrige.setMatrixByID(2, m_mat[2]->C);
-		carrige.Draw(ourShader, 3);
+		carrige.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::black_plastic);
 		tower_frame.setMatrixByID(0, m_mat[0]->D);
 		tower_frame.setMatrixByID(1, m_mat[1]->D);
 		tower_frame.setMatrixByID(2, m_mat[2]->D);
-		tower_frame.Draw(ourShader, 3);
+		tower_frame.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::white_plastic);
 		tower_box.setMatrixByID(0, m_mat[0]->D);
 		tower_box.setMatrixByID(1, m_mat[1]->D);
 		tower_box.setMatrixByID(2, m_mat[2]->D);
-		tower_box.Draw(ourShader, 3);
+		tower_box.Draw(ourShader, 1);
 
 		//pantograph
 		ourShader.setMaterial(Material::yellow_plastic);
 		pb1.setMatrixByID(0, m_mat[0]->pb1);
 		pb1.setMatrixByID(1, m_mat[1]->pb1);
 		pb1.setMatrixByID(2, m_mat[2]->pb1);
-		pb1.Draw(ourShader, 3);
+		pb1.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pb2.setMatrixByID(0, m_mat[0]->pb2);
 		pb2.setMatrixByID(1, m_mat[1]->pb2);
 		pb2.setMatrixByID(2, m_mat[2]->pb2);
-		pb2.Draw(ourShader, 3);
+		pb2.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pb3.setMatrixByID(0, m_mat[0]->pb3);
 		pb3.setMatrixByID(1, m_mat[1]->pb3);
 		pb3.setMatrixByID(2, m_mat[2]->pb3);
-		pb3.Draw(ourShader, 3);
+		pb3.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pb4.setMatrixByID(0, m_mat[0]->pb4);
 		pb4.setMatrixByID(1, m_mat[1]->pb4);
 		pb4.setMatrixByID(2, m_mat[2]->pb4);
-		pb4.Draw(ourShader, 3);
+		pb4.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::green_plastic);
 		bond_rail.setMatrixByID(0, m_mat[0]->E1);
 		bond_rail.setMatrixByID(1, m_mat[1]->E1);
 		bond_rail.setMatrixByID(2, m_mat[2]->E1);
-		bond_rail.Draw(ourShader, 3);
+		bond_rail.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
 		bond_carrige.setMatrixByID(0, m_mat[0]->F1);
 		bond_carrige.setMatrixByID(1, m_mat[1]->F1);
 		bond_carrige.setMatrixByID(2, m_mat[2]->F1);
-		bond_carrige.Draw(ourShader, 3);
+		bond_carrige.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::green_plastic);
 		bond_wrist.setMatrixByID(0, m_mat[0]->G1);
 		bond_wrist.setMatrixByID(1, m_mat[1]->G1);
 		bond_wrist.setMatrixByID(2, m_mat[2]->G1);
-		bond_wrist.Draw(ourShader, 3);
+		bond_wrist.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::yellow_plastic);
 		bond_handler_middle.setMatrixByID(0, m_mat[0]->H);
 		bond_handler_middle.setMatrixByID(1, m_mat[1]->H);
 		bond_handler_middle.setMatrixByID(2, m_mat[2]->H);
-		bond_handler_middle.Draw(ourShader, 3);
+		bond_handler_middle.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_handler_left.setMatrixByID(0, m_mat[0]->H);
-		bond_handler_left.setMatrixByID(1, m_mat[1]->H);
-		bond_handler_left.setMatrixByID(2, m_mat[2]->H);
-		bond_handler_left.Draw(ourShader, 3);
+//		bond_handler_left.setMatrixByID(0, m_mat[0]->H);
+//		bond_handler_left.setMatrixByID(1, m_mat[1]->H);
+//		bond_handler_left.setMatrixByID(2, m_mat[2]->H);
+//		bond_handler_left.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
-		bond_handler_right.setMatrixByID(0, m_mat[0]->H);
-		bond_handler_right.setMatrixByID(1, m_mat[1]->H);
-		bond_handler_right.setMatrixByID(2, m_mat[2]->H);
-		bond_handler_right.Draw(ourShader, 3);
+//		bond_handler_right.setMatrixByID(0, m_mat[0]->H);
+//		bond_handler_right.setMatrixByID(1, m_mat[1]->H);
+//		bond_handler_right.setMatrixByID(2, m_mat[2]->H);
+//		bond_handler_right.Draw(ourShader, 1);
 
 		//pantograph column
 		ourShader.setMaterial(Material::yellow_plastic);
 		pc1.setMatrixByID(0, m_mat[0]->pc1);
 		pc1.setMatrixByID(1, m_mat[1]->pc1);
 		pc1.setMatrixByID(2, m_mat[2]->pc1);
-		pc1.Draw(ourShader, 3);
+		pc1.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pc2.setMatrixByID(0, m_mat[0]->pc2);
 		pc2.setMatrixByID(1, m_mat[1]->pc2);
 		pc2.setMatrixByID(2, m_mat[2]->pc2);
-		pc2.Draw(ourShader, 3);
+		pc2.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::green_plastic);
 		column_rail.setMatrixByID(0, m_mat[0]->E2);
 		column_rail.setMatrixByID(1, m_mat[1]->E2);
 		column_rail.setMatrixByID(2, m_mat[2]->E2);
-		column_rail.Draw(ourShader, 3);
+		column_rail.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
 		column_carrige.setMatrixByID(0, m_mat[0]->F2);
 		column_carrige.setMatrixByID(1, m_mat[1]->F2);
 		column_carrige.setMatrixByID(2, m_mat[2]->F2);
-		column_carrige.Draw(ourShader, 3);
+		column_carrige.Draw(ourShader, 1);
 
 
 
 
-
-	//	model = glm::scale(model, glm::vec3(0.5f));
-		glm::mat4 _model = glm::mat4(1.0f);
-		_model = glm::scale(_model, glm::vec3(100.0f));
-//		_model = glm::rotate(_model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(_model)); //model to identity
-		nanosuit.setMatrixByID(0, m_mat[0]->H);
-		nanosuit.Draw(ourShader, 1);
-	
 
 
 		skyboxShader.use();
@@ -825,6 +817,8 @@ void do_movement()
 }
 
 bool mouse_pressed = false;
+bool mouse_pressed_r = false;
+
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
 	static GLfloat lastX = xpos;
@@ -834,14 +828,22 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 	GLfloat yoffset = lastY - ypos;
 	lastX = xpos;
 	lastY = ypos;
-	if(mouse_pressed)
-		my_cam.processMouseMovement(-xoffset, -yoffset);
+	if(mouse_pressed){
+		if(mouse_pressed_r)
+			my_cam.processMouseMovement(-xoffset, -yoffset);
+		else
+			my_cam.processMouseMovementTranslate(-xoffset, -yoffset);
+	}
 }
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods){
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
         mouse_pressed = true;
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
         mouse_pressed = false;
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        mouse_pressed_r = true;
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+        mouse_pressed_r = false;
 }
 
 

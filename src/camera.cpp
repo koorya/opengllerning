@@ -59,6 +59,22 @@ void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset){
 
 	this->updateCameraVectors();
 }
+void Camera::processMouseMovementTranslate(GLfloat xoffset, GLfloat yoffset){
+	xoffset *= this->MouseSensitivity*this->Zoom/450.0f;
+	yoffset *= this->MouseSensitivity*this->Zoom/450.0f;
+	
+	glm::vec3 shift = this->Direction;
+
+	if(this->plane_moveing)
+		shift = glm::normalize(shift - this->WorldUp*glm::dot(shift, this->WorldUp));
+
+	this->Position -= xoffset * glm::normalize(glm::cross(shift, this->Up));
+
+	this->Position -= yoffset * glm::normalize(glm::cross(shift,glm::normalize(glm::cross(shift, this->Up))));
+
+	this->updateCameraVectors();
+}
+
 void Camera::processMouseScroll(GLfloat yoffset){
 	if(this->Zoom >= 1.0f && this->Zoom <= 45.0f)
 		this->Zoom += yoffset;

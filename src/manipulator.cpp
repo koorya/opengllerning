@@ -450,7 +450,7 @@ void Manipulator::calculateMatrices(){
 	this->E1 = glm::translate(glm::rotate(this->D, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0)),
 										glm::vec3(this->config.bpant.value, 0.0f, 0.0f));
 	this->E2 = glm::translate(this->D, glm::vec3(this->config.cpant.value, 0.0f, 0.0f));
-	this->F1 = glm::translate(this->E1, glm::vec3(627.0, 0.0, -max_bcar_level + this->config.bcar.value));
+	this->F1 = glm::translate(this->E1, glm::vec3(627.0+13.0, 0.0, -max_bcar_level + this->config.bcar.value));
 	this->F2 = glm::translate(this->E2, glm::vec3(0.0, 0.0, -max_ccar_level + this->config.ccar.value));
 	this->G1 = glm::rotate(this->F1, glm::radians(this->config.wrist.value), glm::vec3(0.0, 0.0, 1.0));
 	this->G2 = glm::rotate(glm::translate(this->F2, glm::vec3(1100.0, 0.0, -3100.0)), glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));

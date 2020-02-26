@@ -38,6 +38,8 @@ public:
 	glm::mat4 getMatrix();
 	void processKeyboard(Camera_movement direction, GLfloat delta_time);
 	void processMouseMovement(GLfloat xoffset, GLfloat yoffset);
+	void processMouseMovementTranslate(GLfloat xoffset, GLfloat yoffset);
+	
 	void processMouseScroll(GLfloat yoffset);
 	GLfloat getZoom();
 	glm::vec3 getCamPos();
