@@ -385,7 +385,9 @@ int main(int argc, char * argv[])
 	
 
 //	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
-	Model main_frame("../3D_models/stend_mm_inventor_blender.obj", 1);
+//	Model main_frame("../3D_models/stend_mm_inventor_blender.obj", 1);
+	Model main_frame("../3D_models/пустой стенд.obj", 1);
+	Model cassete("../3D_models/пустая кассета.obj", 1);
 	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
 	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3);					 //tower box
 	Model carrige("../3D_models/obj/manipulator/carrige.obj", 3);				 // carrige
@@ -636,6 +638,8 @@ int main(int argc, char * argv[])
 		ourShader.setMaterial(Material::silver);
 		main_frame.setMatrixByID(0, f_mat.A);
 		main_frame.Draw(ourShader, 1);
+		cassete.setMatrixByID(0, f_mat.A);
+		cassete.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::yellow_plastic);
 		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B1));
