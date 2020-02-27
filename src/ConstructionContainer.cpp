@@ -1,6 +1,6 @@
 #include "ConstructionContainer.h"
 
-#define FLOOR_CNT 0
+#define FLOOR_CNT 20
 
 ConstructionContainer::ConstructionContainer(){
 	tilted_bond_cnt = 48 * (FLOOR_CNT-1);
@@ -89,6 +89,11 @@ ConstructionContainer::ConstructionContainer(){
 	tilted_bond = new Model("../3D_models/obj/tilted_bond.obj", tilt_bond_matrices);
 	horizontal_bond = new Model("../3D_models/obj/horizontal_bond.obj", hor_bond_matrices);
 	column = new Model("../3D_models/obj/column_light.obj", column_matrices);
+
+	tilted_bond_cnt = 0;
+	horizontal_bond_cnt = 0;
+	column_cnt = 0;
+
 }
 
 
@@ -166,6 +171,27 @@ void ConstructionContainer::detach(const glm::mat4 * matr){
             auto tmp = i++;
             column_list.erase(tmp);
         }
+    }	
+
+}
+
+void ConstructionContainer::reattach(const glm::mat4 * matr_prev, const glm::mat4 * matr_new){
+	for(auto i = tilted_bond_list.begin(); i != tilted_bond_list.end(); i++){
+		if(i->matr == matr_prev){
+			i->matr = matr_new;
+		}
+	}
+
+	for(auto i = horizontal_bond_list.begin(); i != horizontal_bond_list.end(); i++){
+		if(i->matr == matr_prev){
+			i->matr = matr_new;
+		}	
+	}
+
+    for(auto i = column_list.begin(); i != column_list.end(); i++){
+		if(i->matr == matr_prev){
+			i->matr = matr_new;
+		}
     }	
 
 }

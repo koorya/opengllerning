@@ -24,6 +24,7 @@ public:
 	~ConstructionContainer();
 	void attachBond(const glm::mat4 * matr, struct BondLocation bond);
 	void detach(const glm::mat4 * matr);
+	void reattach(const glm::mat4 * matr_prev, const glm::mat4 * matr_new);
 	void updateMatrices();
 	void drawElements(Shader shader);
 

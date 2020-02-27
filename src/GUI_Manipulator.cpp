@@ -36,11 +36,16 @@ guiManipulator::guiManipulator(nanogui::Screen * screen) : GUIWindow(screen) {
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)window, "Пантограф колонны", std::ref(this->config.cpant.limits), "mm", std::ref(this->config.cpant.value)));
 	gui_inputs.push_back((GUIField*) new SliderWithText((nanogui::Window*)window, "Каретка колонны", std::ref(this->config.ccar.limits), "mm", std::ref(this->config.ccar.value)));
 
-	// nanogui::Button * button = new nanogui::Button((nanogui::Window*)this);
-	// button->setCallback([&]{
-	// 	std::cout<<glm::to_string(this->getTarget())<<std::endl;
-	// 	this->syncmove();
-	// });
+
+
+	nanogui::Button * button = new nanogui::Button(window, "pickUpBond");
+	button->setCallback([&]{
+		pickUpBond();
+	});
+	button = new nanogui::Button(window, "mountBond");
+	button->setCallback([&]{
+		mountBond();
+	});
 	screen->performLayout();
 	
 }

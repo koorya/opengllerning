@@ -31,7 +31,7 @@
 #include "GUI_Manipulator.h"
 #include "ConstructionContainer.h"
 #include "GUI_MainFrame.h"
-
+#include "cassete.h"
 
 #include <nanogui/nanogui.h>
 
@@ -536,7 +536,13 @@ int main(int argc, char * argv[])
 
 	MainFrame f_mat;
 
-	
+	GUICassete my_cassete(screen, &constr_container);
+//	my_cassete.fillUp();
+	my_cassete.updateMatrices(&(f_mat.rail2));
+	m_mat[0]->cassete = &my_cassete;
+	m_mat[1]->cassete = &my_cassete;
+	m_mat[2]->cassete = &my_cassete;
+
 	bool trig = false;
 
 	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
@@ -578,6 +584,8 @@ int main(int argc, char * argv[])
 		m_mat[1]->B = f_mat.rail2;
 		m_mat[2]->B = f_mat.rail2;
 
+		my_cassete.updateMatrices(&(f_mat.rail2));
+		my_cassete.doStep();
 
 		for (int i = 0; i < 3; i++)
 		{

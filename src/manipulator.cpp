@@ -438,6 +438,13 @@ void BotManipulator::updateManipConfig(){
 }
 
 
+void Manipulator::pickUpBond(){
+	std::cout<<"pickUpBond"<<std::endl;
+	cassete->getBond(&(this->I));
+}
+void Manipulator::mountBond(){
+	container->detach(&(this->I));
+}
 
 void Manipulator::calculateMatrices(){
 

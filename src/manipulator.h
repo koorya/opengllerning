@@ -7,6 +7,7 @@
 #include "movement_program.h"
 #include "ConstructionContainer.h"
 #include <vector>
+#include "cassete.h"
 
 struct ManipulatorDrive{
 	float value;
@@ -41,11 +42,15 @@ public:
 	glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2; ///< матрицы положений элементов манипулятора
 	struct ManipulatorConfig config; ///< актуальная конфигурация манипулятора, в абсолютных единицах координатной системы рамы.
 	ConstructionContainer * container;///< ссылка на контейнер связей. Нужна для отображения захваченной связи и ее отображения после установки
+	Cassete * cassete;
 
 	Manipulator();
 //	~Manipulator();
 	void calculateMatrices();
 	virtual void doStep() = 0;
+	void pickUpBond();
+	void mountBond();
+
 	bool checkConfig();
 };
 
