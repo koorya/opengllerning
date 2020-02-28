@@ -19,10 +19,10 @@ private:
 
 
 guiManipulator::guiManipulator(nanogui::Screen * screen) : GUIWindow(screen) {
-
+	std::cout<<"guiManipulator()"<<std::endl;
     using namespace nanogui;
 
-    Window *window = new Window(screen, "manip");
+    window = new Window(screen, "manip");
     window->setPosition(Vector2i(15, 15));
     window->setLayout(new GroupLayout());
 
@@ -51,22 +51,30 @@ guiManipulator::guiManipulator(nanogui::Screen * screen) : GUIWindow(screen) {
 }
 
 guiManipulator::~guiManipulator() {
-
+	delete window;
 }
 
 
 void guiManipulator::doStep(){
 	this->syncValues();
-	int i=0;
-	//config_mutex->lock();
-	// config.tower = 360.0 * gui_config[i++];
-	// config.bpant = 3000 * gui_config[i++];
-	// config.bcar = 1550 * gui_config[i++];
-	// config.wrist = 80.0 * (-1 + 2*gui_config[i++]);
-	// config.brot = 360.0 * gui_config[i++];
-	// config.cpant = 800 * gui_config[i++];
-	// config.ccar = 450 * gui_config[i++];
-	// config.rail = 1000 + 0.86 * 3000 * 6 * gui_config[i++];
-	//config_mutex->unlock();
 }
 
+guiRemoteManipulator::guiRemoteManipulator(nanogui::Screen * screen, unsigned int manip_id) : guiManipulator(screen), RemoteManipulator(manip_id), database_upd(false) {
+	std::cout<<"guiRemoteManipulator()"<<std::endl;
+	nanogui::Button * button = new nanogui::Button(window, "exit");
+	button->setCallback([&]{
+		exit(0);
+	});
+	nanogui:CheckBox * upd = new nanogui::CheckBox(window, "update");
+	upd->setCallback([&](const bool v){
+		database_upd = v;
+	});
+	screen->performLayout();
+}
+
+void guiRemoteManipulator::doStep(){
+	guiManipulator::doStep();
+	if(database_upd){
+		RemoteManipulator::doStep();
+	}
+}

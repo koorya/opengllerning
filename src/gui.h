@@ -73,6 +73,7 @@ protected:
 	std::vector<GUIField*> gui_inputs;
 	nanogui::FormHelper *gui;
 	ref<Window> nanoguiWindow;
+	nanogui::Screen * screen;
 };
 
 

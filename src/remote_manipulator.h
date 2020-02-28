@@ -6,7 +6,7 @@
 #include <mutex>
 #include <thread>
 
-class RemoteManipulator : public Manipulator{
+class RemoteManipulator : virtual public Manipulator{
 public:
 	RemoteManipulator(unsigned int manip_id);
 	~RemoteManipulator();

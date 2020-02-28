@@ -39,12 +39,10 @@ void Cassete::fillUp(){
 }
 
 int Cassete::getBond(const glm::mat4 * matr){
-	std::cout<<"getBond"<<std::endl;
 	int i;
 	for(int i = 7; i>=0; i--){
 		std::cout<<i<<std::endl;
 		if(places[i]->noempty){
-			std::cout<<"noempty i="<<i<<std::endl;
 			places[i]->getBond(matr);
 			break;
 		}

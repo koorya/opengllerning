@@ -2,7 +2,7 @@
 #include "remote_manipulator.h"
 
 RemoteManipulator::RemoteManipulator(unsigned int manip_id){
-
+	std::cout<<"RemoteManipulator()"<<std::endl;
 	SQL_query = "SELECT kareta, tower, link_pantograph, column_pantograph, link_carige, column_carrige, wrist, link_rotation \
 	 FROM configuration_new WHERE id=";
 	SQL_query += std::to_string(manip_id);
@@ -55,7 +55,7 @@ void RemoteManipulator::updateManipConfig(){
 		while (row = mysql_fetch_row(res))
 		{
 			recieve_data->lock();
-			config_rec.rail.value = -atof(row[0]);
+			config_rec.rail.value = atof(row[0]);
 			config_rec.tower.value = atof(row[1]);
 			config_rec.bpant.value = atof(row[2]);
 			config_rec.cpant.value = atof(row[3]);

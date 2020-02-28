@@ -9,6 +9,7 @@
 float section_length = 3500.0;
 
 Manipulator::Manipulator(){
+	std::cout<<"Manipulator()"<<std::endl;
 	config.rail.value = 0.0;
 	config.tower.value = 0.0;
 	config.bpant.value = 0.0;
@@ -337,7 +338,7 @@ float calcPos(float a1, float a2, float v, float x, float t){
 	return res;
 }
 
-char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate", "__6__", "CAR", "__8__", "__9__", "syncW"};
+const char * axis_names[] = {"none", "pantograph", "tower", "carrige", "turn", "rotate", "__6__", "CAR", "__8__", "__9__", "syncW"};
 /*!
  * \brief Функция, ответственная за выполнения программ движений.
  * 
@@ -439,7 +440,6 @@ void BotManipulator::updateManipConfig(){
 
 
 void Manipulator::pickUpBond(){
-	std::cout<<"pickUpBond"<<std::endl;
 	cassete->getBond(&(this->I));
 }
 void Manipulator::mountBond(){

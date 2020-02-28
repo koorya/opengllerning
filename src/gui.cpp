@@ -62,7 +62,7 @@ std::pair<float, float> limits = std::pair<float, float>(10.0f, 100.0f);
 GUIWindow::GUIWindow(nanogui::Screen * screen)  {
 
 
-
+    this->screen = screen;
 
     // using namespace nanogui;
 

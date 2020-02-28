@@ -509,7 +509,8 @@ int main(int argc, char * argv[])
 
 
 
-	guiManipulator gui_man = guiManipulator(screen);
+	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
+	
 //	guiManipulator gui_man1 = guiManipulator();
 //	guiManipulator gui_man2 = guiManipulator();
 
