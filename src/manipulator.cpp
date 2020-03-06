@@ -464,6 +464,7 @@ void Manipulator::calculateMatrices(){
 	this->H = glm::rotate(this->G1, glm::radians(180.0f-this->config.brot.value), glm::vec3(1.0, 0.0, 0.0));
 	this->I = glm::rotate(glm::translate(this->H, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 
+	this->rangefinder = glm::translate(this->I, glm::vec3(300.0f, 0.0f, -100.0f));
 
 	float bpant_length = this->config.bpant.value+334.2;
 	float bangle = -asinf((bpant_length)/4450);

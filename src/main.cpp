@@ -634,19 +634,7 @@ int main(int argc, char * argv[])
 	while (!glfwWindowShouldClose(window))
 	{
 
-clflag = true;
-		if(clflag){
-			float cassete_cl = cassete.computeRay(my_cl_origin, my_cl_dir, command_queue);
-			cl_t = cassete_cl;//main_frame.computeRay(my_cl_origin, my_cl_dir, command_queue);
-			
-			glm::vec3 sphere_trnsl = glm::vec3((float)my_cl_origin.v4[0], (float)my_cl_origin.v4[1], (float)my_cl_origin.v4[2]) +
-			glm::vec3((float)my_cl_dir.v4[0], (float)my_cl_dir.v4[1], (float)my_cl_dir.v4[2])*cl_t;
 
-			sphere_mat = glm::translate(f_mat.World, sphere_trnsl);
-			my_sphere.setMatrixByID(0, sphere_mat);
-
-			clflag = false;
-		}
 
 			
 			my_ray_vert[0] = my_cl_origin.v4[0];
@@ -712,6 +700,35 @@ clflag = true;
 		m_mat[0]->calculateMatrices();
 	//	m_mat[1]->calculateMatrices();
 	//	m_mat[2]->calculateMatrices();
+
+
+clflag = true;
+		if(clflag){
+			glm::mat4 ray_mat = m_mat[0]->rangefinder;
+			glm::vec3 my_glm_origin;
+			my_glm_origin = ray_mat * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+			my_cl_origin.v4[0] = my_glm_origin.x;
+			my_cl_origin.v4[1] = my_glm_origin.y;
+			my_cl_origin.v4[2] = my_glm_origin.z;
+
+			glm::vec3 my_glm_dir;
+			my_glm_dir = ray_mat * glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
+			my_cl_dir.v4[0] = my_glm_dir.x;
+			my_cl_dir.v4[1] = my_glm_dir.y;
+			my_cl_dir.v4[2] = my_glm_dir.z;
+
+			float cassete_cl = cassete.computeRay(my_cl_origin, my_cl_dir, command_queue);
+			cl_t = cassete_cl;//main_frame.computeRay(my_cl_origin, my_cl_dir, command_queue);
+			
+			glm::vec3 sphere_trnsl = glm::vec3((float)my_cl_origin.v4[0], (float)my_cl_origin.v4[1], (float)my_cl_origin.v4[2]) +
+			glm::vec3((float)my_cl_dir.v4[0], (float)my_cl_dir.v4[1], (float)my_cl_dir.v4[2])*cl_t;
+
+			sphere_mat = glm::translate(f_mat.World, sphere_trnsl);
+			my_sphere.setMatrixByID(0, sphere_mat);
+
+			clflag = false;
+		}
+
 
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 
