@@ -5,8 +5,9 @@
 
 MainFrame::MainFrame(){
     frame_level = 0;
-    World = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-    World = glm::rotate(World, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+    // World = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+    //World = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+    World = glm::mat4(1.0f);
     calcMatrices();    
 }
 

@@ -2,20 +2,13 @@
 #include "load_tex.h"
 
 
-Model::Model(const char * path, std::vector<float> rad_vect){
-	this->rad_vect = rad_vect;
-
-
-	loadModel(path);
-}
-
-Model::Model(const char * path, std::vector <glm::mat4> instance_mat4){
+Model::Model(const char * path, std::vector <glm::mat4> instance_mat4, cl_context context, cl_kernel kernel): context(context), kernel(kernel){
 	this->mat4_vect = instance_mat4;
 
 	loadModel(path);
 }
 
-Model::Model(const char * path, unsigned int max_inst_cnt){
+Model::Model(const char * path, unsigned int max_inst_cnt, cl_context context, cl_kernel kernel): context(context), kernel(kernel){
 	
 	std::vector <glm::mat4> instance_mat4;
 	for (int i = 0; i < max_inst_cnt; i++)
@@ -25,11 +18,7 @@ Model::Model(const char * path, unsigned int max_inst_cnt){
 	loadModel(path);
 }
 
-void Model::Draw(Shader shader){
-	for(unsigned int i = 0; i < meshes.size(); i++){
-		meshes[i].Draw(shader);
-	}
-}
+
 void Model::Draw(Shader shader, unsigned int count){
 	for(unsigned int i = 0; i < meshes.size(); i++){
 		meshes[i].Draw(shader, count);
@@ -40,9 +29,26 @@ void Model::setMatrixByID(unsigned int id, glm::mat4 matrix){
 		meshes[i].setMatrixByID(id, matrix);
 }
 
+float Model::computeRay(cl_float3 origin, cl_float3 dir, cl_command_queue command_queue, int inst_cntinst_cnt){
+	float ret = -1.0f;
+	for(int i = 0; i < meshes.size(); i++){
+		float curr_dist = meshes[i].computeRay(origin, dir, command_queue, inst_cntinst_cnt);
+		if(curr_dist > 0){
+			if(ret<0)
+				ret = curr_dist;
+			if(ret > curr_dist)
+				ret = curr_dist;
+		}
+	}
+	return ret;
+}
+
+
+
+
 void Model::loadModel(std::string path){
 	Assimp::Importer import;
-	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_SplitLargeMeshes);
+	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs );//| aiProcess_SplitLargeMeshes);
 	this->path = path;
 	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
 		std::cout<<"ERROR::ASSIMP::"<< import.GetErrorString() << std::endl << path << std::endl;
@@ -67,8 +73,8 @@ int Model::processNode(aiNode * node, const aiScene * scene){
 	}
 	return vert_cnt;
 }
-
-Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
+extern bool print_vert;
+ClMesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
 
 	std::vector<Texture> textures;
 
@@ -94,11 +100,10 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
 		std::vector <Texture> specularMap = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::SPECULAR);
 		textures.insert(textures.end(), specularMap.begin(), specularMap.end());
 	}
-	if(this->mat4_vect.size() != 0){
-		std::cout << "mat4 constr"<<std::endl;
-		return Mesh(mesh, scene, textures, mat4_vect);
-	}
-	return Mesh(mesh, scene, textures, rad_vect);
+
+	std::cout << "mat4 constr"<<std::endl;
+	return ClMesh(context, kernel, mesh, scene, textures, mat4_vect, print_vert);
+
 
 }
 

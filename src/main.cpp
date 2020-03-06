@@ -42,12 +42,15 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 unsigned int loadCubeMap(std::vector<std::string> faces);
 
+void init_open_cl(cl_context &context, cl_command_queue &command_queue, cl_kernel &kernel);
+
 Camera my_cam(glm::vec3(0.0, 0.0, 0.0));
 bool keys[1024] = {false};
 
 using namespace nanogui;
 
 Screen *screen = nullptr;
+bool print_vert = false;
 
 int main(int argc, char * argv[])
 {
@@ -83,7 +86,7 @@ int main(int argc, char * argv[])
 		window = glfwCreateWindow(mode->width, mode->height, "OpenGL Learning", monitor[mon_numb], nullptr);
 		glfwSetWindowMonitor(window, monitor[mon_numb], 0, 0, mode->width, mode->height, mode->refreshRate);
 	}else{
-		window = glfwCreateWindow(800, 600, "Демо манипулятора с ручным управлением", nullptr, nullptr);
+		window = glfwCreateWindow(1200, 800, "Демо манипулятора с ручным управлением", nullptr, nullptr);
 	}
 	glfwShowWindow(window);
 
@@ -102,6 +105,12 @@ int main(int argc, char * argv[])
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
+
+	cl_context context;
+	cl_command_queue command_queue;
+	cl_kernel kernel;
+	init_open_cl(context, command_queue, kernel);
 
 
 
@@ -321,6 +330,11 @@ int main(int argc, char * argv[])
 	ourShader.use();
 
 	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+   	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+//		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_world)); //model to world transform
+	model = mat_world;
+
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 proj = glm::mat4(1.0f);
 
@@ -379,17 +393,25 @@ int main(int argc, char * argv[])
 
 	glfwMakeContextCurrent(window);
 
-	Model girl =Model("../3D_models/slim girl/slim girl.obj", 1);
+	Model girl = Model("../3D_models/slim girl/slim girl.obj", 1);
 	Model nanosuit = Model("../3D_models/nanosuit/nanosuit.obj", 1);
 	
 	
 
 //	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
 //	Model main_frame("../3D_models/stend_mm_inventor_blender.obj", 1);
-	Model main_frame("../3D_models/пустой стенд.obj", 1);
-	Model cassete("../3D_models/пустая кассета.obj", 1);
+	Model my_sphere("../3D_models/sphere.obj", 1);
+	Model my_dr_cube("../3D_models/cube_cil.obj", 1);
+//	print_vert = true;
+	Model my_cube("../3D_models/cube_cil.obj", 1, context, kernel);
+//	print_vert = false;
+	 Model main_frame("../3D_models/пустой стенд.obj", 1);
+//	Model main_frame("../3D_models/obj/manipulator/Pc2.obj", 1, context, kernel);
+	Model cassete("../3D_models/пустая кассета.stl", 1, context, kernel);
+//	Model cassete("../3D_models/obj/manipulator/Pc1.obj", 1);
 	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
-	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3);					 //tower box
+	
+	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3, context, kernel);					 //tower box
 	Model carrige("../3D_models/obj/manipulator/carrige.obj", 3);				 // carrige
 	Model rail("../3D_models/obj/manipulator/Component129.obj", 3);						 //rail
 	Model bond_wrist("../3D_models/obj/manipulator/Wrist.obj", 3);						 //bond wrist
@@ -400,7 +422,8 @@ int main(int argc, char * argv[])
 	// Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
 	// Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
 	// Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
-	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik.obj", 3);   //bond handler right
+	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik.obj", 3, context, kernel);   //bond handler right
+//	Model bond_handler_middle("../3D_models/cube_cil.obj", 3, context, kernel);   //bond handler right
 
 	Model pb1("../3D_models/obj/manipulator/Pb1.obj", 3); //bond pantograph section 1
 	Model pb2("../3D_models/obj/manipulator/Pb2.obj", 3); //bond pantograph section 2
@@ -409,6 +432,9 @@ int main(int argc, char * argv[])
 
 	Model pc1("../3D_models/obj/manipulator/Pc1.obj", 3); //column pantograph section 1
 	Model pc2("../3D_models/obj/manipulator/Pc2.obj", 3); //column pantograph section 2
+
+
+
 
 
 	glEnable(GL_MULTISAMPLE);
@@ -503,13 +529,13 @@ int main(int argc, char * argv[])
 
 
 	//  RemoteManipulator remote_man = RemoteManipulator(1);
-	  RemoteManipulator remote_man1 = RemoteManipulator(2);
-	  RemoteManipulator remote_man2 = RemoteManipulator(3);
+//	  RemoteManipulator remote_man1 = RemoteManipulator(2);
+//	  RemoteManipulator remote_man2 = RemoteManipulator(3);
 
 
 
 
-	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
+	guiManipulator gui_man = guiManipulator(screen);
 	
 //	guiManipulator gui_man1 = guiManipulator();
 //	guiManipulator gui_man2 = guiManipulator();
@@ -521,17 +547,17 @@ int main(int argc, char * argv[])
 	// glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
 	// glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
-	Manipulator *m_mat[3] = {&gui_man, &remote_man1, &remote_man2};
+	Manipulator *m_mat[3] = {&gui_man, NULL, NULL};
 //	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
 	m_mat[0]->config.rail.value = 3000.0;
-	m_mat[2]->config.rail.value = 6000.0;
+//	m_mat[2]->config.rail.value = 6000.0;
 
 	glfwMakeContextCurrent(window);
 	ConstructionContainer constr_container = ConstructionContainer();
 
 	m_mat[0]->container = &constr_container;
-	m_mat[1]->container = &constr_container;
-	m_mat[2]->container = &constr_container;
+//	m_mat[1]->container = &constr_container;
+//	m_mat[2]->container = &constr_container;
 
 //	guiMainFrame f_mat;
 
@@ -541,8 +567,8 @@ int main(int argc, char * argv[])
 //	my_cassete.fillUp();
 	my_cassete.updateMatrices(&(f_mat.rail2));
 	m_mat[0]->cassete = &my_cassete;
-	m_mat[1]->cassete = &my_cassete;
-	m_mat[2]->cassete = &my_cassete;
+//	m_mat[1]->cassete = &my_cassete;
+//	m_mat[2]->cassete = &my_cassete;
 
 	bool trig = false;
 
@@ -551,10 +577,91 @@ int main(int argc, char * argv[])
 
 	std::chrono::seconds time(1);
 
+	bool clflag = false;
 
+	cl_float3 my_cl_origin = {1.0f, -1500.0f, 0.0f};
+	cl_float3 my_cl_dir = {0.7f, 0.06f, -0.2f};
+	float cl_t = 0;
+	glm::mat4 sphere_mat = glm::scale(f_mat.World, glm::vec3(1.0f));
+	my_sphere.setMatrixByID(0, sphere_mat);
+	my_dr_cube.setMatrixByID(0, f_mat.World);
+
+//	GUIWindow ray_gui(screen);
+
+    using namespace nanogui;
+
+    Window *ray_gui_window = new Window(screen, "ray");
+    ray_gui_window->setPosition(Vector2i(15, 15));
+    ray_gui_window->setLayout(new GroupLayout());
+
+	nanogui::Button * button = new nanogui::Button((nanogui::Window*)ray_gui_window, "rayup");
+	button->setCallback([&]{
+		//this->fillUp();
+		clflag = true;
+	//	my_cl_dir.v4[0] += 0.001f;
+	});
+	std::pair<float, float> limits(-1.0f, 1.0f);
+	std::pair<float, float> limits_2(-5000.0f, 5000.0f);
+
+	SliderWithText xSliderWithText((nanogui::Widget*)(ray_gui_window), "rayx", std::ref(limits), ".", std::ref(my_cl_dir.v4[0]));
+	SliderWithText ySliderWithText((nanogui::Widget*)(ray_gui_window), "rayy", std::ref(limits), ".", std::ref(my_cl_dir.v4[1]));
+	SliderWithText zSliderWithText((nanogui::Widget*)(ray_gui_window), "rayz", std::ref(limits), ".", std::ref(my_cl_dir.v4[2]));
+
+	SliderWithText xoSliderWithText((nanogui::Widget*)(ray_gui_window), "orx", std::ref(limits_2), ".", std::ref(my_cl_origin.v4[0]));
+	SliderWithText yoSliderWithText((nanogui::Widget*)(ray_gui_window), "ory", std::ref(limits_2), ".", std::ref(my_cl_origin.v4[1]));
+	SliderWithText zoSliderWithText((nanogui::Widget*)(ray_gui_window), "orz", std::ref(limits_2), ".", std::ref(my_cl_origin.v4[2]));
+
+
+	screen->performLayout();
+
+	Shader ray_shader("../shaders/ray.vert", "../shaders/ray.frag");
+	float my_ray_vert[] = {	0.0f, 0.0f, 0.0f,
+							0.5f, 5000.5f, 0.0f};
+	GLuint my_ray_vao;
+	GLuint my_ray_vbo;
+	glGenVertexArrays(1, &my_ray_vao);
+	glGenBuffers(1, &my_ray_vbo);
+	glBindVertexArray(my_ray_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, my_ray_vbo);
+	glBufferData(GL_ARRAY_BUFFER, 3*2*sizeof(float), my_ray_vert, GL_STATIC_DRAW);
+
+//	glBufferSubData(GL_ARRAY_BUFFER, 0, 3*2*sizeof(float), my_ray_vert);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+	glBindVertexArray(0);
+	std::cout<<"cassete meshes cnt "<<cassete.meshes.size()<<std::endl;
 
 	while (!glfwWindowShouldClose(window))
 	{
+
+clflag = true;
+		if(clflag){
+			float cassete_cl = cassete.computeRay(my_cl_origin, my_cl_dir, command_queue);
+			cl_t = cassete_cl;//main_frame.computeRay(my_cl_origin, my_cl_dir, command_queue);
+			
+			glm::vec3 sphere_trnsl = glm::vec3((float)my_cl_origin.v4[0], (float)my_cl_origin.v4[1], (float)my_cl_origin.v4[2]) +
+			glm::vec3((float)my_cl_dir.v4[0], (float)my_cl_dir.v4[1], (float)my_cl_dir.v4[2])*cl_t;
+
+			sphere_mat = glm::translate(f_mat.World, sphere_trnsl);
+			my_sphere.setMatrixByID(0, sphere_mat);
+
+			clflag = false;
+		}
+
+			
+			my_ray_vert[0] = my_cl_origin.v4[0];
+			my_ray_vert[1] = my_cl_origin.v4[1];
+			my_ray_vert[2] = my_cl_origin.v4[2];
+
+			my_ray_vert[3] = my_cl_origin.v4[0] + 50000*my_cl_dir.v4[0];
+			my_ray_vert[4] = my_cl_origin.v4[1] + 50000*my_cl_dir.v4[1];
+			my_ray_vert[5] = my_cl_origin.v4[2] + 50000*my_cl_dir.v4[2];
+
+			glBindBuffer(GL_ARRAY_BUFFER, my_ray_vbo);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, 3*2*sizeof(float), my_ray_vert);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+
 
 //		std::this_thread::sleep_for(time);
 
@@ -579,19 +686,20 @@ int main(int argc, char * argv[])
 		if (keys[GLFW_KEY_T])
 			trig = true;
 
+
 		// if (trig)
 //		f_mat.doStep();
 		m_mat[0]->B = f_mat.rail2;
-		m_mat[1]->B = f_mat.rail2;
-		m_mat[2]->B = f_mat.rail2;
+	//	m_mat[1]->B = f_mat.rail2;
+	//	m_mat[2]->B = f_mat.rail2;
 
 		my_cassete.updateMatrices(&(f_mat.rail2));
 		my_cassete.doStep();
 
-		for (int i = 0; i < 3; i++)
-		{
-			m_mat[i]->doStep();
-		}
+		m_mat[0]->doStep();
+		// m_mat[1]->doStep();
+		// m_mat[2]->doStep();
+
 		glfwMakeContextCurrent(window);
 
 		//m_mat[1]->doStep();
@@ -602,8 +710,8 @@ int main(int argc, char * argv[])
 		// m_mat[2]->updateManipConfig();
 
 		m_mat[0]->calculateMatrices();
-		m_mat[1]->calculateMatrices();
-		m_mat[2]->calculateMatrices();
+	//	m_mat[1]->calculateMatrices();
+	//	m_mat[2]->calculateMatrices();
 
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 
@@ -612,11 +720,11 @@ int main(int argc, char * argv[])
 
 		view = my_cam.getMatrix();
 		//ourShader.setMat4(m_mat[0]->I, "view");
-		ourShader.setMat4(view, "view");
+	//	ourShader.setMat4(view, "view");
 		ourShader.setFloat(glfwGetTime(), "time");
 
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width / (float)height, 0.01f, 200.0f);
-		ourShader.setMat4(proj, "proj");
+	//	ourShader.setMat4(proj, "proj");
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(proj));
@@ -635,7 +743,7 @@ int main(int argc, char * argv[])
 		glUniform1i(obj_type_mode, -1);
 		ourShader.setMaterial(Material::green_plastic);
 
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0f))); //model to identity
+//		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0f))); //model to identity
 
 		// column.setMatrixByID(1, m_mat[0]->G2);
 		// column.setMatrixByID(2, m_mat[1]->G2);
@@ -650,6 +758,8 @@ int main(int argc, char * argv[])
 		cassete.setMatrixByID(0, f_mat.A);
 		cassete.Draw(ourShader, 1);
 
+		my_sphere.Draw(ourShader, 1);
+//		my_cube.Draw(ourShader, 1);
 		// ourShader.setMaterial(Material::yellow_plastic);
 		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B1));
 		// rail.Draw(ourShader);
@@ -660,69 +770,69 @@ int main(int argc, char * argv[])
 /////
 		ourShader.setMaterial(Material::green_plastic);
 		carrige.setMatrixByID(0, m_mat[0]->C);
-		carrige.setMatrixByID(1, m_mat[1]->C);
-		carrige.setMatrixByID(2, m_mat[2]->C);
+	//	carrige.setMatrixByID(1, m_mat[1]->C);
+	//	carrige.setMatrixByID(2, m_mat[2]->C);
 		carrige.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::black_plastic);
 		tower_frame.setMatrixByID(0, m_mat[0]->D);
-		tower_frame.setMatrixByID(1, m_mat[1]->D);
-		tower_frame.setMatrixByID(2, m_mat[2]->D);
+	//	tower_frame.setMatrixByID(1, m_mat[1]->D);
+	//	tower_frame.setMatrixByID(2, m_mat[2]->D);
 		tower_frame.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::white_plastic);
 		tower_box.setMatrixByID(0, m_mat[0]->D);
-		tower_box.setMatrixByID(1, m_mat[1]->D);
-		tower_box.setMatrixByID(2, m_mat[2]->D);
+	//	tower_box.setMatrixByID(1, m_mat[1]->D);
+	//	tower_box.setMatrixByID(2, m_mat[2]->D);
 		tower_box.Draw(ourShader, 1);
 
 		//pantograph
 		ourShader.setMaterial(Material::yellow_plastic);
 		pb1.setMatrixByID(0, m_mat[0]->pb1);
-		pb1.setMatrixByID(1, m_mat[1]->pb1);
-		pb1.setMatrixByID(2, m_mat[2]->pb1);
+	//	pb1.setMatrixByID(1, m_mat[1]->pb1);
+	//	pb1.setMatrixByID(2, m_mat[2]->pb1);
 		pb1.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pb2.setMatrixByID(0, m_mat[0]->pb2);
-		pb2.setMatrixByID(1, m_mat[1]->pb2);
-		pb2.setMatrixByID(2, m_mat[2]->pb2);
+	//	pb2.setMatrixByID(1, m_mat[1]->pb2);
+	//	pb2.setMatrixByID(2, m_mat[2]->pb2);
 		pb2.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pb3.setMatrixByID(0, m_mat[0]->pb3);
-		pb3.setMatrixByID(1, m_mat[1]->pb3);
-		pb3.setMatrixByID(2, m_mat[2]->pb3);
+	//	pb3.setMatrixByID(1, m_mat[1]->pb3);
+	//	pb3.setMatrixByID(2, m_mat[2]->pb3);
 		pb3.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pb4.setMatrixByID(0, m_mat[0]->pb4);
-		pb4.setMatrixByID(1, m_mat[1]->pb4);
-		pb4.setMatrixByID(2, m_mat[2]->pb4);
+	//	pb4.setMatrixByID(1, m_mat[1]->pb4);
+	//	pb4.setMatrixByID(2, m_mat[2]->pb4);
 		pb4.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::green_plastic);
 		bond_rail.setMatrixByID(0, m_mat[0]->E1);
-		bond_rail.setMatrixByID(1, m_mat[1]->E1);
-		bond_rail.setMatrixByID(2, m_mat[2]->E1);
+	//	bond_rail.setMatrixByID(1, m_mat[1]->E1);
+	//	bond_rail.setMatrixByID(2, m_mat[2]->E1);
 		bond_rail.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
 		bond_carrige.setMatrixByID(0, m_mat[0]->F1);
-		bond_carrige.setMatrixByID(1, m_mat[1]->F1);
-		bond_carrige.setMatrixByID(2, m_mat[2]->F1);
+	//	bond_carrige.setMatrixByID(1, m_mat[1]->F1);
+	//	bond_carrige.setMatrixByID(2, m_mat[2]->F1);
 		bond_carrige.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::green_plastic);
 		bond_wrist.setMatrixByID(0, m_mat[0]->G1);
-		bond_wrist.setMatrixByID(1, m_mat[1]->G1);
-		bond_wrist.setMatrixByID(2, m_mat[2]->G1);
+	//	bond_wrist.setMatrixByID(1, m_mat[1]->G1);
+	//	bond_wrist.setMatrixByID(2, m_mat[2]->G1);
 		bond_wrist.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::yellow_plastic);
 		bond_handler_middle.setMatrixByID(0, m_mat[0]->H);
-		bond_handler_middle.setMatrixByID(1, m_mat[1]->H);
-		bond_handler_middle.setMatrixByID(2, m_mat[2]->H);
+	//	bond_handler_middle.setMatrixByID(1, m_mat[1]->H);
+	//	bond_handler_middle.setMatrixByID(2, m_mat[2]->H);
 		bond_handler_middle.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
@@ -740,32 +850,34 @@ int main(int argc, char * argv[])
 		//pantograph column
 		ourShader.setMaterial(Material::yellow_plastic);
 		pc1.setMatrixByID(0, m_mat[0]->pc1);
-		pc1.setMatrixByID(1, m_mat[1]->pc1);
-		pc1.setMatrixByID(2, m_mat[2]->pc1);
+	//	pc1.setMatrixByID(1, m_mat[1]->pc1);
+	//	pc1.setMatrixByID(2, m_mat[2]->pc1);
 		pc1.Draw(ourShader, 1);
 
 		// ourShader.setMaterial(Material::green_plastic);
 		pc2.setMatrixByID(0, m_mat[0]->pc2);
-		pc2.setMatrixByID(1, m_mat[1]->pc2);
-		pc2.setMatrixByID(2, m_mat[2]->pc2);
+	//	pc2.setMatrixByID(1, m_mat[1]->pc2);
+	//	pc2.setMatrixByID(2, m_mat[2]->pc2);
 		pc2.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::green_plastic);
 		column_rail.setMatrixByID(0, m_mat[0]->E2);
-		column_rail.setMatrixByID(1, m_mat[1]->E2);
-		column_rail.setMatrixByID(2, m_mat[2]->E2);
+	//	column_rail.setMatrixByID(1, m_mat[1]->E2);
+	//	column_rail.setMatrixByID(2, m_mat[2]->E2);
 		column_rail.Draw(ourShader, 1);
 
 		ourShader.setMaterial(Material::red_plastic);
 		column_carrige.setMatrixByID(0, m_mat[0]->F2);
-		column_carrige.setMatrixByID(1, m_mat[1]->F2);
-		column_carrige.setMatrixByID(2, m_mat[2]->F2);
+	//	column_carrige.setMatrixByID(1, m_mat[1]->F2);
+	//	column_carrige.setMatrixByID(2, m_mat[2]->F2);
 		column_carrige.Draw(ourShader, 1);
 
 
 
-
-
+		ray_shader.use();
+		glBindVertexArray(my_ray_vao);
+		glDrawArrays(GL_LINES, 0, 2);
+		glBindVertexArray(0);
 
 		skyboxShader.use();
 		skyboxShader.setMat4(proj, "proj");
@@ -915,3 +1027,76 @@ unsigned int loadCubeMap(std::vector<std::string> faces)
 
 	return cubeTextureID;
 }
+
+
+
+
+void init_open_cl(cl_context &context, cl_command_queue &command_queue, cl_kernel &kernel){
+	cl_platform_id platform_id;
+	cl_uint ret_num_platforms;
+	/* получить доступные платформы */
+	int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+	std::cout<<ret<<std::endl;
+
+	cl_context_properties prop[] = {
+		CL_CONTEXT_PLATFORM, 	(cl_context_properties) platform_id,
+		CL_WGL_HDC_KHR, 		(cl_context_properties) wglGetCurrentDC(),
+		CL_GL_CONTEXT_KHR,		(cl_context_properties) wglGetCurrentContext(),
+		0
+	};
+
+	cl_device_id device_id;
+	cl_uint ret_num_devices;
+	/* получить доступные устройства */
+	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
+	std::cout<<ret<<std::endl;
+
+
+
+	/* создать контекст */
+	context = clCreateContext(prop, 1, &device_id, NULL, NULL, &ret);
+	std::cout<<ret<<std::endl;
+
+	/* создаем команду */
+	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+	std::cout<<ret<<std::endl;
+
+	cl_program program = NULL;
+	kernel = NULL;
+
+	const char * cl_src_path = "../cl_kernels/ray_triangle_intersect.cl";
+	std::string cl_src;
+
+	std::ifstream cl_src_file;
+
+	cl_src_file.exceptions(std::ifstream::failbit);
+	
+	try{
+		cl_src_file.open(cl_src_path);
+		std::stringstream cl_src_stream;
+		cl_src_stream << cl_src_file.rdbuf();
+		cl_src_file.close();
+
+		cl_src = cl_src_stream.str();
+	}catch(std::ifstream::failure &e){
+		std::cout << "ERROR::OPEN_CL::FILE_NOT_SUCCESFULLY_READ EXEPTION IS:" <<e.what()<<  std::endl;
+		exit(-1);
+	}
+	const char * cl_src_code = cl_src.c_str();
+	const size_t src_size = cl_src.length();
+	program = clCreateProgramWithSource(context, 1, (const char **)&cl_src_code, (const size_t *)&src_size, &ret);
+	std::cout<<ret<<std::endl;
+
+	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+	std::cout<<"clBuildProgram "<<ret<<std::endl;
+	if(ret) 
+		exit(-1);
+	kernel = clCreateKernel(program, "test", &ret);
+	std::cout<<ret<<std::endl;
+	if(ret)
+		exit(-1);
+}
+
+
+
+

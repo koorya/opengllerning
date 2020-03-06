@@ -24,7 +24,7 @@ void main(){
 	texPos = texture;
 	float phase;
 	mat4 instance_mat_ = mat4(1.0);
-	mat4 model_ = instance_mat * model;
+	mat4 model_ = model * instance_mat ;
 	vec4 pos = model_ * vec4(position, 1.0f) ;
 
 	fragPos = pos.xyz;

@@ -28,20 +28,19 @@ class Mesh{
 		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
 		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-//		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures);
-		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <float> instance_float = std::vector <float>({0.0}));
-		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <glm::mat4> instance_mat4);
+		Mesh(aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <glm::mat4> instance_mat4, bool print_vert=false);
 		
-		void Draw(Shader shader);
 		void Draw(Shader shader, unsigned int count);
 		void setMatrixByID(unsigned int id, glm::mat4 matrix);
+		
+	protected:
+		unsigned int mat4_ptr_offset;
+		unsigned int VAO, VBO, EBO;
+
 	private:
 		glm::vec3 diffuse_color;
 		glm::vec3 specular_color;
 		glm::vec3 ambient_color;
-
-		unsigned int mat4_ptr_offset;
-		unsigned int VAO, VBO, EBO;
 
 };
 

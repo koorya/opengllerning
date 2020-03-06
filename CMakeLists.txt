@@ -6,7 +6,7 @@ project(BuildingMachines VERSION 0.0.1 LANGUAGES CXX)
 
 # Добавить в сборку исполняемый файл "${CMAKE_PROJECT_NAME}":
 add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
-#add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/example3.cpp)
+#add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/opencl_main.cpp)
 add_definitions(-DNANOGUI_GLAD)
 
 
@@ -18,6 +18,9 @@ add_definitions(-DNANOGUI_GLAD)
 #target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/build/ext/glad/include")
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC /usr/include/mariadb)
+set(OPENCL_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2")
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${OPENCL_DIR}/include")
+target_link_libraries(${CMAKE_PROJECT_NAME} "${OPENCL_DIR}/lib/x64/OpenCL.lib")
 
 #target_link_libraries(${CMAKE_PROJECT_NAME} dl)
 target_link_libraries(${CMAKE_PROJECT_NAME} pthread)
@@ -109,6 +112,8 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI_
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp)
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ConstructionContainer.cpp)
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/cassete.cpp)
+target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/cl_mesh.cpp)
+
 
 # -L.\ 
 # -Lc:/opengl/lib 
