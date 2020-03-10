@@ -4,10 +4,10 @@
 
 __kernel void test( __global float * vbo, 
 					__global uint * ebo, 
-					__global float4 * res, 
+					__global float * res, 
 					__private float3 origin, 
 					__private float3 dir,
-					__private uint mat_ofset){
+					__private uint _mat_ofset){
 
 
 //	float3 point = (float3) (1.0, 2.0, 3.0);
@@ -17,6 +17,9 @@ __kernel void test( __global float * vbo,
 
 	int instance = get_global_id(0);
 	int face = get_global_id(1);
+	int faces = get_global_size(1);
+
+	uint mat_ofset = _mat_ofset + instance * 16 ; // отступаем на 16 float * номер матрицы
 
 /* получает вершины треугольника */
 	float4 a1 = (float4)(vbo[ebo[face*3]*3], vbo[ebo[face*3]*3+1], vbo[ebo[face*3]*3+2], 1.0);
@@ -54,9 +57,22 @@ __kernel void test( __global float * vbo,
 	float u = dot(P, T)/denom;
 	float v = dot(Q, D)/denom;
 	float t1 = 1 - u - v;
-	float3 res_ = origin + (dir*t);
-	res[face] = (float4)(t1, u, v, t);
+
+//	res[face] = (float4)(t1, u, v, t);
 	
+	res[face + faces*instance] = -1;
+
+	if(	t1 >= 0 && t1 <= 1 &&
+		u >= 0 && u <= 1 &&
+		v >= 0 && v <= 1 ){
+	
+		res[face + faces*instance] = t;
+	}
 
 }
+
+__kernel void minimaze(){
+
+}
+
 

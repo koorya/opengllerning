@@ -10,16 +10,16 @@
 
 #include "shader.h"
 #include "cl_mesh.h"
-
+#include "cl_kernel_container.h"
 
 class Model{
 public:
-	Model(const char * path, std::vector <glm::mat4> instance_mat4, cl_context context=NULL, cl_kernel kernel=NULL);
-	Model(const char * path, unsigned int max_inst_cnt, cl_context context=NULL, cl_kernel kernel=NULL);
+	Model(const char * path, std::vector <glm::mat4> instance_mat4, clKernelsContainer * cl_kernel_cont=NULL);
+	Model(const char * path, unsigned int max_inst_cnt, clKernelsContainer * cl_kernel_cont=NULL);
 	
 	void Draw(Shader shader, unsigned int count);
 	void setMatrixByID(unsigned int id, glm::mat4 matrix);
-	float computeRay(cl_float3 origin, cl_float3 dir, cl_command_queue command_queue, int inst_cntinst_cnt = 1);
+	float computeRay(cl_float3 origin, cl_float3 dir, int inst_cntinst_cnt = 1);
 
 	std::vector<ClMesh> meshes;
 private:
@@ -32,8 +32,7 @@ private:
 	int processNode(aiNode * node, const aiScene * scene);
 	ClMesh processMesh(aiMesh * mesh, const aiScene * scene);
 
-	cl_context context;
-	cl_kernel kernel;
+	clKernelsContainer * cl_kernel_cont;
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial * mat, aiTextureType type, TextureType tex_type);
 };

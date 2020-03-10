@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <list>
 #include "model.h"
+#include "cl_kernel_container.h"
 
 struct BondLocation{
 	int section;
@@ -20,7 +21,7 @@ struct Attachment{
 
 class ConstructionContainer{
 public:
-	ConstructionContainer();
+	ConstructionContainer(clKernelsContainer * cl_kernel_cont=NULL);
 	~ConstructionContainer();
 	void attachBond(const glm::mat4 * matr, struct BondLocation bond);
 	void detach(const glm::mat4 * matr);
@@ -28,10 +29,21 @@ public:
 	void updateMatrices();
 	void drawElements(Shader shader);
 
+	float computeRay(cl_float3 origin, cl_float3 dir);
+
+	int get_t_bond_max_cnt();
+	int get_h_bond_max_cnt();
+	int get_column_max_cnt();
+
+
 private:
 	int tilted_bond_cnt;
 	int horizontal_bond_cnt;
 	int column_cnt;
+
+	int t_bond_max_cnt;
+	int h_bond_max_cnt;
+	int column_max_cnt;
 
 	Model * tilted_bond;
 	Model * horizontal_bond;
@@ -40,6 +52,9 @@ private:
 	std::list <struct Attachment> tilted_bond_list;
 	std::list <struct Attachment> horizontal_bond_list;
 	std::list <struct Attachment> column_list;
+
+
+	clKernelsContainer * cl_kernel_cont;
 
 };
 

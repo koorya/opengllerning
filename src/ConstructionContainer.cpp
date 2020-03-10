@@ -2,7 +2,7 @@
 
 #define FLOOR_CNT 20
 
-ConstructionContainer::ConstructionContainer(){
+ConstructionContainer::ConstructionContainer(clKernelsContainer * cl_kernel_cont): cl_kernel_cont(cl_kernel_cont){
 	tilted_bond_cnt = 48 * (FLOOR_CNT-1);
 	horizontal_bond_cnt = 24* (FLOOR_CNT - 1);
 	column_cnt = 16*FLOOR_CNT;
@@ -85,10 +85,13 @@ ConstructionContainer::ConstructionContainer(){
 			}
 		}
 	}
+	t_bond_max_cnt = tilt_bond_matrices.size();
+	h_bond_max_cnt = hor_bond_matrices.size();
+	column_max_cnt = column_matrices.size();
 
-	tilted_bond = new Model("../3D_models/obj/tilted_bond.obj", tilt_bond_matrices);
-	horizontal_bond = new Model("../3D_models/obj/horizontal_bond.obj", hor_bond_matrices);
-	column = new Model("../3D_models/obj/column_light.obj", column_matrices);
+	tilted_bond = new Model("../3D_models/obj/tilted_bond.obj", tilt_bond_matrices, cl_kernel_cont);
+	horizontal_bond = new Model("../3D_models/obj/horizontal_bond.obj", hor_bond_matrices, cl_kernel_cont);
+	column = new Model("../3D_models/obj/column_light.obj", column_matrices, cl_kernel_cont);
 
 	tilted_bond_cnt = 0;
 	horizontal_bond_cnt = 0;
@@ -101,6 +104,36 @@ ConstructionContainer::~ConstructionContainer(){
 	delete tilted_bond;
 	delete horizontal_bond;
 	delete column;
+}
+
+float ConstructionContainer::computeRay(cl_float3 origin, cl_float3 dir){
+	float ret = -1.0f;
+	float _ret;
+	
+	_ret = tilted_bond->computeRay(origin, dir, tilted_bond_cnt);
+	if(	_ret > 0 && ( ret < 0 || ret > _ret ))
+		ret = _ret;
+
+	_ret = horizontal_bond->computeRay(origin, dir, horizontal_bond_cnt);
+	if(	_ret > 0 && ( ret < 0 || ret > _ret ))
+		ret = _ret;
+
+	_ret = column->computeRay(origin, dir, column_cnt);
+	if(	_ret > 0 && ( ret < 0 || ret > _ret ))
+		ret = _ret;
+
+	return ret;
+}
+
+
+int ConstructionContainer::get_t_bond_max_cnt(){
+	return t_bond_max_cnt;
+}
+int ConstructionContainer::get_h_bond_max_cnt(){
+	return h_bond_max_cnt;
+}
+int ConstructionContainer::get_column_max_cnt(){
+	return column_max_cnt;
 }
 
 void ConstructionContainer::updateMatrices(){

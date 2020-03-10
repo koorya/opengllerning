@@ -35,6 +35,9 @@
 
 #include <nanogui/nanogui.h>
 
+#include "cl_kernel_container.h"
+
+
 void do_movement();
 void key_callback(GLFWwindow *, int, int, int, int);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -107,11 +110,9 @@ int main(int argc, char * argv[])
 	}
 
 
-	cl_context context;
-	cl_command_queue command_queue;
-	cl_kernel kernel;
-	init_open_cl(context, command_queue, kernel);
 
+	
+	clKernelsContainer my_cl_cont = clKernelsContainer();
 
 
 
@@ -403,15 +404,15 @@ int main(int argc, char * argv[])
 	Model my_sphere("../3D_models/sphere.obj", 1);
 	Model my_dr_cube("../3D_models/cube_cil.obj", 1);
 //	print_vert = true;
-	Model my_cube("../3D_models/cube_cil.obj", 1, context, kernel);
+	Model my_cube("../3D_models/cube_cil.obj", 1, &my_cl_cont);
 //	print_vert = false;
 	 Model main_frame("../3D_models/пустой стенд.obj", 1);
-//	Model main_frame("../3D_models/obj/manipulator/Pc2.obj", 1, context, kernel);
-	Model cassete("../3D_models/пустая кассета.stl", 1, context, kernel);
+//	Model main_frame("../3D_models/obj/manipulator/Pc2.obj", 1, &my_cl_cont);
+	Model cassete("../3D_models/пустая кассета.stl", 2, &my_cl_cont);
 //	Model cassete("../3D_models/obj/manipulator/Pc1.obj", 1);
 	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
 	
-	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3, context, kernel);					 //tower box
+	Model tower_box("../3D_models/obj/manipulator/Component31.obj", 3, &my_cl_cont);					 //tower box
 	Model carrige("../3D_models/obj/manipulator/carrige.obj", 3);				 // carrige
 	Model rail("../3D_models/obj/manipulator/Component129.obj", 3);						 //rail
 	Model bond_wrist("../3D_models/obj/manipulator/Wrist.obj", 3);						 //bond wrist
@@ -422,7 +423,7 @@ int main(int argc, char * argv[])
 	// Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
 	// Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
 	// Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
-	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik.obj", 3, context, kernel);   //bond handler right
+	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik.obj", 3, &my_cl_cont);   //bond handler right
 //	Model bond_handler_middle("../3D_models/cube_cil.obj", 3, context, kernel);   //bond handler right
 
 	Model pb1("../3D_models/obj/manipulator/Pb1.obj", 3); //bond pantograph section 1
@@ -553,7 +554,7 @@ int main(int argc, char * argv[])
 //	m_mat[2]->config.rail.value = 6000.0;
 
 	glfwMakeContextCurrent(window);
-	ConstructionContainer constr_container = ConstructionContainer();
+	ConstructionContainer constr_container = ConstructionContainer(&my_cl_cont);
 
 	m_mat[0]->container = &constr_container;
 //	m_mat[1]->container = &constr_container;
@@ -593,6 +594,18 @@ int main(int argc, char * argv[])
     Window *ray_gui_window = new Window(screen, "ray");
     ray_gui_window->setPosition(Vector2i(15, 15));
     ray_gui_window->setLayout(new GroupLayout());
+
+	nanogui::TextBox * textBox = new TextBox(ray_gui_window);
+
+    textBox->setEditable(false);
+    textBox->setDefaultValue("0.0");
+
+    textBox->setFormat("[-]?[0-9]*\\.?[0-9]+");
+
+    textBox->setFixedSize(Vector2i(90, 25));
+    textBox->setValue("0");
+    textBox->setUnits("mm");
+
 
 	nanogui::Button * button = new nanogui::Button((nanogui::Window*)ray_gui_window, "rayup");
 	button->setCallback([&]{
@@ -717,9 +730,18 @@ clflag = true;
 			my_cl_dir.v4[1] = my_glm_dir.y;
 			my_cl_dir.v4[2] = my_glm_dir.z;
 
-			float cassete_cl = cassete.computeRay(my_cl_origin, my_cl_dir, command_queue);
-			cl_t = cassete_cl;//main_frame.computeRay(my_cl_origin, my_cl_dir, command_queue);
+			float ret = -1.0f;
+			float _ret;
+			_ret = cassete.computeRay(my_cl_origin, my_cl_dir, 5);
+			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
+				ret = _ret;
+			_ret = constr_container.computeRay(my_cl_origin, my_cl_dir);
+			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
+				ret = _ret;
+			cl_t = ret;
 			
+			textBox->setValue(std::to_string(cl_t));
+
 			glm::vec3 sphere_trnsl = glm::vec3((float)my_cl_origin.v4[0], (float)my_cl_origin.v4[1], (float)my_cl_origin.v4[2]) +
 			glm::vec3((float)my_cl_dir.v4[0], (float)my_cl_dir.v4[1], (float)my_cl_dir.v4[2])*cl_t;
 
@@ -773,7 +795,9 @@ clflag = true;
 		main_frame.setMatrixByID(0, f_mat.A);
 		main_frame.Draw(ourShader, 1);
 		cassete.setMatrixByID(0, f_mat.A);
-		cassete.Draw(ourShader, 1);
+		cassete.setMatrixByID(1, glm::translate(f_mat.A, glm::vec3(2000.0f, 600.0f, 0.0f)));
+
+		cassete.Draw(ourShader, 2);
 
 		my_sphere.Draw(ourShader, 1);
 //		my_cube.Draw(ourShader, 1);
@@ -1048,71 +1072,6 @@ unsigned int loadCubeMap(std::vector<std::string> faces)
 
 
 
-void init_open_cl(cl_context &context, cl_command_queue &command_queue, cl_kernel &kernel){
-	cl_platform_id platform_id;
-	cl_uint ret_num_platforms;
-	/* получить доступные платформы */
-	int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-	std::cout<<ret<<std::endl;
-
-	cl_context_properties prop[] = {
-		CL_CONTEXT_PLATFORM, 	(cl_context_properties) platform_id,
-		CL_WGL_HDC_KHR, 		(cl_context_properties) wglGetCurrentDC(),
-		CL_GL_CONTEXT_KHR,		(cl_context_properties) wglGetCurrentContext(),
-		0
-	};
-
-	cl_device_id device_id;
-	cl_uint ret_num_devices;
-	/* получить доступные устройства */
-	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
-	std::cout<<ret<<std::endl;
-
-
-
-	/* создать контекст */
-	context = clCreateContext(prop, 1, &device_id, NULL, NULL, &ret);
-	std::cout<<ret<<std::endl;
-
-	/* создаем команду */
-	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-	std::cout<<ret<<std::endl;
-
-	cl_program program = NULL;
-	kernel = NULL;
-
-	const char * cl_src_path = "../cl_kernels/ray_triangle_intersect.cl";
-	std::string cl_src;
-
-	std::ifstream cl_src_file;
-
-	cl_src_file.exceptions(std::ifstream::failbit);
-	
-	try{
-		cl_src_file.open(cl_src_path);
-		std::stringstream cl_src_stream;
-		cl_src_stream << cl_src_file.rdbuf();
-		cl_src_file.close();
-
-		cl_src = cl_src_stream.str();
-	}catch(std::ifstream::failure &e){
-		std::cout << "ERROR::OPEN_CL::FILE_NOT_SUCCESFULLY_READ EXEPTION IS:" <<e.what()<<  std::endl;
-		exit(-1);
-	}
-	const char * cl_src_code = cl_src.c_str();
-	const size_t src_size = cl_src.length();
-	program = clCreateProgramWithSource(context, 1, (const char **)&cl_src_code, (const size_t *)&src_size, &ret);
-	std::cout<<ret<<std::endl;
-
-	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
-	std::cout<<"clBuildProgram "<<ret<<std::endl;
-	if(ret) 
-		exit(-1);
-	kernel = clCreateKernel(program, "test", &ret);
-	std::cout<<ret<<std::endl;
-	if(ret)
-		exit(-1);
-}
 
 
 

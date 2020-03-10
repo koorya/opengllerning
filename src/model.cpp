@@ -2,13 +2,13 @@
 #include "load_tex.h"
 
 
-Model::Model(const char * path, std::vector <glm::mat4> instance_mat4, cl_context context, cl_kernel kernel): context(context), kernel(kernel){
+Model::Model(const char * path, std::vector <glm::mat4> instance_mat4, clKernelsContainer * cl_kernel_cont): cl_kernel_cont(cl_kernel_cont){
 	this->mat4_vect = instance_mat4;
 
 	loadModel(path);
 }
 
-Model::Model(const char * path, unsigned int max_inst_cnt, cl_context context, cl_kernel kernel): context(context), kernel(kernel){
+Model::Model(const char * path, unsigned int max_inst_cnt, clKernelsContainer * cl_kernel_cont): cl_kernel_cont(cl_kernel_cont){
 	
 	std::vector <glm::mat4> instance_mat4;
 	for (int i = 0; i < max_inst_cnt; i++)
@@ -29,10 +29,10 @@ void Model::setMatrixByID(unsigned int id, glm::mat4 matrix){
 		meshes[i].setMatrixByID(id, matrix);
 }
 
-float Model::computeRay(cl_float3 origin, cl_float3 dir, cl_command_queue command_queue, int inst_cntinst_cnt){
+float Model::computeRay(cl_float3 origin, cl_float3 dir, int inst_cntinst_cnt){
 	float ret = -1.0f;
 	for(int i = 0; i < meshes.size(); i++){
-		float curr_dist = meshes[i].computeRay(origin, dir, command_queue, inst_cntinst_cnt);
+		float curr_dist = meshes[i].computeRay(origin, dir, inst_cntinst_cnt);
 		if(curr_dist > 0){
 			if(ret<0)
 				ret = curr_dist;
@@ -102,7 +102,7 @@ ClMesh Model::processMesh(aiMesh * mesh, const aiScene * scene){
 	}
 
 	std::cout << "mat4 constr"<<std::endl;
-	return ClMesh(context, kernel, mesh, scene, textures, mat4_vect, print_vert);
+	return ClMesh(cl_kernel_cont, mesh, scene, textures, mat4_vect, print_vert);
 
 
 }
