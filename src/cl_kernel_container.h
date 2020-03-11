@@ -32,6 +32,7 @@ class clKernelsContainer{
 	cl_command_queue command_queue;
 	cl_kernel intersect_kernel;
 	cl_kernel min_kernel;
+	cl_kernel translate_kernel;
 
 	std::vector<mesh_cl_data> mem_objects;
 	

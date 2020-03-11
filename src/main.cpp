@@ -406,9 +406,12 @@ int main(int argc, char * argv[])
 //	print_vert = true;
 	Model my_cube("../3D_models/cube_cil.obj", 1, &my_cl_cont);
 //	print_vert = false;
-	 Model main_frame("../3D_models/пустой стенд.obj", 1);
+	 Model main_frame_cl("../3D_models/пустой стенд.stl", 1, &my_cl_cont);
+	 Model main_frame_gl("../3D_models/пустой стенд.obj", 1);
 //	Model main_frame("../3D_models/obj/manipulator/Pc2.obj", 1, &my_cl_cont);
-	Model cassete("../3D_models/пустая кассета.stl", 2, &my_cl_cont);
+	Model cassete_cl("../3D_models/пустая кассета.stl", 1, &my_cl_cont);
+	Model cassete_gl("../3D_models/пустая кассета.obj", 1);
+
 //	Model cassete("../3D_models/obj/manipulator/Pc1.obj", 1);
 	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
 	
@@ -641,8 +644,6 @@ int main(int argc, char * argv[])
 //	glBufferSubData(GL_ARRAY_BUFFER, 0, 3*2*sizeof(float), my_ray_vert);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-	glBindVertexArray(0);
-	std::cout<<"cassete meshes cnt "<<cassete.meshes.size()<<std::endl;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -716,7 +717,6 @@ int main(int argc, char * argv[])
 
 
 clflag = true;
-		if(clflag){
 			glm::mat4 ray_mat = m_mat[0]->rangefinder;
 			glm::vec3 my_glm_origin;
 			my_glm_origin = ray_mat * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -730,16 +730,22 @@ clflag = true;
 			my_cl_dir.v4[1] = my_glm_dir.y;
 			my_cl_dir.v4[2] = my_glm_dir.z;
 
+		if(clflag){
 			float ret = -1.0f;
 			float _ret;
-			_ret = cassete.computeRay(my_cl_origin, my_cl_dir, 5);
+			_ret = cassete_cl.computeRay(my_cl_origin, my_cl_dir, 5);
 			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 				ret = _ret;
 			_ret = constr_container.computeRay(my_cl_origin, my_cl_dir);
 			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 				ret = _ret;
+			_ret = main_frame_cl.computeRay(my_cl_origin, my_cl_dir);
+			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
+				ret = _ret;
 			cl_t = ret;
 			
+
+
 			textBox->setValue(std::to_string(cl_t));
 
 			glm::vec3 sphere_trnsl = glm::vec3((float)my_cl_origin.v4[0], (float)my_cl_origin.v4[1], (float)my_cl_origin.v4[2]) +
@@ -792,12 +798,13 @@ clflag = true;
 		constr_container.drawElements(ourShader);
 
 		ourShader.setMaterial(Material::silver);
-		main_frame.setMatrixByID(0, f_mat.A);
-		main_frame.Draw(ourShader, 1);
-		cassete.setMatrixByID(0, f_mat.A);
-		cassete.setMatrixByID(1, glm::translate(f_mat.A, glm::vec3(2000.0f, 600.0f, 0.0f)));
+		main_frame_gl.setMatrixByID(0, f_mat.A);
+		main_frame_cl.setMatrixByID(0, f_mat.A);
+		main_frame_gl.Draw(ourShader, 1);
+		cassete_gl.setMatrixByID(0, f_mat.A);
+		cassete_cl.setMatrixByID(0, f_mat.A);
 
-		cassete.Draw(ourShader, 2);
+		cassete_gl.Draw(ourShader, 1);
 
 		my_sphere.Draw(ourShader, 1);
 //		my_cube.Draw(ourShader, 1);

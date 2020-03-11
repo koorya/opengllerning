@@ -71,8 +71,44 @@ __kernel void test( __global float * vbo,
 
 }
 
-__kernel void minimaze(){
+__kernel void minimaze(	__global float * res, 			//массив
+						__private uint size,			//полный размер массива, чтоб не вылезти за границы
+						__private uint stride, 			//шаг между кусочками в текущей итерации (шаг между потоками)
+						__private uint prev_stride, 	//шаг между кусочками на предудыщей итерации (шаг между элементами подмассива)
+						__private uint _cnt				//количество кусочков на предыдущем шаге, количество элементов подмассива
+						){
+	 int gid = get_global_id(0);
+	// int gsi = get_global_size(0);
 
+	uint offset = gid * stride;
+
+	uint cnt = _cnt;
+	if( offset + cnt*prev_stride > size)
+		cnt = (size - offset) / prev_stride;
+
+	for(int i = 0; i < cnt; i ++){
+		
+		if(res[offset + i*prev_stride] > 0){
+			if(res[offset] > res[offset + i*prev_stride]){
+				res[offset] = res[offset + i*prev_stride];
+			}
+			if(res[offset] < 0)
+				res[offset] = res[offset + i*prev_stride];
+		}
+		if(i > 0)
+			res[offset + i*prev_stride] = -1;
+	}
 }
 
+__kernel void translate_arr(__global float * res, 			//массив
+						__private uint stride 			//шаг между кусочками в текущей итерации (шаг между потоками)
+						){
+	int gid = get_global_id(0);
+	// int gsi = get_global_size(0);
+
+	uint offset = gid * stride;
+
+	res[gid] = res[offset];
+
+}
 

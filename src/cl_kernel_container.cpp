@@ -72,6 +72,11 @@ clKernelsContainer::clKernelsContainer(){
 	std::cout<<ret<<std::endl;
 	if(ret)
 		exit(-1);
+	translate_kernel = clCreateKernel(program, "translate_arr", &ret);
+	std::cout<<ret<<std::endl;
+	if(ret)
+		exit(-1);
+
 
 }
 
@@ -107,6 +112,7 @@ unsigned int clKernelsContainer::addModel(unsigned int VBO, unsigned int EBO, un
 }
 
 
+void minimaze(float * arr, unsigned int size);
 
 float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, cl_float3 origin, cl_float3 dir){
 	mesh_cl_data * m = &(mem_objects[mesh_cl_ptr]);
@@ -134,36 +140,54 @@ float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, cl_
 	ret = clSetKernelArg(intersect_kernel, 5, sizeof(cl_uint), (void*)&(m->mat4_ptr)); //mat_ofset
 
 
+
 	size_t global_work_size[] = {inst_cnt, m->faces_cnt};
 
 	ret = clEnqueueNDRangeKernel(command_queue, intersect_kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-
 	ret = clFinish(command_queue);
-
 	ret = clEnqueueReleaseGLObjects(command_queue, 1, &m->vbo_memobj, 0, NULL, NULL);
-
 	ret = clEnqueueReleaseGLObjects(command_queue, 1, &m->ebo_memobj, 0, NULL, NULL);
 
-	std::vector<cl_float> res(inst_cnt * m->faces_cnt);
+	int size = inst_cnt * m->faces_cnt;
+	int stride;
+	int prev_stride = 1;
+	int cnt = 512;
+	for(stride = 512; size/stride >= 512 || stride == 512; stride *= 512){
+		ret = clSetKernelArg(min_kernel, 0, sizeof(cl_mem), (void*)&m->cl_memobj); //массив
+		ret = clSetKernelArg(min_kernel, 1, sizeof(cl_uint), (void*)&size); // размер массива для нахождения размера последнего кусочка 
+		ret = clSetKernelArg(min_kernel, 2, sizeof(cl_uint), (void*)&stride); //интервал между началами кусочков (нужен, чтобы посчитать offset для кусочка в потоке)
+		ret = clSetKernelArg(min_kernel, 3, sizeof(cl_uint), (void*)&prev_stride); // интервал между элементами кусочка (для обработки кусочка в потоке, изначально 1, потом 512, потом 512*512)
+		ret = clSetKernelArg(min_kernel, 4, sizeof(cl_uint), (void*)&cnt); // количество элементов в целом кусочке, всегда 512
+		size_t global_work_size[] = {size / stride + 1}; // количество целых кусочков + 1 неполный
+		prev_stride = stride;
+	//	cnt = 512;
+		ret = clEnqueueNDRangeKernel(command_queue, min_kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+	}
 
-	ret = clEnqueueReadBuffer(command_queue, m->cl_memobj, CL_TRUE, 0, inst_cnt * m->faces_cnt * sizeof(cl_float), res.data(), 0, NULL, NULL);
+	ret = clSetKernelArg(translate_kernel, 0, sizeof(cl_mem), (void*)&m->cl_memobj); //массив
+	ret = clSetKernelArg(translate_kernel, 1, sizeof(cl_uint), (void*)&prev_stride); //интервал между началами кусочков (нужен, чтобы посчитать offset для кусочка в потоке)
+	size_t tr_global_work_size[] = {size / prev_stride + 1}; //
+
+	ret = clEnqueueNDRangeKernel(command_queue, translate_kernel, 1, NULL, tr_global_work_size, NULL, 0, NULL, NULL);
+
+	std::vector<cl_float> res(size / prev_stride + 1);
+
+	ret = clEnqueueReadBuffer(command_queue, m->cl_memobj, CL_TRUE, 0, (size / prev_stride + 1) * sizeof(cl_float), res.data(), 0, NULL, NULL);
 
 	float ret_f = -1;
-	for(int i = 0; i < inst_cnt * m->faces_cnt; i++){
+
+	for(int i = 0; i < (size / prev_stride + 1); i++){
 		if(res[i] > 0){
 			if(ret_f<0)
 				ret_f = res[i];
-			if(res[i]<ret_f)
+			if(res[i]<ret_f){
 				ret_f = res[i];
-
+			}
 		}
 	}
-
 	return ret_f;
 }
-
-
 
 
 
