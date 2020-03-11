@@ -5,13 +5,13 @@
 #include "mesh.h"
 #include "cl_kernel_container.h"
 #include <CL/opencl.h>
+#include "rangefinder.h"
 
-
-class ClMesh: public Mesh{
+class ClMesh: public Mesh, public RayTarget{
 	public:
 	
 	ClMesh(clKernelsContainer * cl_kernel_cont, aiMesh * mesh, const aiScene * scene, std::vector<Texture> textures, std::vector <glm::mat4> instance_mat4, bool print_vert = false);
-	float computeRay(cl_float3 origin, cl_float3 dir, int inst_cnt = 1);
+	float computeRay(const Ray * ray, int inst_cnt = 1);
 
 	private:
 

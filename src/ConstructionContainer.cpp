@@ -106,19 +106,19 @@ ConstructionContainer::~ConstructionContainer(){
 	delete column;
 }
 
-float ConstructionContainer::computeRay(cl_float3 origin, cl_float3 dir){
+float ConstructionContainer::computeRay(const Ray * ray, int){
 	float ret = -1.0f;
 	float _ret;
 	
-	_ret = tilted_bond->computeRay(origin, dir, tilted_bond_cnt);
+	_ret = tilted_bond->computeRay(ray, tilted_bond_cnt);
 	if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 		ret = _ret;
 
-	_ret = horizontal_bond->computeRay(origin, dir, horizontal_bond_cnt);
+	_ret = horizontal_bond->computeRay(ray, horizontal_bond_cnt);
 	if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 		ret = _ret;
 
-	_ret = column->computeRay(origin, dir, column_cnt);
+	_ret = column->computeRay(ray, column_cnt);
 	if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 		ret = _ret;
 

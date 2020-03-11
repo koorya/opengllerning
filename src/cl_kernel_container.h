@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 
+
 typedef struct {
 	cl_mem vbo_memobj;
 	cl_mem ebo_memobj;
@@ -19,12 +20,24 @@ typedef struct {
 	unsigned int mat4_ptr;
 } mesh_cl_data;
 
+class Ray{
+	public:
+		Ray();
+		cl_float3 origin;
+		cl_float3 dir;
+};
+
+class RayTarget{
+	public:
+	virtual float computeRay(const Ray * ray, int inst_cntinst_cnt = 1);
+};
+
 class clKernelsContainer{
 	public:
 		clKernelsContainer();
 		~clKernelsContainer();
 		unsigned int addModel(unsigned int VBO, unsigned int EBO, unsigned int mat4_ptr_offset_index, unsigned int faces_cnt, unsigned int inst_cnt);
-		float computeRay(unsigned int mesh_cl_ptr, int inst_cnt, cl_float3 origin, cl_float3 dir);
+		float computeRay(unsigned int mesh_cl_ptr, int inst_cnt, const Ray * ray);
 
 	private:
 

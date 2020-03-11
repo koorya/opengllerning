@@ -36,7 +36,7 @@
 #include <nanogui/nanogui.h>
 
 #include "cl_kernel_container.h"
-
+#include "rangefinder.h"
 
 void do_movement();
 void key_callback(GLFWwindow *, int, int, int, int);
@@ -645,19 +645,23 @@ int main(int argc, char * argv[])
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 
+
+	Rangefinder my_rangef = Rangefinder(&(m_mat[0]->rangefinder));
+	my_rangef.calcProp();
+
 	while (!glfwWindowShouldClose(window))
 	{
 
 
 
 			
-			my_ray_vert[0] = my_cl_origin.v4[0];
-			my_ray_vert[1] = my_cl_origin.v4[1];
-			my_ray_vert[2] = my_cl_origin.v4[2];
+			my_ray_vert[0] = my_rangef.origin.v4[0];
+			my_ray_vert[1] = my_rangef.origin.v4[1];
+			my_ray_vert[2] = my_rangef.origin.v4[2];
 
-			my_ray_vert[3] = my_cl_origin.v4[0] + 50000*my_cl_dir.v4[0];
-			my_ray_vert[4] = my_cl_origin.v4[1] + 50000*my_cl_dir.v4[1];
-			my_ray_vert[5] = my_cl_origin.v4[2] + 50000*my_cl_dir.v4[2];
+			my_ray_vert[3] = my_rangef.origin.v4[0] + 50000*my_rangef.dir.v4[0];
+			my_ray_vert[4] = my_rangef.origin.v4[1] + 50000*my_rangef.dir.v4[1];
+			my_ray_vert[5] = my_rangef.origin.v4[2] + 50000*my_rangef.dir.v4[2];
 
 			glBindBuffer(GL_ARRAY_BUFFER, my_ray_vbo);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, 3*2*sizeof(float), my_ray_vert);
@@ -717,29 +721,18 @@ int main(int argc, char * argv[])
 
 
 clflag = true;
-			glm::mat4 ray_mat = m_mat[0]->rangefinder;
-			glm::vec3 my_glm_origin;
-			my_glm_origin = ray_mat * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-			my_cl_origin.v4[0] = my_glm_origin.x;
-			my_cl_origin.v4[1] = my_glm_origin.y;
-			my_cl_origin.v4[2] = my_glm_origin.z;
-
-			glm::vec3 my_glm_dir;
-			my_glm_dir = ray_mat * glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
-			my_cl_dir.v4[0] = my_glm_dir.x;
-			my_cl_dir.v4[1] = my_glm_dir.y;
-			my_cl_dir.v4[2] = my_glm_dir.z;
+		my_rangef.calcProp();
 
 		if(clflag){
 			float ret = -1.0f;
 			float _ret;
-			_ret = cassete_cl.computeRay(my_cl_origin, my_cl_dir, 5);
+			_ret = cassete_cl.computeRay(&my_rangef, 5);
 			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 				ret = _ret;
-			_ret = constr_container.computeRay(my_cl_origin, my_cl_dir);
+			_ret = constr_container.computeRay(&my_rangef);
 			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 				ret = _ret;
-			_ret = main_frame_cl.computeRay(my_cl_origin, my_cl_dir);
+			_ret = main_frame_cl.computeRay(&my_rangef);
 			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
 				ret = _ret;
 			cl_t = ret;
@@ -748,8 +741,8 @@ clflag = true;
 
 			textBox->setValue(std::to_string(cl_t));
 
-			glm::vec3 sphere_trnsl = glm::vec3((float)my_cl_origin.v4[0], (float)my_cl_origin.v4[1], (float)my_cl_origin.v4[2]) +
-			glm::vec3((float)my_cl_dir.v4[0], (float)my_cl_dir.v4[1], (float)my_cl_dir.v4[2])*cl_t;
+			glm::vec3 sphere_trnsl = glm::vec3((float)my_rangef.origin.v4[0], (float)my_rangef.origin.v4[1], (float)my_rangef.origin.v4[2]) +
+			glm::vec3((float)my_rangef.dir.v4[0], (float)my_rangef.dir.v4[1], (float)my_rangef.dir.v4[2])*cl_t;
 
 			sphere_mat = glm::translate(f_mat.World, sphere_trnsl);
 			my_sphere.setMatrixByID(0, sphere_mat);

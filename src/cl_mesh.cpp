@@ -10,11 +10,11 @@ ClMesh::ClMesh(clKernelsContainer * cl_kernel_cont, aiMesh * mesh, const aiScene
 }
 
 
-float ClMesh::computeRay(cl_float3 origin, cl_float3 dir, int inst_cnt){
+float ClMesh::computeRay(const Ray * ray, int inst_cnt){
 	if(cl_kernel_cont == NULL)
 		return -1;
 
-	return cl_kernel_cont->computeRay(cl_kernel_ptr, inst_cnt, origin, dir);
+	return cl_kernel_cont->computeRay(cl_kernel_ptr, inst_cnt, ray);
 
 }
 

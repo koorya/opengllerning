@@ -8,6 +8,7 @@
 #include <list>
 #include "model.h"
 #include "cl_kernel_container.h"
+#include "rangefinder.h"
 
 struct BondLocation{
 	int section;
@@ -19,7 +20,7 @@ struct Attachment{
 	int id;
 };
 
-class ConstructionContainer{
+class ConstructionContainer:public RayTarget{
 public:
 	ConstructionContainer(clKernelsContainer * cl_kernel_cont=NULL);
 	~ConstructionContainer();
@@ -29,7 +30,7 @@ public:
 	void updateMatrices();
 	void drawElements(Shader shader);
 
-	float computeRay(cl_float3 origin, cl_float3 dir);
+	float computeRay(const Ray * ray, int inst_cntinst_cnt = 1);
 
 	int get_t_bond_max_cnt();
 	int get_h_bond_max_cnt();

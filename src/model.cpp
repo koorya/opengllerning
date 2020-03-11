@@ -29,10 +29,10 @@ void Model::setMatrixByID(unsigned int id, glm::mat4 matrix){
 		meshes[i].setMatrixByID(id, matrix);
 }
 
-float Model::computeRay(cl_float3 origin, cl_float3 dir, int inst_cntinst_cnt){
+float Model::computeRay(const Ray * ray, int inst_cntinst_cnt){
 	float ret = -1.0f;
 	for(int i = 0; i < meshes.size(); i++){
-		float curr_dist = meshes[i].computeRay(origin, dir, inst_cntinst_cnt);
+		float curr_dist = meshes[i].computeRay(ray, inst_cntinst_cnt);
 		if(curr_dist > 0){
 			if(ret<0)
 				ret = curr_dist;

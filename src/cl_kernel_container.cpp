@@ -4,6 +4,10 @@
 #include <glad/glad.h>
 
 
+Ray::Ray(){
+
+}
+
 clKernelsContainer::clKernelsContainer(){
 	cl_platform_id platform_id;
 	cl_uint ret_num_platforms;
@@ -114,7 +118,7 @@ unsigned int clKernelsContainer::addModel(unsigned int VBO, unsigned int EBO, un
 
 void minimaze(float * arr, unsigned int size);
 
-float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, cl_float3 origin, cl_float3 dir){
+float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, const Ray * ray){
 	mesh_cl_data * m = &(mem_objects[mesh_cl_ptr]);
 	if(inst_cnt <= 0)
 		return -1.0f;
@@ -133,8 +137,8 @@ float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, cl_
 
 
 	ret = clSetKernelArg(intersect_kernel, 2, sizeof(cl_mem), (void*)&m->cl_memobj);
-	ret = clSetKernelArg(intersect_kernel, 3, sizeof(cl_float3), (void*)&origin); //origin
-	ret = clSetKernelArg(intersect_kernel, 4, sizeof(cl_float3), (void*)&dir); //dir
+	ret = clSetKernelArg(intersect_kernel, 3, sizeof(cl_float3), (void*)&ray->origin); //origin
+	ret = clSetKernelArg(intersect_kernel, 4, sizeof(cl_float3), (void*)&ray->dir); //dir
 
 
 	ret = clSetKernelArg(intersect_kernel, 5, sizeof(cl_uint), (void*)&(m->mat4_ptr)); //mat_ofset
