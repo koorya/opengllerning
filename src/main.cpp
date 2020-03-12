@@ -409,8 +409,8 @@ int main(int argc, char * argv[])
 	 Model main_frame_cl("../3D_models/пустой стенд.stl", 1, &my_cl_cont);
 	 Model main_frame_gl("../3D_models/пустой стенд.obj", 1);
 //	Model main_frame("../3D_models/obj/manipulator/Pc2.obj", 1, &my_cl_cont);
-	Model cassete_cl("../3D_models/пустая кассета.stl", 1, &my_cl_cont);
-	Model cassete_gl("../3D_models/пустая кассета.obj", 1);
+	Model cassete_cl("../3D_models/правильная кассета.stl", 1, &my_cl_cont);
+	Model cassete_gl("../3D_models/правильная кассета.obj", 1);
 
 //	Model cassete("../3D_models/obj/manipulator/Pc1.obj", 1);
 	Model tower_frame("../3D_models/obj/manipulator/Component18.obj", 3);				 //tower frame
@@ -426,7 +426,7 @@ int main(int argc, char * argv[])
 	// Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
 	// Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
 	// Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
-	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik.obj", 3, &my_cl_cont);   //bond handler right
+	Model bond_handler_middle("../3D_models/obj/manipulator/zaklepochnik1.obj", 3, &my_cl_cont);   //bond handler right
 //	Model bond_handler_middle("../3D_models/cube_cil.obj", 3, context, kernel);   //bond handler right
 
 	Model pb1("../3D_models/obj/manipulator/Pb1.obj", 3); //bond pantograph section 1
@@ -592,43 +592,17 @@ int main(int argc, char * argv[])
 
 //	GUIWindow ray_gui(screen);
 
-    using namespace nanogui;
-
-    Window *ray_gui_window = new Window(screen, "ray");
-    ray_gui_window->setPosition(Vector2i(15, 15));
-    ray_gui_window->setLayout(new GroupLayout());
-
-	nanogui::TextBox * textBox = new TextBox(ray_gui_window);
-
-    textBox->setEditable(false);
-    textBox->setDefaultValue("0.0");
-
-    textBox->setFormat("[-]?[0-9]*\\.?[0-9]+");
-
-    textBox->setFixedSize(Vector2i(90, 25));
-    textBox->setValue("0");
-    textBox->setUnits("mm");
-
-
-	nanogui::Button * button = new nanogui::Button((nanogui::Window*)ray_gui_window, "rayup");
-	button->setCallback([&]{
-		//this->fillUp();
-		clflag = true;
-	//	my_cl_dir.v4[0] += 0.001f;
-	});
-	std::pair<float, float> limits(-1.0f, 1.0f);
-	std::pair<float, float> limits_2(-5000.0f, 5000.0f);
-
-	SliderWithText xSliderWithText((nanogui::Widget*)(ray_gui_window), "rayx", std::ref(limits), ".", std::ref(my_cl_dir.v4[0]));
-	SliderWithText ySliderWithText((nanogui::Widget*)(ray_gui_window), "rayy", std::ref(limits), ".", std::ref(my_cl_dir.v4[1]));
 
 	screen->performLayout();
 
 
 
-	RangefindersContainer my_rf_cont = RangefindersContainer();
+	guiRangefindersContainer my_rf_cont = guiRangefindersContainer(screen);
 	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder1));
 	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder2));
+	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder3));
+	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder4));
+//	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder5));
 
 	my_rf_cont.addTarget(&cassete_cl);
 	my_rf_cont.addTarget(&constr_container);

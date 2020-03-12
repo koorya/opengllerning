@@ -12,6 +12,8 @@
 
 #include <glm/gtx/string_cast.hpp>
 
+#include <nanogui/nanogui.h>
+
 class Rangefinder : public Ray{
 	public:
 	Rangefinder(glm::mat4 * parent_m4 = NULL);
@@ -47,11 +49,27 @@ class RangefindersContainer{
 	GLuint my_ray_vao;
 	GLuint my_ray_vbo;
 
+	protected:
 	std::vector <Rangefinder> rangef_list;
 
 	std::vector <RayTarget *> target_list;
 
 
 };
+
+class guiRangefindersContainer: public RangefindersContainer{
+	public:
+	
+	guiRangefindersContainer(nanogui::Screen * screen, int max_cnt = 10);
+	void addRangefinder(glm::mat4 * parent_m4);
+	void computeRays();
+	private:
+	nanogui::Window *ray_gui_window;
+	nanogui::Screen * screen;
+	std::vector<nanogui::TextBox *> text_boxes;
+
+};
+
+
 
 #endif

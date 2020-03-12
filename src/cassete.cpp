@@ -54,7 +54,7 @@ void Cassete::updateMatrices(const glm::mat4 * parent){
 	float param[5];
 	param[0] = 190;
 	param[1] = -197;
-	param[2] = -3087;
+	param[2] = -3024;//-3087;//3496, 3433
 	param[3] = 155;
 	param[4] = 400;
 	glm::mat4 origin = * parent;

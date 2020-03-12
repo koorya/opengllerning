@@ -42,6 +42,10 @@ public:
 	glm::mat4 B, C, D, E1, E2, F1, F2, G1, G2, H, I, pb1, pb2, pb3, pb4, pc1, pc2; ///< матрицы положений элементов манипулятора
 	glm::mat4 rangefinder1;
 	glm::mat4 rangefinder2;
+	glm::mat4 rangefinder3;
+	glm::mat4 rangefinder4;
+	glm::mat4 rangefinder5;
+
 	struct ManipulatorConfig config; ///< актуальная конфигурация манипулятора, в абсолютных единицах координатной системы рамы.
 	ConstructionContainer * container;///< ссылка на контейнер связей. Нужна для отображения захваченной связи и ее отображения после установки
 	Cassete * cassete;

@@ -145,7 +145,7 @@ float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, con
 
 
 
-	size_t global_work_size[] = {inst_cnt, m->faces_cnt};
+	size_t global_work_size[] = {(size_t)inst_cnt, m->faces_cnt};
 
 	ret = clEnqueueNDRangeKernel(command_queue, intersect_kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
@@ -163,7 +163,7 @@ float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, con
 		ret = clSetKernelArg(min_kernel, 2, sizeof(cl_uint), (void*)&stride); //интервал между началами кусочков (нужен, чтобы посчитать offset для кусочка в потоке)
 		ret = clSetKernelArg(min_kernel, 3, sizeof(cl_uint), (void*)&prev_stride); // интервал между элементами кусочка (для обработки кусочка в потоке, изначально 1, потом 512, потом 512*512)
 		ret = clSetKernelArg(min_kernel, 4, sizeof(cl_uint), (void*)&cnt); // количество элементов в целом кусочке, всегда 512
-		size_t global_work_size[] = {size / stride + 1}; // количество целых кусочков + 1 неполный
+		size_t global_work_size[] = {(size_t)(size / stride + 1)}; // количество целых кусочков + 1 неполный
 		prev_stride = stride;
 	//	cnt = 512;
 		ret = clEnqueueNDRangeKernel(command_queue, min_kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
@@ -171,7 +171,7 @@ float clKernelsContainer::computeRay(unsigned int mesh_cl_ptr, int inst_cnt, con
 
 	ret = clSetKernelArg(translate_kernel, 0, sizeof(cl_mem), (void*)&m->cl_memobj); //массив
 	ret = clSetKernelArg(translate_kernel, 1, sizeof(cl_uint), (void*)&prev_stride); //интервал между началами кусочков (нужен, чтобы посчитать offset для кусочка в потоке)
-	size_t tr_global_work_size[] = {size / prev_stride + 1}; //
+	size_t tr_global_work_size[] = {(size_t)(size / prev_stride + 1)}; //
 
 	ret = clEnqueueNDRangeKernel(command_queue, translate_kernel, 1, NULL, tr_global_work_size, NULL, 0, NULL, NULL);
 

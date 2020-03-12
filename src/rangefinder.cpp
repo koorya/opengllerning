@@ -99,11 +99,63 @@ void RangefindersContainer::computeRays(){
 		ray_vertices[i*6] 	= (*ray).origin.v4[0];
 		ray_vertices[i*6+1] = (*ray).origin.v4[1];
 		ray_vertices[i*6+2] = (*ray).origin.v4[2];
-
-		ray_vertices[i*6+3] = (*ray).origin.v4[0] + (*ray).dir.v4[0]*ret;
-		ray_vertices[i*6+4] = (*ray).origin.v4[1] + (*ray).dir.v4[1]*ret;
-		ray_vertices[i*6+5] = (*ray).origin.v4[2] + (*ray).dir.v4[2]*ret;
-
+		if(ret > 0){
+			ray_vertices[i*6+3] = (*ray).origin.v4[0] + (*ray).dir.v4[0]*ret;
+			ray_vertices[i*6+4] = (*ray).origin.v4[1] + (*ray).dir.v4[1]*ret;
+			ray_vertices[i*6+5] = (*ray).origin.v4[2] + (*ray).dir.v4[2]*ret;
+		}else{
+			ray_vertices[i*6+3] = (*ray).origin.v4[0] + (*ray).dir.v4[0]*5000;
+			ray_vertices[i*6+4] = (*ray).origin.v4[1] + (*ray).dir.v4[1]*5000;
+			ray_vertices[i*6+5] = (*ray).origin.v4[2] + (*ray).dir.v4[2]*5000;
+		}
 		sphere->setMatrixByID(i, (*ray).get_intersect_mat());
 	}
 }
+
+
+//GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI 
+//GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI 
+//GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI 
+
+guiRangefindersContainer::guiRangefindersContainer(nanogui::Screen * screen, int max_cnt):RangefindersContainer(max_cnt), screen(screen){
+    using namespace nanogui;
+
+    ray_gui_window = new Window(screen, "ray");
+    ray_gui_window->setPosition(Vector2i(15, 15));
+    ray_gui_window->setLayout(new GroupLayout());
+
+}
+void guiRangefindersContainer::addRangefinder(glm::mat4 * parent_m4){
+
+	RangefindersContainer::addRangefinder(parent_m4);
+
+	using namespace nanogui;
+	int i = rangef_list.size() - 1;
+	if(text_boxes.size() != i)
+		return;
+	text_boxes.push_back(new TextBox(ray_gui_window));
+
+    text_boxes[i]->setEditable(false);
+    text_boxes[i]->setDefaultValue("0.0");
+
+    text_boxes[i]->setFormat("[-]?[0-9]*\\.?[0-9]+");
+
+    text_boxes[i]->setFixedSize(Vector2i(150, 25));
+    text_boxes[i]->setValue("0");
+    text_boxes[i]->setUnits("mm");
+
+	screen->performLayout();
+
+
+//	text_boxes.end()->setValue(std::to_string(-1.0));
+}
+
+
+void guiRangefindersContainer::computeRays(){
+	RangefindersContainer::computeRays();
+	for(int i = 0; i < rangef_list.size(); i++){
+		auto str = std::to_string(rangef_list[i].distance);
+		text_boxes[i]->setValue(str.erase(str.size()-5));
+	}
+}
+

@@ -464,11 +464,18 @@ void Manipulator::calculateMatrices(){
 	this->H = glm::rotate(this->G1, glm::radians(180.0f-this->config.brot.value), glm::vec3(1.0, 0.0, 0.0));
 	this->I = glm::rotate(glm::translate(this->H, glm::vec3(653.0, 0.0, -1210.0)), glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
 
-	this->rangefinder1 = glm::rotate(this->I, glm::radians(180.0f), glm::vec3(0.0, 0.0, 1.0));
+	this->rangefinder1 = this->H;
 
-	this->rangefinder2 = glm::translate(this->rangefinder1, glm::vec3(-300.0f, 0.0f, 2520.0f));
-	this->rangefinder1 = glm::translate(this->rangefinder1, glm::vec3(-300.0f, 0.0f, -100.0f));
+	this->rangefinder2 = glm::translate(this->rangefinder1, glm::vec3(466.0f, 0.0f, 1312.0f));
+	this->rangefinder1 = glm::translate(this->rangefinder1, glm::vec3(466.0f, 0.0f, -1312.0f));
 
+	this->rangefinder3 = glm::translate(this->H, glm::vec3(731.0f, 67.8f, 1285.0f));
+	this->rangefinder4 = glm::translate(this->H, glm::vec3(731.0f, 67.8f, -1285.0f));
+
+	this->rangefinder3 = glm::rotate(rangefinder3, glm::radians(-70.0f), glm::vec3(0.0, 0.0, 1.0));
+	this->rangefinder4 = glm::rotate(rangefinder4, glm::radians(-70.0f), glm::vec3(0.0, 0.0, 1.0));
+
+	this->rangefinder5 = D;
 
 	float bpant_length = this->config.bpant.value+334.2;
 	float bangle = -asinf((bpant_length)/4450);
