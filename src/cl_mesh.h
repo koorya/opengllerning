@@ -5,7 +5,6 @@
 #include "mesh.h"
 #include "cl_kernel_container.h"
 #include <CL/opencl.h>
-#include "rangefinder.h"
 
 class ClMesh: public Mesh, public RayTarget{
 	public:

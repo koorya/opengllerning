@@ -621,52 +621,24 @@ int main(int argc, char * argv[])
 
 	SliderWithText xSliderWithText((nanogui::Widget*)(ray_gui_window), "rayx", std::ref(limits), ".", std::ref(my_cl_dir.v4[0]));
 	SliderWithText ySliderWithText((nanogui::Widget*)(ray_gui_window), "rayy", std::ref(limits), ".", std::ref(my_cl_dir.v4[1]));
-	SliderWithText zSliderWithText((nanogui::Widget*)(ray_gui_window), "rayz", std::ref(limits), ".", std::ref(my_cl_dir.v4[2]));
-
-	SliderWithText xoSliderWithText((nanogui::Widget*)(ray_gui_window), "orx", std::ref(limits_2), ".", std::ref(my_cl_origin.v4[0]));
-	SliderWithText yoSliderWithText((nanogui::Widget*)(ray_gui_window), "ory", std::ref(limits_2), ".", std::ref(my_cl_origin.v4[1]));
-	SliderWithText zoSliderWithText((nanogui::Widget*)(ray_gui_window), "orz", std::ref(limits_2), ".", std::ref(my_cl_origin.v4[2]));
-
 
 	screen->performLayout();
 
-	Shader ray_shader("../shaders/ray.vert", "../shaders/ray.frag");
-	float my_ray_vert[] = {	0.0f, 0.0f, 0.0f,
-							0.5f, 5000.5f, 0.0f};
-	GLuint my_ray_vao;
-	GLuint my_ray_vbo;
-	glGenVertexArrays(1, &my_ray_vao);
-	glGenBuffers(1, &my_ray_vbo);
-	glBindVertexArray(my_ray_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, my_ray_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3*2*sizeof(float), my_ray_vert, GL_STATIC_DRAW);
-
-//	glBufferSubData(GL_ARRAY_BUFFER, 0, 3*2*sizeof(float), my_ray_vert);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 
 
-	Rangefinder my_rangef = Rangefinder(&(m_mat[0]->rangefinder));
-	my_rangef.calcProp();
+	RangefindersContainer my_rf_cont = RangefindersContainer();
+	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder1));
+	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder2));
+
+	my_rf_cont.addTarget(&cassete_cl);
+	my_rf_cont.addTarget(&constr_container);
+	my_rf_cont.addTarget(&main_frame_cl);
+
 
 	while (!glfwWindowShouldClose(window))
 	{
 
 
-
-			
-			my_ray_vert[0] = my_rangef.origin.v4[0];
-			my_ray_vert[1] = my_rangef.origin.v4[1];
-			my_ray_vert[2] = my_rangef.origin.v4[2];
-
-			my_ray_vert[3] = my_rangef.origin.v4[0] + 50000*my_rangef.dir.v4[0];
-			my_ray_vert[4] = my_rangef.origin.v4[1] + 50000*my_rangef.dir.v4[1];
-			my_ray_vert[5] = my_rangef.origin.v4[2] + 50000*my_rangef.dir.v4[2];
-
-			glBindBuffer(GL_ARRAY_BUFFER, my_ray_vbo);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, 3*2*sizeof(float), my_ray_vert);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
 
 
 //		std::this_thread::sleep_for(time);
@@ -721,31 +693,15 @@ int main(int argc, char * argv[])
 
 
 clflag = true;
-		my_rangef.calcProp();
 
 		if(clflag){
-			float ret = -1.0f;
-			float _ret;
-			_ret = cassete_cl.computeRay(&my_rangef, 5);
-			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
-				ret = _ret;
-			_ret = constr_container.computeRay(&my_rangef);
-			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
-				ret = _ret;
-			_ret = main_frame_cl.computeRay(&my_rangef);
-			if(	_ret > 0 && ( ret < 0 || ret > _ret ))
-				ret = _ret;
-			cl_t = ret;
+		//	float ret = -1.0f;
+			my_rf_cont.computeRays();
+		//	cl_t = ret;
 			
 
 
-			textBox->setValue(std::to_string(cl_t));
-
-			glm::vec3 sphere_trnsl = glm::vec3((float)my_rangef.origin.v4[0], (float)my_rangef.origin.v4[1], (float)my_rangef.origin.v4[2]) +
-			glm::vec3((float)my_rangef.dir.v4[0], (float)my_rangef.dir.v4[1], (float)my_rangef.dir.v4[2])*cl_t;
-
-			sphere_mat = glm::translate(f_mat.World, sphere_trnsl);
-			my_sphere.setMatrixByID(0, sphere_mat);
+		//	textBox->setValue(std::to_string(cl_t));
 
 			clflag = false;
 		}
@@ -799,7 +755,8 @@ clflag = true;
 
 		cassete_gl.Draw(ourShader, 1);
 
-		my_sphere.Draw(ourShader, 1);
+		my_rf_cont.Draw(ourShader);
+
 //		my_cube.Draw(ourShader, 1);
 		// ourShader.setMaterial(Material::yellow_plastic);
 		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B1));
@@ -914,11 +871,6 @@ clflag = true;
 		column_carrige.Draw(ourShader, 1);
 
 
-
-		ray_shader.use();
-		glBindVertexArray(my_ray_vao);
-		glDrawArrays(GL_LINES, 0, 2);
-		glBindVertexArray(0);
 
 		skyboxShader.use();
 		skyboxShader.setMat4(proj, "proj");

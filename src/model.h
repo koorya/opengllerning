@@ -11,7 +11,7 @@
 #include "shader.h"
 #include "cl_mesh.h"
 #include "cl_kernel_container.h"
-#include "rangefinder.h"
+
 
 class Model: public RayTarget{
 public:
