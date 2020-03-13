@@ -12,7 +12,7 @@ class CasseteCell{
 public:
     CasseteCell(ConstructionContainer * container);
     void attachBond(struct BondLocation bond);
-    void getBond(const glm::mat4 * matr);
+    bool getBond(const glm::mat4 * matr);
     ConstructionContainer * container;
     glm::mat4 matr;
     bool noempty;

@@ -3,7 +3,7 @@
 
 RemoteManipulator::RemoteManipulator(unsigned int manip_id){
 	std::cout<<"RemoteManipulator()"<<std::endl;
-	SQL_query = "SELECT kareta, tower, link_pantograph, column_pantograph, link_carige, column_carrige, wrist, link_rotation \
+	SQL_query = "SELECT kareta, tower, link_pantograph, column_pantograph, link_carige, column_carrige, wrist, link_rotation, stick_in_hand \
 	 FROM configuration_new WHERE id=";
 	SQL_query += std::to_string(manip_id);
 
@@ -63,6 +63,7 @@ void RemoteManipulator::updateManipConfig(){
 			config_rec.ccar.value = atof(row[5]);
 			config_rec.wrist.value = atof(row[6]);
 			config_rec.brot.value = atof(row[7]);
+			config_rec.bond_capture_actuator = atoi(row[8]);
 			recieve_data->unlock();
 			// for (int i = 0; i < mysql_num_fields(res); i++)
 			// {
@@ -88,7 +89,7 @@ void RemoteManipulator::resetConfiguration(){
 	config.ccar.value = 0.0;
 	config.wrist.value = 0.0;
 	config.brot.value = 0.0;
-
+	config.bond_capture_actuator = false;
 }
 
 void RemoteManipulator::doStep(){
@@ -103,6 +104,13 @@ void RemoteManipulator::doStep(){
 	config.ccar = config_rec.ccar;
 	config.wrist = config_rec.wrist;
 	config.brot = config_rec.brot;
+	calculateMatrices();
+	if(!config.bond_capture_actuator && config_rec.bond_capture_actuator)
+		pickUpBond();
+	if(config.bond_capture_actuator && !config_rec.bond_capture_actuator)
+		mountBond();
+	
+	config.bond_capture_actuator = config_rec.bond_capture_actuator;
 	recieve_data->unlock();
 //	this->updateManipConfig();
 }

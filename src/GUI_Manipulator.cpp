@@ -38,12 +38,12 @@ guiManipulator::guiManipulator(nanogui::Screen * screen) : GUIWindow(screen) {
 
 
 
-	nanogui::Button * button = new nanogui::Button(window, "pickUpBond");
-	button->setCallback([&]{
+	buttons.push_back(new nanogui::Button(window, "pickUpBond"));
+	(*--buttons.end())->setCallback([&]{
 		pickUpBond();
 	});
-	button = new nanogui::Button(window, "mountBond");
-	button->setCallback([&]{
+	buttons.push_back(new nanogui::Button(window, "mountBond"));
+	(*--buttons.end())->setCallback([&]{
 		mountBond();
 	});
 	screen->performLayout();
@@ -57,6 +57,8 @@ guiManipulator::~guiManipulator() {
 
 void guiManipulator::doStep(){
 	this->syncValues();
+	calculateMatrices();
+
 }
 
 guiRemoteManipulator::guiRemoteManipulator(nanogui::Screen * screen, unsigned int manip_id) : guiManipulator(screen), RemoteManipulator(manip_id), database_upd(false) {
@@ -68,13 +70,16 @@ guiRemoteManipulator::guiRemoteManipulator(nanogui::Screen * screen, unsigned in
 	nanogui:CheckBox * upd = new nanogui::CheckBox(window, "update");
 	upd->setCallback([&](const bool v){
 		database_upd = v;
+		for(auto b = buttons.begin(); b != buttons.end(); b++)
+			(*b)->setVisible(!v);
 	});
 	screen->performLayout();
 }
 
 void guiRemoteManipulator::doStep(){
-	guiManipulator::doStep();
 	if(database_upd){
 		RemoteManipulator::doStep();
+	}else{
+		guiManipulator::doStep();
 	}
 }

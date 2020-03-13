@@ -539,7 +539,7 @@ int main(int argc, char * argv[])
 
 
 
-	guiManipulator gui_man = guiManipulator(screen);
+	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
 	
 //	guiManipulator gui_man1 = guiManipulator();
 //	guiManipulator gui_man2 = guiManipulator();
@@ -553,7 +553,7 @@ int main(int argc, char * argv[])
 
 	Manipulator *m_mat[3] = {&gui_man, NULL, NULL};
 //	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
-	m_mat[0]->config.rail.value = 3000.0;
+//	m_mat[0]->config.rail.value = 3000.0;
 //	m_mat[2]->config.rail.value = 6000.0;
 
 	glfwMakeContextCurrent(window);
@@ -582,15 +582,6 @@ int main(int argc, char * argv[])
 	std::chrono::seconds time(1);
 
 	bool clflag = false;
-
-	cl_float3 my_cl_origin = {1.0f, -1500.0f, 0.0f};
-	cl_float3 my_cl_dir = {0.7f, 0.06f, -0.2f};
-	float cl_t = 0;
-	glm::mat4 sphere_mat = glm::scale(f_mat.World, glm::vec3(1.0f));
-	my_sphere.setMatrixByID(0, sphere_mat);
-	my_dr_cube.setMatrixByID(0, f_mat.World);
-
-//	GUIWindow ray_gui(screen);
 
 
 	screen->performLayout();
@@ -652,6 +643,10 @@ int main(int argc, char * argv[])
 		// m_mat[1]->doStep();
 		// m_mat[2]->doStep();
 
+		constr_container.updateMatrices();
+
+
+
 		glfwMakeContextCurrent(window);
 
 		//m_mat[1]->doStep();
@@ -661,9 +656,6 @@ int main(int argc, char * argv[])
 		// m_mat[2]->driverSM(glfwGetTime()/10.0);
 		// m_mat[2]->updateManipConfig();
 
-		m_mat[0]->calculateMatrices();
-	//	m_mat[1]->calculateMatrices();
-	//	m_mat[2]->calculateMatrices();
 
 
 clflag = true;
@@ -709,15 +701,7 @@ clflag = true;
 		ourShader.use();
 
 		glUniform1i(obj_type_mode, -1);
-		ourShader.setMaterial(Material::green_plastic);
 
-//		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(glm::mat4(1.0f))); //model to identity
-
-		// column.setMatrixByID(1, m_mat[0]->G2);
-		// column.setMatrixByID(2, m_mat[1]->G2);
-		// column.setMatrixByID(3, m_mat[2]->G2);
-
-		constr_container.updateMatrices();
 		constr_container.drawElements(ourShader);
 
 		ourShader.setMaterial(Material::silver);

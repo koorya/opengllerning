@@ -23,6 +23,7 @@ struct ManipulatorConfig{
 	struct ManipulatorDrive ccar;
 	struct ManipulatorDrive wrist;
 	struct ManipulatorDrive brot;
+	bool bond_capture_actuator;
 };
 
 

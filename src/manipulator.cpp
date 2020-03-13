@@ -18,9 +18,9 @@ Manipulator::Manipulator(){
 	config.ccar.value = 0.0;
 	config.wrist.value = 0.0;
 	config.brot.value = 0.0;
+	config.bond_capture_actuator = false;
 
-
-	config.rail.limits = std::pair<float, float> (0.0, 1000 + 0.86 * 3000 * 6 );
+	config.rail.limits = std::pair<float, float> (0.0, 2490.0 );
 	config.tower.limits = std::pair<float, float> (-110.0, 210.0);
 	config.bpant.limits = std::pair<float, float> (0.0, 2920.0);
 	config.bcar.limits = std::pair<float, float> (0.0, 1645.0);

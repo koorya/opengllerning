@@ -55,6 +55,7 @@ public:
 private:
 protected:
 	nanogui::Window *window;
+	std::vector<nanogui::Button *> buttons;
 };
 
 class guiRemoteManipulator : public guiManipulator, public RemoteManipulator {

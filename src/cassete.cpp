@@ -12,10 +12,19 @@ void CasseteCell::attachBond(struct BondLocation bond){
 	}
 }
 
-void CasseteCell::getBond(const glm::mat4 * matr){
+bool CasseteCell::getBond(const glm::mat4 * matr){
 	std::cout<<"CasseteCell::getBond"<<std::endl;
-	container->reattach(&(this->matr), matr);
-	noempty = false;
+	glm::vec4 r1(0.0f, 0.0f, 0.0f, 1.0f);
+	glm::vec4 r2(0.0f, 0.0f, 0.0f, 1.0f);
+	r1 = this->matr * r1;
+	r2 = (*matr) * r2;
+	r1 -= r2;
+	std::cout<<"glm::dot(r1, r1) "<<glm::dot(r1, r1)<<std::endl;
+	if(glm::dot(r1, r1) < 5000 && noempty){
+		container->reattach(&(this->matr), matr);
+		noempty = false;
+	}
+	return noempty;
 }
 
 Cassete::Cassete(ConstructionContainer * container){
@@ -41,10 +50,8 @@ void Cassete::fillUp(){
 int Cassete::getBond(const glm::mat4 * matr){
 	int i;
 	for(int i = 7; i>=0; i--){
-		std::cout<<i<<std::endl;
 		if(places[i]->noempty){
-			places[i]->getBond(matr);
-			break;
+			return places[i]->getBond(matr);
 		}
 	}
 	return 0;
@@ -52,7 +59,7 @@ int Cassete::getBond(const glm::mat4 * matr){
 
 void Cassete::updateMatrices(const glm::mat4 * parent){
 	float param[5];
-	param[0] = 190;
+	param[0] = 190 - 2255.0; //вдоль рельсов
 	param[1] = -197;
 	param[2] = -3024;//-3087;//3496, 3433
 	param[3] = 155;
