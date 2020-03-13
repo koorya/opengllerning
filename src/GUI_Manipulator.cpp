@@ -82,4 +82,5 @@ void guiRemoteManipulator::doStep(){
 	}else{
 		guiManipulator::doStep();
 	}
+	this->syncValues();
 }
