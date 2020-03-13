@@ -21,8 +21,9 @@ layout (std140, binding = 2) uniform transformBlock{
 
 
 void main(){
-	TexCoords = aPos;
 	mat4 view_ = mat4(mat3(view));
+
+	TexCoords = vec3(-aPos.y, aPos.zx);//вращаем координаты из опенжл, когда z смитрит на тебя из эрана в такие, что z смотрит вверх, y налево, а x вдаль
 	gl_Position = proj * view_ * vec4(aPos, 1.0f);
 	gl_Position = gl_Position.xyww;
 }

@@ -39,6 +39,7 @@ public:
 	void processKeyboard(Camera_movement direction, GLfloat delta_time);
 	void processMouseMovement(GLfloat xoffset, GLfloat yoffset);
 	void processMouseMovementTranslate(GLfloat xoffset, GLfloat yoffset);
+	void processMouseMovementMiddle(GLfloat xoffset, GLfloat yoffset);
 	
 	void processMouseScroll(GLfloat yoffset);
 	GLfloat getZoom();

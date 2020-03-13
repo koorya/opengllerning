@@ -1,6 +1,6 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, bool pm) :  MovementSpeed(7.0f), MouseSensitivity(0.1f), Zoom(45.0f), Direction(glm::vec3(0.0f, 0.0f, 1.0f))
+Camera::Camera(glm::vec3 position, glm::vec3 up, GLfloat yaw, GLfloat pitch, bool pm) :  MovementSpeed(3500.0f), MouseSensitivity(0.1f), Zoom(45.0f), Direction(glm::vec3(0.0f, 0.0f, 1.0f))
 {
 	this->WorldUp = up;
 	this->Position = position;
@@ -60,8 +60,8 @@ void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset){
 	this->updateCameraVectors();
 }
 void Camera::processMouseMovementTranslate(GLfloat xoffset, GLfloat yoffset){
-	xoffset *= this->MouseSensitivity*this->Zoom/450.0f;
-	yoffset *= this->MouseSensitivity*this->Zoom/450.0f;
+	xoffset *= MovementSpeed*MouseSensitivity*this->Zoom/4500.0f;
+	yoffset *= MovementSpeed*MouseSensitivity*this->Zoom/4500.0f;
 	
 	glm::vec3 shift = this->Direction;
 
@@ -71,6 +71,17 @@ void Camera::processMouseMovementTranslate(GLfloat xoffset, GLfloat yoffset){
 	this->Position -= xoffset * glm::normalize(glm::cross(shift, this->Up));
 
 	this->Position -= yoffset * glm::normalize(glm::cross(shift,glm::normalize(glm::cross(shift, this->Up))));
+
+	this->updateCameraVectors();
+}
+void Camera::processMouseMovementMiddle(GLfloat xoffset, GLfloat yoffset){
+
+	yoffset *= MovementSpeed*MouseSensitivity*this->Zoom/4500.0f;
+	
+	glm::vec3 shift = this->Direction;
+
+
+	this->Position -= yoffset * shift;
 
 	this->updateCameraVectors();
 }

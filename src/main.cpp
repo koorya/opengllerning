@@ -331,10 +331,9 @@ int main(int argc, char * argv[])
 	ourShader.use();
 
 	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-   	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-//		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_world)); //model to world transform
-	model = mat_world;
+//	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+//	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+//	model = mat_world;
 
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 proj = glm::mat4(1.0f);
@@ -540,6 +539,7 @@ int main(int argc, char * argv[])
 
 
 	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
+//	guiManipulator gui_man = guiManipulator(screen);
 	
 //	guiManipulator gui_man1 = guiManipulator();
 //	guiManipulator gui_man2 = guiManipulator();
@@ -576,8 +576,8 @@ int main(int argc, char * argv[])
 
 	bool trig = false;
 
-	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
-	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
+//	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
+//	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
 
 	std::chrono::seconds time(1);
 
@@ -679,11 +679,14 @@ clflag = true;
 		ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 
 		view = my_cam.getMatrix();
+		view = view * glm::rotate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0)), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 		//ourShader.setMat4(m_mat[0]->I, "view");
 	//	ourShader.setMat4(view, "view");
 		ourShader.setFloat(glfwGetTime(), "time");
-
+//	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
+//	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width / (float)height, 0.01f, 200.0f);
+		proj = proj * glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
 	//	ourShader.setMat4(proj, "proj");
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
@@ -894,6 +897,7 @@ void do_movement()
 
 bool mouse_pressed = false;
 bool mouse_pressed_r = false;
+bool mouse_pressed_m = false;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
@@ -909,6 +913,8 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 			my_cam.processMouseMovement(-xoffset, -yoffset);
 		else
 			my_cam.processMouseMovementTranslate(-xoffset, -yoffset);
+	}else if(mouse_pressed_m){
+		my_cam.processMouseMovementMiddle(-xoffset, -yoffset);
 	}
 }
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods){
@@ -920,6 +926,10 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods){
         mouse_pressed_r = true;
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
         mouse_pressed_r = false;
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
+        mouse_pressed_m = true;
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE)
+        mouse_pressed_m = false;
 }
 
 

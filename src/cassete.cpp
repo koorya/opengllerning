@@ -83,12 +83,12 @@ GUICassete::GUICassete(nanogui::Screen * screen, ConstructionContainer * contain
     window->setPosition(Vector2i(15, 15));
     window->setLayout(new GroupLayout());
 
-	nanogui::Button * button = new nanogui::Button((nanogui::Window*)window, "pos test");
+	nanogui::Button * button = new nanogui::Button((nanogui::Window*)window, "FillUp");
 	button->setCallback([&]{
 		this->fillUp();
 	});
 
-	pos_test = new nanogui::CheckBox(window, "update");
+	pos_test = new nanogui::CheckBox(window, "pos test");
 	
 	pos_test->setCallback([&](const bool v){
 		pos_test_var = v;
