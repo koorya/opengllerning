@@ -12,7 +12,7 @@ class CasseteCell{
 public:
     CasseteCell(ConstructionContainer * container);
     void attachBond(struct BondLocation bond);
-    bool getBond(const glm::mat4 * matr);
+    bool getBond(const glm::mat4 * matr, bool pos_test = true);
     ConstructionContainer * container;
     glm::mat4 matr;
     bool noempty;
@@ -28,7 +28,8 @@ public:
     void fillUp();
     int getBond(const glm::mat4 * matr);///<этот метод будет вызываться с матрицей заклепочника манипулятора
     void updateMatrices(const glm::mat4 * parent);
-
+    protected:
+    bool pos_test_var;
 
 };
 
@@ -37,6 +38,9 @@ public:
     GUICassete(nanogui::Screen * screen, ConstructionContainer * container);
     ~GUICassete();
     void doStep();
+    int getBond(const glm::mat4 * matr, bool);
+    private:
+    nanogui::CheckBox * pos_test;
 };
 
 #endif

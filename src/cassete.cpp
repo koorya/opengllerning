@@ -12,22 +12,24 @@ void CasseteCell::attachBond(struct BondLocation bond){
 	}
 }
 
-bool CasseteCell::getBond(const glm::mat4 * matr){
+bool CasseteCell::getBond(const glm::mat4 * matr, bool pos_test){
 	std::cout<<"CasseteCell::getBond"<<std::endl;
+	std::cout<<"pos_test is "<<pos_test<<std::endl;
+
 	glm::vec4 r1(0.0f, 0.0f, 0.0f, 1.0f);
 	glm::vec4 r2(0.0f, 0.0f, 0.0f, 1.0f);
 	r1 = this->matr * r1;
 	r2 = (*matr) * r2;
 	r1 -= r2;
 	std::cout<<"glm::dot(r1, r1) "<<glm::dot(r1, r1)<<std::endl;
-	if(glm::dot(r1, r1) < 5000 && noempty){
+	if((glm::dot(r1, r1) < 5000 && noempty ) || !pos_test){
 		container->reattach(&(this->matr), matr);
 		noempty = false;
 	}
 	return noempty;
 }
 
-Cassete::Cassete(ConstructionContainer * container){
+Cassete::Cassete(ConstructionContainer * container):pos_test_var(false){
 	for(int i = 0; i<8; i++){
 		places[i] = new CasseteCell(container);
 	}
@@ -51,7 +53,7 @@ int Cassete::getBond(const glm::mat4 * matr){
 	int i;
 	for(int i = 7; i>=0; i--){
 		if(places[i]->noempty){
-			return places[i]->getBond(matr);
+			return places[i]->getBond(matr, pos_test_var);
 		}
 	}
 	return 0;
@@ -81,9 +83,17 @@ GUICassete::GUICassete(nanogui::Screen * screen, ConstructionContainer * contain
     window->setPosition(Vector2i(15, 15));
     window->setLayout(new GroupLayout());
 
-	nanogui::Button * button = new nanogui::Button((nanogui::Window*)window, "FillUp");
+	nanogui::Button * button = new nanogui::Button((nanogui::Window*)window, "pos test");
 	button->setCallback([&]{
 		this->fillUp();
+	});
+
+	pos_test = new nanogui::CheckBox(window, "update");
+	
+	pos_test->setCallback([&](const bool v){
+		pos_test_var = v;
+		std::cout<<"CALLBACK || pos_test_var "<<pos_test_var<<std::endl;
+
 	});
 	screen->performLayout();
 	
