@@ -53,6 +53,7 @@ bool keys[1024] = {false};
 using namespace nanogui;
 
 Screen *screen = nullptr;
+
 bool print_vert = false;
 
 int main(int argc, char * argv[])
@@ -121,11 +122,6 @@ int main(int argc, char * argv[])
 	screen->initialize(window, true);
 
 
-//	glfwSetKeyCallback(window, key_callback);
-//	glfwSetCursorPosCallback(window, mouse_callback);
-//	glfwSetMouseButtonCallback(window, MouseButtonCallback);
-
-//	glfwSetScrollCallback(window, scroll_callback);
 
     glfwSetCursorPosCallback(window,
             [](GLFWwindow *, double x, double y) {
@@ -189,11 +185,7 @@ int main(int argc, char * argv[])
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	Shader ourShader("../shaders/shader.vert", "../shaders/shader.frag");
-	Shader stensilShader("../shaders/shader.vert", "../shaders/stencil.frag");
-//	Shader screenShader("../shaders/screen.vert", "../shaders/screen.frag");
 	Shader skyboxShader("../shaders/skybox.vert", "../shaders/skybox.frag");
-	Shader reflectShader("../shaders/reflect.vert", "../shaders/reflect.frag");
-	Shader refractShader("../shaders/refract.vert", "../shaders/refract.frag");
 
 	GLuint uboTransform;
 	glGenBuffers(1, &uboTransform);
@@ -211,12 +203,6 @@ int main(int argc, char * argv[])
 		-1.0f, 1.0f, 0.0f, 1.0f,
 		1.0f, -1.0f, 1.0f, 0.0f};
 
-	glm::vec3 lightPositions[] = {
-		glm::vec3(1.003572f, 1.105885f, -2.825360f),
-		glm::vec3(-2.258501f, -0.766950f, -2.328455f),
-		glm::vec3(0.698238f, -0.064507f, -4.464025f),
-		glm::vec3(-0.820750f, 1.761344f, -3.465433f),
-		glm::vec3(-1.309989f, 0.969520f, -7.091900f)};
 
 	float skyboxVertices[] = {
 		// positions
@@ -331,64 +317,26 @@ int main(int argc, char * argv[])
 	ourShader.use();
 
 	glm::mat4 model = glm::mat4(1.0f);
-//	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-//	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-//	model = mat_world;
-
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 proj = glm::mat4(1.0f);
 
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f) / 10.0f, "spotLight.ambient");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "spotLight.diffuse");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "spotLight.specular");
-	ourShader.setFloat(1.0f, "spotLight.constatnt");
-	ourShader.setFloat(0.22f, "spotLight.linear");
-	ourShader.setFloat(0.2f, "spotLight.quadratic");
+	ourShader.setVec3(glm::vec3(0x10 / 255.0f, 0x10 / 255.0f, 0x10 / 255.0f) / 1.0f, "dirLight[0].ambient");
+	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight[0].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight[0].specular");
+	ourShader.setVec4(glm::vec4(1.0f, 0.0f, -1.0f, 0.0f), "dirLight[0].direction");
 
-	ourShader.setVec4(glm::vec4(my_cam.Position, 1.0f), "spotLight.position");
-	ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
-	ourShader.setFloat(glm::cos(glm::radians(90.0f)), "spotLight.cutOff");
-	ourShader.setFloat(glm::cos(glm::radians(100.0f)), "spotLight.outerCutOff");
+	ourShader.setVec3(glm::vec3(0x10 / 255.0f, 0x10 / 255.0f, 0x10 / 255.0f) / 1.0f, "dirLight[1].ambient");
+	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight[1].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight[1].specular");
+	ourShader.setVec4(glm::vec4(-0.5f, -0.5f, -1.0f, 0.0f), "dirLight[1].direction");
 
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f) / 1.0f, "dirLight.ambient");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight.diffuse");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight.specular");
-	ourShader.setVec4(glm::vec4(1.0f, -1.0f, 0.0f, 0.0f), "dirLight.direction");
+	ourShader.setVec3(glm::vec3(0x10 / 255.0f, 0x10 / 255.0f, 0x10 / 255.0f) / 1.0f, "dirLight[1].ambient");
+	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight[1].diffuse");
+	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "dirLight[1].specular");
+	ourShader.setVec4(glm::vec4(-0.5f, 0.5f, -1.0f, 0.0f), "dirLight[2].direction");
 
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0x0F / 255.0f) / 10.0f, "pointLights[0].ambient");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0x0F / 255.0f), "pointLights[0].diffuse");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0x0F / 255.0f), "pointLights[0].specular");
-	ourShader.setFloat(1.0f, "pointLights[0].constatnt");
-	ourShader.setFloat(0.22f, "pointLights[0].linear");
-	ourShader.setFloat(0.2f, "pointLights[0].quadratic");
-	ourShader.setVec4(glm::vec4(lightPositions[0], 1.0f), "pointLights[0].position");
-
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f) / 10.0f, "pointLights[1].ambient");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "pointLights[1].diffuse");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "pointLights[1].specular");
-	ourShader.setFloat(1.0f, "pointLights[1].constatnt");
-	ourShader.setFloat(0.22f, "pointLights[1].linear");
-	ourShader.setFloat(0.2f, "pointLights[1].quadratic");
-	ourShader.setVec4(glm::vec4(lightPositions[1], 1.0f), "pointLights[1].position");
-
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f) / 10.0f, "pointLights[2].ambient");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "pointLights[2].diffuse");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0xFF / 255.0f, 0xFF / 255.0f), "pointLights[2].specular");
-	ourShader.setFloat(1.0f, "pointLights[2].constatnt");
-	ourShader.setFloat(0.22f, "pointLights[2].linear");
-	ourShader.setFloat(0.2f, "pointLights[2].quadratic");
-	ourShader.setVec4(glm::vec4(lightPositions[2], 1.0f), "pointLights[2].position");
-
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0x0F / 255.0f, 0xFF / 255.0f) / 10.0f, "pointLights[3].ambient");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0x0F / 255.0f, 0xFF / 255.0f), "pointLights[3].diffuse");
-	ourShader.setVec3(glm::vec3(0xFF / 255.0f, 0x0F / 255.0f, 0xFF / 255.0f), "pointLights[3].specular");
-	ourShader.setFloat(1.0f, "pointLights[3].constatnt");
-	ourShader.setFloat(0.22f, "pointLights[3].linear");
-	ourShader.setFloat(0.2f, "pointLights[3].quadratic");
-	ourShader.setVec4(glm::vec4(lightPositions[3], 1.0f), "pointLights[3].position");
 
 	GLuint viewPosLoc = glGetUniformLocation(ourShader.Program, "viewPos");
-	GLuint obj_type_mode = glGetUniformLocation(ourShader.Program, "isLight");
 
 
 	glfwMakeContextCurrent(window);
@@ -456,119 +404,27 @@ int main(int argc, char * argv[])
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
 
-	fillUpSPProgramsArray();
-
-	BotManipulator l_m = BotManipulator(&glfwGetTime);
-	BotManipulator m_m = BotManipulator(&glfwGetTime);
-	BotManipulator r_m = BotManipulator(&glfwGetTime);
-	BondLocation bl;
-	for (int i = 1; i <= 4; i++)
-	{
-
-		bl.section = i;
-		if (i > 1)
-		{
-			bl.name = 11;
-			m_m.bond_list.push_back(bl);
-			bl.name = 10;
-			m_m.bond_list.push_back(bl);
-			bl.name = 9;
-			m_m.bond_list.push_back(bl);
-			bl.name = 7;
-			m_m.bond_list.push_back(bl);
-			bl.name = 8;
-			m_m.bond_list.push_back(bl);
-			bl.name = 6;
-			m_m.bond_list.push_back(bl);
-		}
-		bl.name = 5;
-		m_m.bond_list.push_back(bl);
-		bl.name = 4;
-		m_m.bond_list.push_back(bl);
-		bl.name = 3;
-		m_m.bond_list.push_back(bl);
-		bl.name = 2;
-		m_m.bond_list.push_back(bl);
-		bl.name = 1;
-		m_m.bond_list.push_back(bl);
-	}
-
-	for (int i = 1; i <= 4; i++)
-	{
-		bl.section = i;
-		if (i > 1)
-		{
-			bl.name = 11;
-			l_m.bond_list.push_back(bl);
-			bl.name = 9;
-			l_m.bond_list.push_back(bl);
-			bl.name = 8;
-			l_m.bond_list.push_back(bl);
-		}
-		bl.name = 5;
-		l_m.bond_list.push_back(bl);
-		bl.name = 13;
-		l_m.bond_list.push_back(bl);
-	}
-
-	for (int i = 1; i <= 4; i++)
-	{
-		bl.section = i;
-		if (i > 1)
-		{
-			bl.name = 10;
-			r_m.bond_list.push_back(bl);
-			bl.name = 7;
-			r_m.bond_list.push_back(bl);
-			bl.name = 6;
-			r_m.bond_list.push_back(bl);
-		}
-		bl.name = 4;
-		r_m.bond_list.push_back(bl);
-		bl.name = 12;
-		r_m.bond_list.push_back(bl);
-	}
-
-
-
-	//  RemoteManipulator remote_man = RemoteManipulator(1);
-//	  RemoteManipulator remote_man1 = RemoteManipulator(2);
-//	  RemoteManipulator remote_man2 = RemoteManipulator(3);
-
-
-
-
-	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
-//	guiManipulator gui_man = guiManipulator(screen);
-	
-//	guiManipulator gui_man1 = guiManipulator();
-//	guiManipulator gui_man2 = guiManipulator();
-
+//	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
+	guiManipulator gui_man = guiManipulator(screen);
 
 	glfwSetWindowPos(window, 50, 100);
 
-//	 glfwSetWindowPos(gui_man.glfwWindow(), 900, 50);
-	// glfwSetWindowPos(gui_man1.glfwWindow(), 1200, 50);
-	// glfwSetWindowPos(gui_man2.glfwWindow(), 1500, 50);
 
 	Manipulator *m_mat[3] = {&gui_man, NULL, NULL};
-//	Manipulator *m_mat[3] = {&remote_man, &remote_man1, &remote_man2};
-//	m_mat[0]->config.rail.value = 3000.0;
-//	m_mat[2]->config.rail.value = 6000.0;
 
 	glfwMakeContextCurrent(window);
+
 	ConstructionContainer constr_container = ConstructionContainer(&my_cl_cont);
 
 	m_mat[0]->container = &constr_container;
 //	m_mat[1]->container = &constr_container;
 //	m_mat[2]->container = &constr_container;
 
-//	guiMainFrame f_mat;
 
 	MainFrame f_mat;
 
 	GUICassete my_cassete(screen, &constr_container);
-//	my_cassete.fillUp();
+	my_cassete.fillUp();
 	my_cassete.updateMatrices(&(f_mat.rail2));
 	m_mat[0]->cassete = &my_cassete;
 //	m_mat[1]->cassete = &my_cassete;
@@ -576,8 +432,6 @@ int main(int argc, char * argv[])
 
 	bool trig = false;
 
-//	my_cam.Direction = glm::vec3(0.755312, -0.197657, -0.624849);
-//	my_cam.Position = glm::vec3(-6.934844, -1.400352, 6.606244);
 
 	std::chrono::seconds time(1);
 
@@ -675,39 +529,26 @@ clflag = true;
 
 		glUniform3fv(viewPosLoc, 1, glm::value_ptr(my_cam.getCamPos()));
 
-		ourShader.setVec4(glm::vec4(my_cam.Position + glm::vec3(1.0, 0.0, 1.0), 1.0f), "spotLight.position");
-		ourShader.setVec4(glm::vec4(my_cam.Direction, 0.0f), "spotLight.direction");
 
 		view = my_cam.getMatrix();
 		view = view * glm::rotate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0)), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-		//ourShader.setMat4(m_mat[0]->I, "view");
-	//	ourShader.setMat4(view, "view");
 		ourShader.setFloat(glfwGetTime(), "time");
-//	glm::mat4 mat_world = glm::scale(glm::mat4(1.0f), glm::vec3(0.002));
-//	mat_world = glm::rotate(mat_world, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 		proj = glm::perspective(glm::radians(my_cam.getZoom()), (float)width / (float)height, 0.01f, 200.0f);
 		proj = proj * glm::scale(glm::mat4(1.0f), glm::vec3(0.002f));
-	//	ourShader.setMat4(proj, "proj");
 
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(model));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(proj));
 		glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-		// glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(glm::rotate(m_mat[0]->I,
-		// 																							glm::radians(-90.0f), glm::vec3(0.0, 1.0, 0.0))));
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClearColor(0.1f, 0.2f, 0.1f, 1.0f);
 		glStencilMask(0xFF);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glStencilMask(0x00);
 
 		ourShader.use();
 
-		glUniform1i(obj_type_mode, -1);
-
 		constr_container.drawElements(ourShader);
 
-		ourShader.setMaterial(Material::silver);
 		main_frame_gl.setMatrixByID(0, f_mat.A);
 		main_frame_cl.setMatrixByID(0, f_mat.A);
 		main_frame_gl.Draw(ourShader, 1);
@@ -718,114 +559,80 @@ clflag = true;
 
 		my_rf_cont.Draw(ourShader);
 
-//		my_cube.Draw(ourShader, 1);
-		// ourShader.setMaterial(Material::yellow_plastic);
-		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B1));
-		// rail.Draw(ourShader);
-		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B2));
-		// rail.Draw(ourShader);
-		// glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mat_B3));
-		// rail.Draw(ourShader);
-/////
-		ourShader.setMaterial(Material::green_plastic);
 		carrige.setMatrixByID(0, m_mat[0]->C);
 	//	carrige.setMatrixByID(1, m_mat[1]->C);
 	//	carrige.setMatrixByID(2, m_mat[2]->C);
 		carrige.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::black_plastic);
 		tower_frame.setMatrixByID(0, m_mat[0]->D);
 	//	tower_frame.setMatrixByID(1, m_mat[1]->D);
 	//	tower_frame.setMatrixByID(2, m_mat[2]->D);
 		tower_frame.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::white_plastic);
 		tower_box.setMatrixByID(0, m_mat[0]->D);
 	//	tower_box.setMatrixByID(1, m_mat[1]->D);
 	//	tower_box.setMatrixByID(2, m_mat[2]->D);
 		tower_box.Draw(ourShader, 1);
 
 		//pantograph
-		ourShader.setMaterial(Material::yellow_plastic);
 		pb1.setMatrixByID(0, m_mat[0]->pb1);
 	//	pb1.setMatrixByID(1, m_mat[1]->pb1);
 	//	pb1.setMatrixByID(2, m_mat[2]->pb1);
 		pb1.Draw(ourShader, 1);
 
-		// ourShader.setMaterial(Material::green_plastic);
 		pb2.setMatrixByID(0, m_mat[0]->pb2);
 	//	pb2.setMatrixByID(1, m_mat[1]->pb2);
 	//	pb2.setMatrixByID(2, m_mat[2]->pb2);
 		pb2.Draw(ourShader, 1);
 
-		// ourShader.setMaterial(Material::green_plastic);
 		pb3.setMatrixByID(0, m_mat[0]->pb3);
 	//	pb3.setMatrixByID(1, m_mat[1]->pb3);
 	//	pb3.setMatrixByID(2, m_mat[2]->pb3);
 		pb3.Draw(ourShader, 1);
 
-		// ourShader.setMaterial(Material::green_plastic);
 		pb4.setMatrixByID(0, m_mat[0]->pb4);
 	//	pb4.setMatrixByID(1, m_mat[1]->pb4);
 	//	pb4.setMatrixByID(2, m_mat[2]->pb4);
 		pb4.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::green_plastic);
 		bond_rail.setMatrixByID(0, m_mat[0]->E1);
 	//	bond_rail.setMatrixByID(1, m_mat[1]->E1);
 	//	bond_rail.setMatrixByID(2, m_mat[2]->E1);
 		bond_rail.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::red_plastic);
 		bond_carrige.setMatrixByID(0, m_mat[0]->F1);
 	//	bond_carrige.setMatrixByID(1, m_mat[1]->F1);
 	//	bond_carrige.setMatrixByID(2, m_mat[2]->F1);
 		bond_carrige.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::green_plastic);
 		bond_wrist.setMatrixByID(0, m_mat[0]->G1);
 	//	bond_wrist.setMatrixByID(1, m_mat[1]->G1);
 	//	bond_wrist.setMatrixByID(2, m_mat[2]->G1);
 		bond_wrist.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::yellow_plastic);
 		bond_handler_middle.setMatrixByID(0, m_mat[0]->H);
 	//	bond_handler_middle.setMatrixByID(1, m_mat[1]->H);
 	//	bond_handler_middle.setMatrixByID(2, m_mat[2]->H);
 		bond_handler_middle.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::red_plastic);
-//		bond_handler_left.setMatrixByID(0, m_mat[0]->H);
-//		bond_handler_left.setMatrixByID(1, m_mat[1]->H);
-//		bond_handler_left.setMatrixByID(2, m_mat[2]->H);
-//		bond_handler_left.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::red_plastic);
-//		bond_handler_right.setMatrixByID(0, m_mat[0]->H);
-//		bond_handler_right.setMatrixByID(1, m_mat[1]->H);
-//		bond_handler_right.setMatrixByID(2, m_mat[2]->H);
-//		bond_handler_right.Draw(ourShader, 1);
 
 		//pantograph column
-		ourShader.setMaterial(Material::yellow_plastic);
 		pc1.setMatrixByID(0, m_mat[0]->pc1);
 	//	pc1.setMatrixByID(1, m_mat[1]->pc1);
 	//	pc1.setMatrixByID(2, m_mat[2]->pc1);
 		pc1.Draw(ourShader, 1);
 
-		// ourShader.setMaterial(Material::green_plastic);
 		pc2.setMatrixByID(0, m_mat[0]->pc2);
 	//	pc2.setMatrixByID(1, m_mat[1]->pc2);
 	//	pc2.setMatrixByID(2, m_mat[2]->pc2);
 		pc2.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::green_plastic);
 		column_rail.setMatrixByID(0, m_mat[0]->E2);
 	//	column_rail.setMatrixByID(1, m_mat[1]->E2);
 	//	column_rail.setMatrixByID(2, m_mat[2]->E2);
 		column_rail.Draw(ourShader, 1);
 
-		ourShader.setMaterial(Material::red_plastic);
 		column_carrige.setMatrixByID(0, m_mat[0]->F2);
 	//	column_carrige.setMatrixByID(1, m_mat[1]->F2);
 	//	column_carrige.setMatrixByID(2, m_mat[2]->F2);
@@ -842,19 +649,9 @@ clflag = true;
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glDepthMask(GL_TRUE);
 
-		// glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		// screenShader.use();
-		// glDisable(GL_DEPTH_TEST);
-		// glClear(GL_COLOR_BUFFER_BIT);
-		// glBindVertexArray(screen_vao);
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-		// glDrawArrays(GL_TRIANGLES, 0, 6);
-		// glBindVertexArray(0);
 
 
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-//        screen->drawContents();
         screen->drawWidgets();
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);

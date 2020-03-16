@@ -22,12 +22,11 @@ uniform float time;
 void main(){
 	
 	texPos = texture;
-	float phase;
-	mat4 instance_mat_ = mat4(1.0);
-	mat4 model_ = model * instance_mat ;
+
+	mat4 model_ = view * model * instance_mat ;
 	vec4 pos = model_ * vec4(position, 1.0f) ;
 
 	fragPos = pos.xyz;
-	gl_Position =  proj * view * pos;
+	gl_Position =  proj * pos;
 	vertexNormal = vec3(model_ * vec4(normal, 0.0f));
 }
