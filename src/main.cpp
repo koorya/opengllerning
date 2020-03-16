@@ -341,6 +341,54 @@ int main(int argc, char * argv[])
 
 	glfwMakeContextCurrent(window);
 
+#define light_model_
+#ifdef light_model
+
+	Model girl = Model("../3D_models/sphere.obj", 1);
+	Model nanosuit = Model("../3D_models/sphere.obj", 1);
+	
+	
+
+//	Model main_frame("../3D_models/stl_components/main_frame.stl", 1);
+//	Model main_frame("../3D_models/stend_mm_inventor_blender.obj", 1);
+	Model my_sphere("../3D_models/sphere.obj", 1);
+	Model my_dr_cube("../3D_models/cube_cil.obj", 1);
+//	print_vert = true;
+	Model my_cube("../3D_models/sphere.obj", 1, &my_cl_cont);
+//	print_vert = false;
+	 Model main_frame_cl("../3D_models/sphere.obj", 1, &my_cl_cont);
+	 Model main_frame_gl("../3D_models/sphere.obj", 1);
+//	Model main_frame("../3D_models/obj/manipulator/Pc2.obj", 1, &my_cl_cont);
+	Model cassete_cl("../3D_models/sphere.obj", 1, &my_cl_cont);
+	Model cassete_gl("../3D_models/sphere.obj", 1);
+
+//	Model cassete("../3D_models/obj/manipulator/Pc1.obj", 1);
+	Model tower_frame("../3D_models/sphere.obj", 3);				 //tower frame
+	
+	Model tower_box("../3D_models/sphere.obj", 3, &my_cl_cont);					 //tower box
+	Model carrige("../3D_models/sphere.obj", 3);				 // carrige
+	Model rail("../3D_models/sphere.obj", 3);						 //rail
+	Model bond_wrist("../3D_models/sphere.obj", 3);						 //bond wrist
+	Model bond_carrige("../3D_models/sphere.obj", 3);						 //bond carrige
+	Model bond_rail("../3D_models/sphere.obj", 3);			 //bond rail
+	Model column_rail("../3D_models/sphere.obj", 3);				 //column rail
+	Model column_carrige("../3D_models/sphere.obj", 3);				 //column carrige
+	// Model bond_handler_middle("../3D_models/obj/manipulator/Bond Handler Middle.obj", 3); //bond handler middle
+	// Model bond_handler_left("../3D_models/obj/manipulator/Bond Handler Left.obj", 3);	 //bond handlre left
+	// Model bond_handler_right("../3D_models/obj/manipulator/Bond Handler Right.obj", 3);   //bond handler right
+	Model bond_handler_middle("../3D_models/sphere.obj", 3, &my_cl_cont);   //bond handler right
+//	Model bond_handler_middle("../3D_models/cube_cil.obj", 3, context, kernel);   //bond handler right
+
+	Model pb1("../3D_models/sphere.obj", 3); //bond pantograph section 1
+	Model pb2("../3D_models/sphere.obj", 3); //bond pantograph section 2
+	Model pb3("../3D_models/sphere.obj", 3); //bond pantograph section 3
+	Model pb4("../3D_models/sphere.obj", 3); //bond pantograph section 4
+
+	Model pc1("../3D_models/sphere.obj", 3); //column pantograph section 1
+	Model pc2("../3D_models/sphere.obj", 3); //column pantograph section 2
+
+#else
+
 	Model girl = Model("../3D_models/slim girl/slim girl.obj", 1);
 	Model nanosuit = Model("../3D_models/nanosuit/nanosuit.obj", 1);
 	
@@ -385,6 +433,7 @@ int main(int argc, char * argv[])
 	Model pc2("../3D_models/obj/manipulator/Pc2.obj", 3); //column pantograph section 2
 
 
+#endif
 
 
 
@@ -404,8 +453,8 @@ int main(int argc, char * argv[])
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uboTransform);
 
-//	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
-	guiManipulator gui_man = guiManipulator(screen);
+	guiRemoteManipulator gui_man = guiRemoteManipulator(screen, 1);
+//	guiManipulator gui_man = guiManipulator(screen);
 
 	glfwSetWindowPos(window, 50, 100);
 
@@ -437,7 +486,7 @@ int main(int argc, char * argv[])
 
 	bool clflag = false;
 
-
+	screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Minimum, 0, 0));
 	screen->performLayout();
 
 
