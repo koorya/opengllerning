@@ -15,15 +15,15 @@ void Rangefinder::calcProp(){
 		return;
 	glm::vec3 my_glm_origin;
 	my_glm_origin = (*mat) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	origin.v4[0] = my_glm_origin.x;
-	origin.v4[1] = my_glm_origin.y;
-	origin.v4[2] = my_glm_origin.z;
+	origin.s[0] = my_glm_origin.x;
+	origin.s[1] = my_glm_origin.y;
+	origin.s[2] = my_glm_origin.z;
 
 	glm::vec3 my_glm_dir;
 	my_glm_dir = (*mat) * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-	dir.v4[0] = my_glm_dir.x;
-	dir.v4[1] = my_glm_dir.y;
-	dir.v4[2] = my_glm_dir.z;
+	dir.s[0] = my_glm_dir.x;
+	dir.s[1] = my_glm_dir.y;
+	dir.s[2] = my_glm_dir.z;
 
 }
 
@@ -96,17 +96,17 @@ void RangefindersContainer::computeRays(){
 				ret = _ret;
 		}
 		(*ray).distance = ret;
-		ray_vertices[i*6] 	= (*ray).origin.v4[0];
-		ray_vertices[i*6+1] = (*ray).origin.v4[1];
-		ray_vertices[i*6+2] = (*ray).origin.v4[2];
+		ray_vertices[i*6] 	= (*ray).origin.s[0];
+		ray_vertices[i*6+1] = (*ray).origin.s[1];
+		ray_vertices[i*6+2] = (*ray).origin.s[2];
 		if(ret > 0){
-			ray_vertices[i*6+3] = (*ray).origin.v4[0] + (*ray).dir.v4[0]*ret;
-			ray_vertices[i*6+4] = (*ray).origin.v4[1] + (*ray).dir.v4[1]*ret;
-			ray_vertices[i*6+5] = (*ray).origin.v4[2] + (*ray).dir.v4[2]*ret;
+			ray_vertices[i*6+3] = (*ray).origin.s[0] + (*ray).dir.s[0]*ret;
+			ray_vertices[i*6+4] = (*ray).origin.s[1] + (*ray).dir.s[1]*ret;
+			ray_vertices[i*6+5] = (*ray).origin.s[2] + (*ray).dir.s[2]*ret;
 		}else{
-			ray_vertices[i*6+3] = (*ray).origin.v4[0] + (*ray).dir.v4[0]*5000;
-			ray_vertices[i*6+4] = (*ray).origin.v4[1] + (*ray).dir.v4[1]*5000;
-			ray_vertices[i*6+5] = (*ray).origin.v4[2] + (*ray).dir.v4[2]*5000;
+			ray_vertices[i*6+3] = (*ray).origin.s[0] + (*ray).dir.s[0]*5000;
+			ray_vertices[i*6+4] = (*ray).origin.s[1] + (*ray).dir.s[1]*5000;
+			ray_vertices[i*6+5] = (*ray).origin.s[2] + (*ray).dir.s[2]*5000;
 		}
 		sphere->setMatrixByID(i, (*ray).get_intersect_mat());
 	}
