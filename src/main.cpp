@@ -493,12 +493,14 @@ int main(int argc, char * argv[])
 
 
 
-	guiRangefindersContainer my_rf_cont = guiRangefindersContainer(screen);
+	guisqlRangefinderContainer my_rf_cont = guisqlRangefinderContainer(screen);
 	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder1));
 	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder2));
 	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder3));
 	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder4));
 //	my_rf_cont.addRangefinder(&(m_mat[0]->rangefinder5));
+
+	gui_man.rf_cont = &my_rf_cont;
 
 	my_rf_cont.addTarget(&cassete_cl);
 	my_rf_cont.addTarget(&constr_container);

@@ -159,3 +159,20 @@ void guiRangefindersContainer::computeRays(){
 	}
 }
 
+sqlRangefindersContainer::sqlRangefindersContainer(){
+//создать подключение к бд
+
+}
+void sqlRangefindersContainer::updateBD(){
+//создать поток который бы обновил данные в бд
+	
+}
+
+guisqlRangefinderContainer::guisqlRangefinderContainer(nanogui::Screen * screen, int max_cnt) : guiRangefindersContainer(screen, max_cnt){
+
+}
+
+void guisqlRangefinderContainer::computeRays(){
+	guiRangefindersContainer::computeRays();
+	sqlRangefindersContainer::updateBD();
+}

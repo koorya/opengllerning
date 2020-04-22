@@ -2,6 +2,7 @@
 #define REMOTE_MANIPULATOR
 
 #include "manipulator.h"
+#include "rangefinder.h"
 #include <mysql.h>
 #include <mutex>
 #include <thread>
@@ -13,6 +14,7 @@ public:
 	void resetConfiguration();
 	void doStep();
 	void updateManipConfig();
+	RangefindersContainer * rf_cont;
 
 protected:
 	bool destroy_flag;
@@ -29,6 +31,7 @@ private:
 	std::string SQL_query;
 	struct ManipulatorConfig config_rec;
 	std::mutex * recieve_data;/// < блокирует обновление данных, пока происходит пересчет матриц
+	unsigned int manip_id;
 };
 
 

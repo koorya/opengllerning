@@ -1,7 +1,7 @@
 
 #include "remote_manipulator.h"
 
-RemoteManipulator::RemoteManipulator(unsigned int manip_id){
+RemoteManipulator::RemoteManipulator(unsigned int manip_id): manip_id(manip_id), rf_cont(NULL){
 	std::cout<<"RemoteManipulator()"<<std::endl;
 	SQL_query = "SELECT kareta, tower, link_pantograph, column_pantograph, link_carige, column_carrige, wrist, link_rotation, stick_in_hand \
 	 FROM configuration_new WHERE id=";
@@ -50,7 +50,18 @@ void RemoteManipulator::updateManipConfig(){
 
 	MYSQL_RES * res;
 	MYSQL_ROW row;
+	if(rf_cont != NULL)
+	{
+		std::string SQL_query_upd = "UPDATE sensors SET sensor1 = "+std::to_string(rf_cont->rangef_list[0].distance)
+			+", sensor2 =  "+std::to_string(rf_cont->rangef_list[1].distance)
+			+", sensor3 =  "+std::to_string(rf_cont->rangef_list[2].distance)
+			+", sensor4 =  "+std::to_string(rf_cont->rangef_list[3].distance)+
+			" WHERE id=" + std::to_string(manip_id);
+		mysql_query(conn, SQL_query_upd.c_str());
+		res = mysql_store_result(conn);
+	}
 	mysql_query(conn, SQL_query.c_str()); 
+	
 
 	if (res = mysql_store_result(conn))
 	{
