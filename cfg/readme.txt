@@ -1,0 +1,1 @@
+This directory consists platform compatible configs

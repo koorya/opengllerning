@@ -18,9 +18,16 @@ add_definitions(-DNANOGUI_GLAD)
 #target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/build/ext/glad/include")
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC /usr/include/mariadb)
-set(OPENCL_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2")
+
+set(OPENCL_DIR "C:/Program Files (x86)/AMD APP SDK/3.0")
+set(OPENCL_LIB "${OPENCL_DIR}/lib/x86/OpenCL.lib")
+if(NOT EXISTS ${OPENCL_DIR})
+    set(OPENCL_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2")
+    set(OPENCL_LIB "${OPENCL_DIR}/lib/x64/OpenCL.lib")
+endif()
+
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${OPENCL_DIR}/include")
-target_link_libraries(${CMAKE_PROJECT_NAME} "${OPENCL_DIR}/lib/x64/OpenCL.lib")
+target_link_libraries(${CMAKE_PROJECT_NAME} "${OPENCL_DIR}/lib/x86/OpenCL.lib")
 
 #target_link_libraries(${CMAKE_PROJECT_NAME} dl)
 target_link_libraries(${CMAKE_PROJECT_NAME} pthread)
