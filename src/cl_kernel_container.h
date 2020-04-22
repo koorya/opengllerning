@@ -29,7 +29,7 @@ class Ray{
 
 class RayTarget{
 	public:
-	virtual float computeRay(const Ray * ray, int inst_cntinst_cnt = 1);
+	virtual float computeRay(const Ray * ray, int inst_cntinst_cnt = 1) = 0;
 };
 
 class clKernelsContainer{

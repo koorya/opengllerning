@@ -1,4 +1,6 @@
 /build
 /3D_models
 /textures
-./vscode
+/.vscode
+/cfg/*
+!/cfg/readme.txt

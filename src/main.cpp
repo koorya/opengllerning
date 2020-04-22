@@ -70,7 +70,8 @@ int main(int argc, char * argv[])
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+
 	bool FULL_SCREEN = false;
 	int mon_numb = 0;
 	if(argc>1){
@@ -92,8 +93,7 @@ int main(int argc, char * argv[])
 	}else{
 		window = glfwCreateWindow(1200, 800, "Демо манипулятора с ручным управлением", nullptr, nullptr);
 	}
-	glfwShowWindow(window);
-
+	
 
 	if (window == nullptr)
 	{
@@ -112,9 +112,11 @@ int main(int argc, char * argv[])
 
 
 
-	
+	std::cout<<"before clKernelsContainer"<<std::endl;
 	clKernelsContainer my_cl_cont = clKernelsContainer();
+	std::cout<<"after clKernelsContainer"<<std::endl;
 
+	
 
 
 	screen = new Screen();
@@ -502,6 +504,7 @@ int main(int argc, char * argv[])
 	my_rf_cont.addTarget(&constr_container);
 	my_rf_cont.addTarget(&main_frame_cl);
 
+	glfwShowWindow(window);
 
 	while (!glfwWindowShouldClose(window))
 	{

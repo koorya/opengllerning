@@ -2,18 +2,55 @@
 #include "cl_kernel_container.h"
 
 #include <glad/glad.h>
-
+#include <fstream>
 
 Ray::Ray(){
 
 }
 
+int read_cfg(){
+	int pl_index = -1;
+	std::ifstream f("../cfg/cl_cfg.txt");
+	if(f.good()){
+		
+		f>>pl_index;
+		f.close();
+	}
+	return pl_index;
+}
+
 clKernelsContainer::clKernelsContainer(){
+	
 	cl_platform_id platform_id;
 	cl_uint ret_num_platforms;
 	/* получить доступные платформы */
-	int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-	std::cout<<ret<<std::endl;
+	int ret = clGetPlatformIDs(0, NULL, &ret_num_platforms);
+	std::cout<<"clGetPlatformIDs "<<ret<<std::endl;
+	std::cout<<"ret_num_platforms "<<ret_num_platforms<<std::endl;
+
+	int pl_index = read_cfg();
+	std::vector <cl_platform_id>  platform_ids(ret_num_platforms);
+	clGetPlatformIDs(ret_num_platforms, platform_ids.data(), NULL);
+	if(pl_index < 0){
+		std::cout << "Select platform"<<std::endl;
+		for(int i = 0; i < ret_num_platforms; i++){
+			size_t st_size;
+			clGetPlatformInfo(platform_ids[i], CL_PLATFORM_NAME, 0, NULL, &st_size);
+			std::vector<char> name(st_size);
+			clGetPlatformInfo(platform_ids[i], CL_PLATFORM_NAME, st_size, name.data(), NULL);
+			std::cout<<i<<" : "<< name.data() << std::endl;
+		}
+		
+		std::cin>>pl_index;
+		if(pl_index >= ret_num_platforms)
+			pl_index = 0;
+		if(pl_index < 0)
+			pl_index = 0;
+		std::ofstream f("../cfg/cl_cfg.txt");
+		f<<pl_index;
+		f.close();
+	}
+	platform_id = platform_ids[pl_index];
 
 	cl_context_properties prop[] = {
 		CL_CONTEXT_PLATFORM, 	(cl_context_properties) platform_id,
@@ -22,21 +59,27 @@ clKernelsContainer::clKernelsContainer(){
 		0
 	};
 
+	std::cout<<"wglGetCurrentDC "<<wglGetCurrentDC()<<"; "<<"wglGetCurrentContext "<<wglGetCurrentContext()<<std::endl;
+
 	cl_device_id device_id;
 	cl_uint ret_num_devices;
 	/* получить доступные устройства */
 	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
-	std::cout<<ret<<std::endl;
+	std::cout<<"clGetDeviceIDs "<<ret<<std::endl;
+	std::cout<<"device_id = "<<device_id<<"; ret_num_devices = "<<ret_num_devices<<std::endl;
 
 
-
+	
 	/* создать контекст */
+	
 	context = clCreateContext(prop, 1, &device_id, NULL, NULL, &ret);
-	std::cout<<ret<<std::endl;
+	if(ret == CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR)
+		std::cout<<"clCreateContext err::CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR"<<std::endl;
+	std::cout<<"clCreateContext "<<ret<<std::endl;
 
 	/* создаем команду */
 	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-	std::cout<<ret<<std::endl;
+	std::cout<<"clCreateCommandQueue "<<ret<<std::endl;
 
 	cl_program program = NULL;
 	intersect_kernel = NULL;
@@ -62,7 +105,7 @@ clKernelsContainer::clKernelsContainer(){
 	const char * cl_src_code = cl_src.c_str();
 	const size_t src_size = cl_src.length();
 	program = clCreateProgramWithSource(context, 1, (const char **)&cl_src_code, (const size_t *)&src_size, &ret);
-	std::cout<<ret<<std::endl;
+	std::cout<<"clCreateProgramWithSource "<<ret<<std::endl;
 
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
 	std::cout<<"clBuildProgram "<<ret<<std::endl;
